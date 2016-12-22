@@ -7,6 +7,8 @@ import SafariServices
 class BraveBrowserViewController : BrowserViewController {
     var historySwiper = HistorySwiper()
 
+    var syncWebView:SyncWebView?
+
     override func applyTheme(themeName: String) {
         super.applyTheme(themeName)
 
@@ -29,6 +31,13 @@ class BraveBrowserViewController : BrowserViewController {
         }
 
         RunOnceAtStartup.ran = true
+
+        if syncWebView == nil {
+            syncWebView = SyncWebView()
+            addChildViewController(syncWebView!)
+            view.addSubview(syncWebView!.view)
+            syncWebView!.didMoveToParentViewController(self)
+        }
     }
 
     override func viewWillAppear(animated: Bool) {
