@@ -16,6 +16,7 @@ protocol BrowserToolbarProtocol {
     var shareButton: UIButton { get }
     var forwardButton: UIButton { get }
     var backButton: UIButton { get }
+    var addTabButton: UIButton { get }
     var actionButtons: [UIButton] { get }
 
     func updateBackStatus(canGoBack: Bool)
@@ -51,21 +52,20 @@ public class BrowserToolbarHelper: NSObject {
         super.init()
 
         toolbar.backButton.setImage(UIImage(named: "back"), forState: .Normal)
-        //toolbar.backButton.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
         toolbar.backButton.accessibilityLabel = Strings.Back
         toolbar.backButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickBack), forControlEvents: UIControlEvents.TouchUpInside)
 
         toolbar.forwardButton.setImage(UIImage(named: "forward"), forState: .Normal)
-        //toolbar.forwardButton.setImage(UIImage(named: "forwardPressed"), forState: .Highlighted)
         toolbar.forwardButton.accessibilityLabel = Strings.Forward
         toolbar.forwardButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickForward), forControlEvents: UIControlEvents.TouchUpInside)
 
         toolbar.shareButton.setImage(UIImage(named: "send"), forState: .Normal)
-#if !BRAVE // we use the default press state for now. 
-        toolbar.shareButton.setImage(UIImage(named: "sendPressed"), forState: .Highlighted)
-#endif
         toolbar.shareButton.accessibilityLabel = Strings.Share
         toolbar.shareButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickShare), forControlEvents: UIControlEvents.TouchUpInside)
+        
+        toolbar.addTabButton.setImage(UIImage(named: "add"), forState: .Normal)
+        toolbar.addTabButton.accessibilityLabel = Strings.Add_Tab
+        toolbar.addTabButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickAddTab), forControlEvents: UIControlEvents.TouchUpInside)
 
         setTintColor(buttonTintColor, forButtons: toolbar.actionButtons)
     }
@@ -81,14 +81,28 @@ public class BrowserToolbarHelper: NSObject {
     func SELdidClickForward() {
         toolbar.browserToolbarDelegate?.browserToolbarDidPressForward(toolbar, button: toolbar.forwardButton)
     }
+    
+    func SELdidClickAddTab() {
+        telemetry(action: "add tab", props: ["bottomToolbar": "true"])
+        let app = UIApplication.sharedApplication().delegate as! AppDelegate
+        let isPrivate = PrivateBrowsing.singleton.isOn
+        if isPrivate {
+            app.tabManager.addTabAndSelect(nil, configuration: nil, isPrivate: true)
+        } else {
+            app.tabManager.addTabAndSelect()
+        }
+        app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
+    }
 }
 
 class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     weak var browserToolbarDelegate: BrowserToolbarDelegate?
 
-    let shareButton: UIButton
-    let forwardButton: UIButton
-    let backButton: UIButton
+    let shareButton = UIButton()
+    let forwardButton = UIButton()
+    let backButton = UIButton()
+    let addTabButton = UIButton()
+    
     let actionButtons: [UIButton]
 
     var stopReloadButton: UIButton {
@@ -114,20 +128,14 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     // This has to be here since init() calls it
     override init(frame: CGRect) {
-        // And these have to be initialized in here or the compiler will get angry
-        backButton = UIButton()
-        backButton.accessibilityIdentifier = "BrowserToolbar.backButton"
-        forwardButton = UIButton()
-        forwardButton.accessibilityIdentifier = "BrowserToolbar.forwardButton"
-        shareButton = UIButton()
-        shareButton.accessibilityIdentifier = "BrowserToolbar.shareButton"
-        actionButtons = [backButton, forwardButton, shareButton]
+        
+        actionButtons = [backButton, forwardButton, shareButton, addTabButton]
 
         super.init(frame: frame)
 
         self.helper = BrowserToolbarHelper(toolbar: self)
 
-        addButtons(backButton, forwardButton, shareButton)
+        addButtons(backButton, forwardButton, shareButton, addTabButton)
 
         accessibilityNavigationStyle = .Combined
         accessibilityLabel = Strings.Navigation_Toolbar
