@@ -44,7 +44,7 @@ public class BrowserToolbarHelper: NSObject {
     }
 
     private func setTintColor(color: UIColor, forButtons buttons: [UIButton]) {
-      buttons.forEach { $0.tintColor = UIColor.greenColor() }
+      buttons.forEach { $0.tintColor = color }
     }
 
     init(toolbar: BrowserToolbarProtocol) {
