@@ -135,7 +135,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
         self.helper = BrowserToolbarHelper(toolbar: self)
 
-        addButtons(backButton, forwardButton, shareButton, addTabButton)
+        addButtons(actionButtons)
 
         accessibilityNavigationStyle = .Combined
         accessibilityLabel = Strings.Navigation_Toolbar
