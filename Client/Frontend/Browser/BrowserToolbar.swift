@@ -103,7 +103,9 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     let backButton = UIButton()
     let addTabButton = UIButton()
     
-    let actionButtons: [UIButton]
+    lazy var actionButtons: [UIButton] = {
+        return [self.shareButton, self.forwardButton, self.backButton, self.addTabButton]
+    }()
 
     var stopReloadButton: UIButton {
         get {
@@ -128,9 +130,6 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     // This has to be here since init() calls it
     override init(frame: CGRect) {
-        
-        actionButtons = [backButton, forwardButton, shareButton, addTabButton]
-
         super.init(frame: frame)
 
         self.helper = BrowserToolbarHelper(toolbar: self)
