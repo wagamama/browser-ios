@@ -63,11 +63,8 @@ class ButtonWithUnderlayView : UIButton {
     }
 
     func setStarImageBookmarked(on: Bool) {
-        if on {
-            starView.image = UIImage(named: "listpanel_bookmarked_star")!.imageWithRenderingMode(.AlwaysOriginal)
-        } else {
-            starView.image = UIImage(named: "listpanel_notbookmarked_star")!.imageWithRenderingMode(.AlwaysTemplate)
-        }
+        let starName = on ? "listpanel_bookmarked_star" : "listpanel_notbookmarked_star"
+        starView.image = UIImage(named: starName)!.imageWithRenderingMode(.AlwaysOriginal)
     }
 }
 
