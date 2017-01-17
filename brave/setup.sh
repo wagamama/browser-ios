@@ -32,3 +32,5 @@ echo GENERATED_BUILD_ID=`date +"%y.%m.%d.%H"` >> xcconfig/local-def.xcconfig
 
 npm update
 
+node -e "require('./node_modules/ad-block/lib/regions.js').forEach((x) =>{ if (x.lang) {console.log(x.lang + ',' + x.uuid)} } )" > adblock-regions.txt
+
