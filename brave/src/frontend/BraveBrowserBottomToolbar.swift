@@ -94,9 +94,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
     }
 
     func setAlphaOnAllExceptTabButton(alpha: CGFloat) {
-        for item in [addTabButton, backButton, forwardButton, shareButton] {
-            item.alpha = alpha
-        }
+        actionButtons.forEach { $0.alpha = alpha }
     }
 
     func onClickShowTabs() {
