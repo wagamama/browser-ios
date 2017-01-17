@@ -106,15 +106,8 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         setAlphaOnAllExceptTabButton(1.0)
     }
 
-    // TODO find a way to do this properly with themes.
-    func styleHacks() {
-        tabsButton.labelBackground.backgroundColor = BraveUX.ActionButtonTintColor
-    }
-
     override func updateConstraints() {
         super.updateConstraints()
-
-        styleHacks()
 
         func common(make: ConstraintMaker, bottomInset: Int = 0) {
             make.top.equalTo(self)
