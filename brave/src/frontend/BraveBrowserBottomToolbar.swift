@@ -39,14 +39,6 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         return tabsButton
     }()
 
-    lazy var addTabButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(named: "add"), forState: .Normal)
-        button.accessibilityLabel = Strings.Add_Tab
-        button.addTarget(self, action: #selector(BraveBrowserBottomToolbar.onClickAddTab), forControlEvents: UIControlEvents.TouchUpInside)
-        return button
-    }()
-
     var leftSpacer = UIView()
     var rightSpacer = UIView()
 
@@ -67,8 +59,6 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         bringSubviewToFront(backButton)
         bringSubviewToFront(forwardButton)
 
-        addSubview(addTabButton)
-
         addSubview(leftSpacer)
         addSubview(rightSpacer)
         rightSpacer.userInteractionEnabled = false
@@ -80,7 +70,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         if let img = backButton.imageView?.image {
             backButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
         }
-
+        
         var theme = Theme()
         theme.buttonTintColor = BraveUX.ActionButtonTintColor
         theme.backgroundColor = UIColor.clearColor()
@@ -101,18 +91,6 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         tabsCount = count
         URLBarView.updateTabCount(instance.tabsButton,
                                   clonedTabsButton: &instance.clonedTabsButton, count: count, animated: animated)
-    }
-
-    func onClickAddTab() {
-        telemetry(action: "add tab", props: ["bottomToolbar": "true"])
-        let app = UIApplication.sharedApplication().delegate as! AppDelegate
-        let isPrivate = PrivateBrowsing.singleton.isOn
-        if isPrivate {
-            app.tabManager.addTabAndSelect(nil, configuration: nil, isPrivate: true)
-        } else {
-            app.tabManager.addTabAndSelect()
-        }
-        app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
     }
 
     func setAlphaOnAllExceptTabButton(alpha: CGFloat) {

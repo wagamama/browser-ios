@@ -143,6 +143,8 @@ class URLBarView: UIView {
         return button
     }()
 
+    // TODO: After protocol removal, check what is necessary here
+    
     lazy var shareButton: UIButton = { return UIButton() }()
     
     lazy var pwdMgrButton: UIButton = { return UIButton() }()
@@ -150,9 +152,12 @@ class URLBarView: UIView {
     lazy var forwardButton: UIButton = { return UIButton() }()
 
     lazy var backButton: UIButton = { return UIButton() }()
+    
+    // Required solely for protocol conforming
+    lazy var addTabButton = { return UIButton() }()
 
     lazy var actionButtons: [UIButton] = {
-        return [self.shareButton, self.forwardButton, self.backButton, self.pwdMgrButton]
+        return [self.shareButton, self.forwardButton, self.backButton, self.pwdMgrButton, self.addTabButton]
     }()
 
     // Used to temporarily store the cloned button so we can respond to layout changes during animation
