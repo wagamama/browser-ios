@@ -92,14 +92,11 @@ class TabCell: UICollectionViewCell {
         self.closeButton = UIButton()
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
         self.closeButton.tintColor = UIColor.lightGrayColor()
-       // self.closeButton.imageEdgeInsets = UIEdgeInsetsMake(TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset)
 
         self.innerStroke = InnerStrokedView(frame: self.backgroundHolder.frame)
         self.innerStroke.layer.backgroundColor = UIColor.clearColor().CGColor
 
         super.init(frame: frame)
-
-        //self.opaque = true
 
         self.animator = SwipeAnimator(animatingView: self.backgroundHolder, container: self)
         self.closeButton.addTarget(self, action: #selector(TabCell.SELclose), forControlEvents: UIControlEvents.TouchUpInside)
@@ -404,11 +401,6 @@ class TabTrayController: UIViewController {
         } else if PrivateBrowsing.singleton.isOn {
             privateMode = true
         }
-
-        // register for previewing delegate to enable peek and pop if force touch feature available
-//            if traitCollection.forceTouchCapability == .Available {
-//                registerForPreviewingWithDelegate(self, sourceView: view)
-//            }
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabTrayController.SELappWillResignActiveNotification), name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabTrayController.SELappDidBecomeActiveNotification), name: UIApplicationDidBecomeActiveNotification, object: nil)
@@ -931,76 +923,3 @@ private class EmptyPrivateTabsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
-//@available(iOS 9.0, *)
-//extension TabTrayController: TabPeekDelegate {
-//
-//    func tabPeekDidAddBookmark(tab: Browser) {
-//        delegate?.tabTrayDidAddBookmark(tab)
-//    }
-//
-//    func tabPeekDidAddToReadingList(tab: Browser) -> ReadingListClientRecord? {
-//        return delegate?.tabTrayDidAddToReadingList(tab)
-//    }
-//
-//    func tabPeekDidCloseTab(tab: Browser) {
-//        if let index = self.tabDataSource.tabs.indexOf(tab),
-//            let cell = self.collectionView?.cellForItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0)) as? TabCell {
-//            cell.SELclose()
-//        }
-//    }
-//
-//    func tabPeekRequestsPresentationOf(viewController viewController: UIViewController) {
-//        delegate?.tabTrayRequestsPresentationOf(viewController: viewController)
-//    }
-//}
-
-//@available(iOS 9.0, *)
-//extension TabTrayController: UIViewControllerPreviewingDelegate {
-//
-//    func previewingContext(previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-//
-//        guard let collectionView = collectionView else { return nil }
-//        let convertedLocation = self.view.convertPoint(location, toView: collectionView)
-//
-//        guard let indexPath = collectionView.indexPathForItemAtPoint(convertedLocation),
-//            let cell = collectionView.cellForItemAtIndexPath(indexPath) else { return nil }
-//
-//        let tab = tabDataSource.tabs[indexPath.row]
-//        let tabVC = TabPeekViewController(tab: tab, delegate: self)
-//        if let browserProfile = profile as? BrowserProfile {
-//            tabVC.setState(withProfile: browserProfile, clientPickerDelegate: self)
-//        }
-//        previewingContext.sourceRect = self.view.convertRect(cell.frame, fromView: collectionView)
-//
-//        return tabVC
-//    }
-//
-//    func previewingContext(previewingContext: UIViewControllerPreviewing, commitViewController viewControllerToCommit: UIViewController) {
-//        guard let tpvc = viewControllerToCommit as? TabPeekViewController else { return }
-//        tabManager.selectTab(tpvc.tab)
-//
-//        #if BRAVE
-//            self.dismissViewControllerAnimated(true, completion: nil)
-//        #else
-//            self.navigationController?.popViewControllerAnimated(true)
-//        #endif
-//
-//        delegate?.tabTrayDidDismiss(self)
-//
-//    }
-//}
-
-//extension TabTrayController: ClientPickerViewControllerDelegate {
-//
-//    func clientPickerViewController(clientPickerViewController: ClientPickerViewController, didPickClients clients: [RemoteClient]) {
-//        if let item = clientPickerViewController.shareItem {
-//            self.profile.sendItems([item], toClients: clients)
-//        }
-//        clientPickerViewController.dismissViewControllerAnimated(true, completion: nil)
-//    }
-//
-//    func clientPickerViewControllerDidCancel(clientPickerViewController: ClientPickerViewController) {
-//        clientPickerViewController.dismissViewControllerAnimated(true, completion: nil)
-//    }
-//}
