@@ -60,16 +60,14 @@ extension BrowserViewController: URLBarDelegate {
             screenshotHelper.takeScreenshot(t)
         }
 
-        //self.navigationController?.pushViewController(tabTrayController, animated: true)
-        #if BRAVE
-            tabTrayController.modalPresentationStyle = .OverCurrentContext
-            tabTrayController.modalTransitionStyle = .CrossDissolve
-            self.navigationController?.presentViewController(tabTrayController, animated: true, completion: nil)
-            UIView.animateWithDuration(0.2, animations: {
-                getApp().braveTopViewController.view.backgroundColor = UIColor.blackColor()
-                self.view.alpha = CGFloat(BraveUX.BrowserViewAlphaWhenShowingTabTray)
-            })
-        #endif
+        tabTrayController.modalPresentationStyle = .OverCurrentContext
+        tabTrayController.modalTransitionStyle = .CrossDissolve
+        self.navigationController?.presentViewController(tabTrayController, animated: true, completion: nil)
+        UIView.animateWithDuration(0.2, animations: {
+            getApp().braveTopViewController.view.backgroundColor = UIColor.blackColor()
+            self.view.alpha = CGFloat(BraveUX.BrowserViewAlphaWhenShowingTabTray)
+        })
+        
         self.tabTrayController = tabTrayController
     }
 
