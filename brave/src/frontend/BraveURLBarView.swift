@@ -4,11 +4,6 @@ import Shared
 
 let TabsBarHeight = CGFloat(29)
 
-// To hide the curve effect
-class HideCurveView : CurveView {
-    override func drawRect(rect: CGRect) {}
-}
-
 extension UILabel {
     func boldRange(range: Range<String.Index>) {
         if let text = self.attributedText {
@@ -83,7 +78,6 @@ class BraveURLBarView : URLBarView {
     override func commonInit() {
         BraveURLBarView.currentInstance = self
         locationContainer.layer.cornerRadius = BraveUX.TextFieldCornerRadius
-        curveShape = HideCurveView()
 
         addSubview(leftSidePanelButton.underlay)
         addSubview(leftSidePanelButton)
@@ -309,9 +303,6 @@ class BraveURLBarView : URLBarView {
             make.left.right.equalTo(leftSidePanelButton).inset(4)
             make.top.bottom.equalTo(leftSidePanelButton).inset(7)
         }
-
-        curveShape.hidden = true
-        curveShape.snp_removeConstraints()
 
         func pinLeftPanelButtonToLeft() {
             leftSidePanelButton.snp_remakeConstraints { make in
