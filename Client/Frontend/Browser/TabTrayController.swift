@@ -246,12 +246,10 @@ class TabTrayController: UIViewController {
 
     private(set) internal var privateMode: Bool = false {
         didSet {
-#if !BRAVE_NO_PRIVATE_MODE
-    togglePrivateMode.selected = privateMode
-    togglePrivateMode.accessibilityValue = privateMode ? PrivateModeStrings.toggleAccessibilityValueOn : PrivateModeStrings.toggleAccessibilityValueOff
-    tabDataSource.updateData()
-    collectionView?.reloadData()
-#endif
+            togglePrivateMode.selected = privateMode
+            togglePrivateMode.accessibilityValue = privateMode ? PrivateModeStrings.toggleAccessibilityValueOn : PrivateModeStrings.toggleAccessibilityValueOff
+            tabDataSource.updateData()
+            collectionView?.reloadData()
         }
     }
 
@@ -259,7 +257,6 @@ class TabTrayController: UIViewController {
         return tabManager.tabs.displayedTabsForCurrentPrivateMode
     }
 
-#if !BRAVE_NO_PRIVATE_MODE
     lazy var togglePrivateMode: UIButton = {
         let button = UIButton()
         button.setTitle(Strings.Private, forState: .Normal)
@@ -286,7 +283,7 @@ class TabTrayController: UIViewController {
         emptyView.learnMoreButton.addTarget(self, action: #selector(TabTrayController.SELdidTapLearnMore), forControlEvents: UIControlEvents.TouchUpInside)
         return emptyView
     }()
-#endif
+    
     private lazy var tabDataSource: TabManagerDataSource = {
         return TabManagerDataSource(cellDelegate: self)
     }()
@@ -388,7 +385,7 @@ class TabTrayController: UIViewController {
 
 
         makeConstraints()
-#if !BRAVE_NO_PRIVATE_MODE
+        
         if profile.prefs.boolForKey(kPrefKeyPrivateBrowsingAlwaysOn) ?? false {
             togglePrivateMode.hidden = true
         }
@@ -416,8 +413,6 @@ class TabTrayController: UIViewController {
 //            if traitCollection.forceTouchCapability == .Available {
 //                registerForPreviewingWithDelegate(self, sourceView: view)
 //            }
-
-#endif
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabTrayController.SELappWillResignActiveNotification), name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabTrayController.SELappDidBecomeActiveNotification), name: UIApplicationDidBecomeActiveNotification, object: nil)
@@ -461,7 +456,7 @@ class TabTrayController: UIViewController {
     func SELdidClickAddTab() {
         openNewTab()
     }
-  #if !BRAVE_NO_PRIVATE_MODE
+    
     func SELdidTapLearnMore() {
         let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
         if let langID = NSLocale.preferredLanguages().first {
@@ -551,10 +546,8 @@ class TabTrayController: UIViewController {
     private func privateTabsAreEmpty() -> Bool {
         return privateMode && tabManager.tabs.privateTabs.count == 0
     }
-#endif
-
+    
     func changePrivacyMode(isPrivate: Bool) {
-#if !BRAVE_NO_PRIVATE_MODE
         if isPrivate != privateMode {
             guard let _ = collectionView else {
                 privateMode = isPrivate
@@ -562,25 +555,19 @@ class TabTrayController: UIViewController {
             }
             SELdidTogglePrivateMode()
         }
-#endif
     }
-
+    
     private func openNewTab(request: NSURLRequest? = nil) {
-#if !BRAVE_NO_PRIVATE_MODE
         if privateMode {
             emptyPrivateTabsView.hidden = true
         }
-#endif
+        
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
         self.collectionView.performBatchUpdates({ _ in
             var tab: Browser?
-#if !BRAVE_NO_PRIVATE_MODE
             tab = self.tabManager.addTab(request, isPrivate: self.privateMode)
 
-#else
-            tab = self.tabManager.addTab(request)
-#endif
             if let tab = tab {
                 self.tabManager.selectTab(tab)
             }
@@ -690,11 +677,10 @@ extension TabTrayController: TabManagerDelegate {
             }
             self.collectionView.reloadItemsAtIndexPaths(offscreenIndexPaths)
         }
-#if !BRAVE_NO_PRIVATE_MODE
+        
         if privateTabsAreEmpty() {
             emptyPrivateTabsView.alpha = 1
         }
-#endif
     }
 
     func tabManagerDidAddTabs(tabManager: TabManager) {
