@@ -268,7 +268,6 @@ class TabTrayController: UIViewController {
 
     private lazy var emptyPrivateTabsView: EmptyPrivateTabsView = {
         let emptyView = EmptyPrivateTabsView()
-        emptyView.learnMoreButton.addTarget(self, action: #selector(TabTrayController.SELdidTapLearnMore), forControlEvents: UIControlEvents.TouchUpInside)
         return emptyView
     }()
     
@@ -355,6 +354,7 @@ class TabTrayController: UIViewController {
         collectionView.registerClass(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
         collectionView.backgroundColor = UIColor.clearColor()
 
+        // Background view created for tapping background closure
         collectionView.backgroundView = UIView(frame: view.frame)
         collectionView.backgroundView?.snp_makeConstraints() {
             make in
@@ -432,14 +432,6 @@ class TabTrayController: UIViewController {
 
     func SELdidClickAddTab() {
         openNewTab()
-    }
-    
-    func SELdidTapLearnMore() {
-        let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
-        if let langID = NSLocale.preferredLanguages().first {
-            let learnMoreRequest = NSURLRequest(URL: "https://support.mozilla.org/1/mobile/\(appVersion)/iOS/\(langID)/private-browsing-ios".asURL!)
-            openNewTab(learnMoreRequest)
-        }
     }
     
     func SELdidTogglePrivateMode() {
@@ -866,14 +858,6 @@ private class EmptyPrivateTabsView: UIView {
         label.numberOfLines = 0
         label.preferredMaxLayoutWidth = EmptyPrivateTabsViewUX.MaxDescriptionWidth
         return label
-    }()
-
-    private var learnMoreButton: UIButton = {
-        let button = UIButton(type: .System)
-        button.setTitle(Strings.Learn_More, forState: .Normal)
-        button.setTitleColor(UIConstants.PrivateModeTextHighlightColor, forState: .Normal)
-        button.titleLabel?.font = EmptyPrivateTabsViewUX.LearnMoreFont
-        return button
     }()
 
     override init(frame: CGRect) {
