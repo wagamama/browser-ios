@@ -135,8 +135,6 @@ class URLBarView: UIView {
         return cancelButton
     }()
 
-    lazy var curveShape: CurveView = { return CurveView() }()
-
     lazy var scrollToTopButton: UIButton = {
         let button = UIButton()
         button.addTarget(self, action: #selector(URLBarView.SELtappedScrollToTopArea), forControlEvents: UIControlEvents.TouchUpInside)
@@ -191,7 +189,6 @@ class URLBarView: UIView {
 
     func commonInit() {
         backgroundColor = URLBarViewUX.backgroundColorWithAlpha(0)
-        addSubview(curveShape)
         addSubview(scrollToTopButton)
 
         addSubview(tabsButton)
