@@ -198,16 +198,7 @@ class TabCell: UICollectionViewCell {
     }
 
     override func accessibilityScroll(direction: UIAccessibilityScrollDirection) -> Bool {
-        var right: Bool
-        switch direction {
-        case .Left:
-            right = false
-        case .Right:
-            right = true
-        default:
-            return false
-        }
-        animator.close(right: right)
+        animator.close(right: direction == .Right)
         return true
     }
 
@@ -376,7 +367,6 @@ class TabTrayController: UIViewController {
         view.addSubview(navBar)
         view.addSubview(addTabButton)
 
-
         makeConstraints()
         
         if profile.prefs.boolForKey(kPrefKeyPrivateBrowsingAlwaysOn) ?? false {
@@ -386,7 +376,6 @@ class TabTrayController: UIViewController {
         view.addSubview(togglePrivateMode)
         togglePrivateMode.snp_makeConstraints { make in
             make.right.equalTo(addTabButton.snp_left).offset(-10)
-            //make.height.equalTo(UIConstants.ToolbarHeight)
             make.centerY.equalTo(self.navBar)
         }
 
@@ -396,7 +385,7 @@ class TabTrayController: UIViewController {
             make.edges.equalTo(self.view)
         }
 
-        if let tab = tabManager.selectedTab  where tab.isPrivate {
+        if let tab = tabManager.selectedTab where tab.isPrivate {
             privateMode = true
         } else if PrivateBrowsing.singleton.isOn {
             privateMode = true
