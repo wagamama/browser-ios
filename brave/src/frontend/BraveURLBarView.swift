@@ -94,7 +94,6 @@ class BraveURLBarView : URLBarView {
         leftSidePanelButton.setImage(UIImage(named: "listpanel")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
         leftSidePanelButton.setImage(UIImage(named: "listpanel_down")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Selected)
         leftSidePanelButton.accessibilityLabel = Strings.Bookmarks_and_History_Panel
-        leftSidePanelButton.tintColor = BraveUX.ActionButtonTintColor
         leftSidePanelButton.setStarImageBookmarked(false)
 
         braveButton.addTarget(self, action: #selector(onClickBraveButton) , forControlEvents: UIControlEvents.TouchUpInside)
@@ -102,8 +101,6 @@ class BraveURLBarView : URLBarView {
         braveButton.setImage(UIImage(named: "bravePanelButtonOff"), forState: .Selected)
         braveButton.accessibilityLabel = Strings.Brave_Panel
         braveButton.tintColor = BraveUX.ActionButtonTintColor
-
-        //ToolbarTextField.appearance().clearButtonTintColor = nil
 
         var theme = Theme()
         theme.URLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
@@ -127,7 +124,7 @@ class BraveURLBarView : URLBarView {
         theme = Theme()
         theme.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor_Private
         theme.textColor = BraveUX.LocationBarEditModeTextColor_Private
-        theme.buttonTintColor = UIColor.whiteColor()    
+        theme.buttonTintColor = UIColor.whiteColor()
         ToolbarTextField.Themes[Theme.PrivateMode] = theme
 
         theme = Theme()
@@ -200,6 +197,10 @@ class BraveURLBarView : URLBarView {
 
     override func applyTheme(themeName: String) {
         super.applyTheme(themeName)
+        
+        guard let theme = URLBarViewUX.Themes[themeName] else { return }
+        
+        leftSidePanelButton.tintColor = theme.buttonTintColor
     }
 
     override func updateAlphaForSubviews(alpha: CGFloat) {
