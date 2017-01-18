@@ -266,9 +266,8 @@ class TabTrayController: UIViewController {
         return button
     }()
 
-    private lazy var emptyPrivateTabsView: EmptyPrivateTabsView = {
-        let emptyView = EmptyPrivateTabsView()
-        return emptyView
+    private lazy var emptyPrivateTabsView: UIView = {
+        return self.newEmptyPrivateTabsView()
     }()
     
     private lazy var tabDataSource: TabManagerDataSource = {
@@ -426,6 +425,40 @@ class TabTrayController: UIViewController {
             make.top.equalTo(navBar.snp_bottom)
             make.left.right.bottom.equalTo(self.view)
         }
+    }
+    
+    // View we display when there are no private tabs created
+    private func newEmptyPrivateTabsView() -> UIView {
+        let titleLabel = UILabel()
+        titleLabel.textColor = EmptyPrivateTabsViewUX.TitleColor
+        titleLabel.font = EmptyPrivateTabsViewUX.TitleFont
+        titleLabel.textAlignment = NSTextAlignment.Center
+        
+        let descriptionLabel = UILabel()
+        descriptionLabel.textColor = EmptyPrivateTabsViewUX.DescriptionColor
+        descriptionLabel.font = EmptyPrivateTabsViewUX.DescriptionFont
+        descriptionLabel.textAlignment = NSTextAlignment.Center
+        descriptionLabel.numberOfLines = 0
+        descriptionLabel.preferredMaxLayoutWidth = EmptyPrivateTabsViewUX.MaxDescriptionWidth
+        
+        let emptyView = UIView()
+        emptyView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.6)
+        
+        titleLabel.text = Strings.Private_Browsing
+        descriptionLabel.text = Strings.Brave_wont_remember_any_of_your_history
+        
+        emptyView.addSubview(titleLabel)
+        emptyView.addSubview(descriptionLabel)
+        
+        titleLabel.snp_makeConstraints { make in
+            make.center.equalTo(emptyView)
+        }
+        
+        descriptionLabel.snp_makeConstraints { make in
+            make.top.equalTo(titleLabel.snp_bottom).offset(EmptyPrivateTabsViewUX.TextMargin)
+            make.centerX.equalTo(emptyView)
+        }
+        return emptyView
     }
 
 // MARK: Selectors
@@ -838,49 +871,4 @@ struct EmptyPrivateTabsViewUX {
     static let TextMargin: CGFloat = 18
     static let LearnMoreMargin: CGFloat = 30
     static let MaxDescriptionWidth: CGFloat = 250
-}
-
-// View we display when there are no private tabs created
-private class EmptyPrivateTabsView: UIView {
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = EmptyPrivateTabsViewUX.TitleColor
-        label.font = EmptyPrivateTabsViewUX.TitleFont
-        label.textAlignment = NSTextAlignment.Center
-        return label
-    }()
-
-    private var descriptionLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = EmptyPrivateTabsViewUX.DescriptionColor
-        label.font = EmptyPrivateTabsViewUX.DescriptionFont
-        label.textAlignment = NSTextAlignment.Center
-        label.numberOfLines = 0
-        label.preferredMaxLayoutWidth = EmptyPrivateTabsViewUX.MaxDescriptionWidth
-        return label
-    }()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-
-        backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.6)
-
-        titleLabel.text = Strings.Private_Browsing
-        descriptionLabel.text = Strings.Brave_wont_remember_any_of_your_history
-
-        addSubview(titleLabel)
-        addSubview(descriptionLabel)
-        titleLabel.snp_makeConstraints { make in
-            make.center.equalTo(self)
-        }
-
-        descriptionLabel.snp_makeConstraints { make in
-            make.top.equalTo(titleLabel.snp_bottom).offset(EmptyPrivateTabsViewUX.TextMargin)
-            make.centerX.equalTo(self)
-        }
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
