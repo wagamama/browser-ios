@@ -97,6 +97,19 @@ class BraveSettingsView : AppSettingsTableViewController {
         }
 
 
+        var shieldSettingsList = [BoolSetting(prefs: prefs, prefKey: AdBlocker.prefKey, defaultValue: true, titleText: Strings.Block_Ads_and_Tracking),
+                                  BoolSetting(prefs: prefs, prefKey: HttpsEverywhere.prefKey, defaultValue: true, titleText: Strings.HTTPS_Everywhere),
+                                  BoolSetting(prefs: prefs, prefKey: SafeBrowsing.prefKey, defaultValue: true, titleText: Strings.Block_Phishing_and_Malware),
+                                  BoolSetting(prefs: prefs, prefKey: kPrefKeyNoScriptOn, defaultValue: false, titleText: Strings.Block_Scripts),
+                                  BoolSetting(prefs: prefs, prefKey: kPrefKeyFingerprintProtection, defaultValue: false, titleText: Strings.Fingerprinting_Protection)
+                                  ]
+
+        let adblockRegionOption = AdBlocker.singleton.isRegionalAdblockPossible()
+        if adblockRegionOption.hasRegionalFile {
+            let defaultOn = adblockRegionOption.isDefaultSettingOn
+            shieldSettingsList.append(BoolSetting(prefs: prefs, prefKey: AdBlocker.prefKeyUseRegional, defaultValue: defaultOn, titleText: Strings.Use_regional_adblock))
+        }
+
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.General), children: generalSettings),
             SettingSection(title: NSAttributedString(string: Strings.Privacy), children:
@@ -111,13 +124,7 @@ class BraveSettingsView : AppSettingsTableViewController {
                         }
                     })]
             ),
-            SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults), children:
-                [BoolSetting(prefs: prefs, prefKey: AdBlocker.prefKey, defaultValue: true, titleText: Strings.Block_Ads_and_Tracking),
-                    BoolSetting(prefs: prefs, prefKey: HttpsEverywhere.prefKey, defaultValue: true, titleText: Strings.HTTPS_Everywhere),
-                    BoolSetting(prefs: prefs, prefKey: SafeBrowsing.prefKey, defaultValue: true, titleText: Strings.Block_Phishing_and_Malware),
-                    BoolSetting(prefs: prefs, prefKey: kPrefKeyNoScriptOn, defaultValue: false, titleText: Strings.Block_Scripts),
-                    BoolSetting(prefs: prefs, prefKey: kPrefKeyFingerprintProtection, defaultValue: false, titleText: Strings.Fingerprinting_Protection)
-                ])]
+            SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults), children: shieldSettingsList)]
 
         //#if !DISABLE_INTRO_SCREEN
         settings += [
