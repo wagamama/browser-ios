@@ -56,6 +56,16 @@ class WebViewTest: XCTestCase {
         XCTAssert(found.exists, "didn't find UA for desktop")
     }
 
+    func testSafeBrowsing() {
+        UITestUtils.restart()
+        let app = XCUIApplication()
+        UITestUtils.loadSite(app, "excellentmovies.net")
+
+        let search = NSPredicate(format: "label contains[c] %@", "brave shield blocked page")
+        let found = app.staticTexts.elementMatchingPredicate(search)
+        XCTAssert(found.exists, "safe browsing failed")
+    }
+  
     func testRegionalAdblock() {
         UITestUtils.restart(["LOCALE=RU"])
         let app = XCUIApplication()
