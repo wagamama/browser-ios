@@ -23,7 +23,12 @@ class AdBlocker {
     private var regionToS3FileName = [localeCode: String]()
     private var networkLoaders = [localeCode: AdblockNetworkDataFileLoader]()
     private lazy var abpFilterLibWrappers: [localeCode: ABPFilterLibWrapper] = { return ["en": ABPFilterLibWrapper()] }()
-    private var currentLocaleCode: localeCode = "en"
+    var currentLocaleCode: localeCode = "en" {
+        didSet {
+            // data loading is triggered explicitly at end of startup
+            updateRegionalAdblockEnabledState(newRegionsLoadImmediately: false)
+        }
+    }
     private var isRegionalAdblockEnabled: Bool? = nil
     private let wellTestedAdblockRegions = ["ru", "uk", "be", "hi"]
 
@@ -34,8 +39,6 @@ class AdBlocker {
 
         networkLoaders["en"] = getNetworkLoader(forLocale: "en", name: "ABPFilterParserData")
 
-        currentLocaleCode = NSLocale.preferredLanguages()[0]
-
         let regional = try! NSString(contentsOfFile: NSBundle.mainBundle().pathForResource("adblock-regions", ofType: "txt")!, encoding: NSUTF8StringEncoding) as String
         regional.componentsSeparatedByString("\n").forEach {
             let parts = String($0).componentsSeparatedByString(",")
@@ -44,8 +47,7 @@ class AdBlocker {
             }
         }
 
-        // data loading is triggered explicitly at end of startup
-        updateRegionalAdblockEnabledState(newRegionsLoadImmediately: false)
+        currentLocaleCode = NSLocale.preferredLanguages()[0]
     }
 
     private func getNetworkLoader(forLocale locale: localeCode, name: String) -> AdblockNetworkDataFileLoader {
@@ -65,7 +67,7 @@ class AdBlocker {
     func isRegionalAdblockPossible() -> (hasRegionalFile: Bool, isDefaultSettingOn: Bool) {
         return (hasRegionalFile: currentLocaleCode != "en" && regionToS3FileName[currentLocaleCode] != nil,
                 isDefaultSettingOn: isRegionalAdblockEnabled ?? false)
-    }
+   }
 
     func updateEnabledState() {
         isNSPrefEnabled = BraveApp.getPrefs()?.boolForKey(AdBlocker.prefKey) ?? AdBlocker.prefKeyDefaultValue
@@ -196,8 +198,10 @@ class AdBlocker {
         }
 
 
-        if request.mainDocumentURL?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
-            return false
+        if let main = request.mainDocumentURL?.absoluteString where (main.startsWith(WebServer.sharedInstance.base) ?? false) {
+            if !main.containsString("testing/") { // don't skip for localhost testing
+                return false
+            }
         }
 
         var mainDocDomain = request.mainDocumentURL?.host ?? ""
@@ -223,16 +227,22 @@ class AdBlocker {
         }
 
         var isBlocked = false
-        for (_, adblocker) in abpFilterLibWrappers {
+        var blockedByLocale = ""
+        for (locale, adblocker) in abpFilterLibWrappers {
             isBlocked = adblocker.isBlockedConsideringType(url.absoluteString,
                                                            mainDocumentUrl: mainDocDomain,
                                                            acceptHTTPHeader:request.valueForHTTPHeaderField("Accept"))
 
             if isBlocked {
+                blockedByLocale = locale
+                if locale != "en" && AppConstants.IsRunningTest {
+                    messageUITest(identifier: "blocked-url", message:"\(blockedByLocale) \(url.absoluteString!)")
+                }
                 break
             }
         }
         fifoCacheOfUrlsChecked.addItem(key, value: isBlocked)
+
 
         #if LOG_AD_BLOCK
             if isBlocked {
@@ -241,6 +251,24 @@ class AdBlocker {
         #endif
 
         return isBlocked
+    }
+
+    // Hack to use a UILabel to send UITest app a message
+    private func messageUITest(identifier identifier:String, message: String) {
+        postAsyncToMain {
+            let tag = 19283
+            let v = getApp().rootViewController.view.viewWithTag(tag) as? UILabel ?? UILabel()
+            if v.tag != tag {
+                getApp().rootViewController.view.addSubview(v)
+                v.tag = tag
+                v.frame = CGRect(x: 0, y: 0, width: 200, height: 10)
+                v.alpha = 0.1
+            }
+            v.text = message
+            v.accessibilityValue = message
+            v.accessibilityLabel = identifier
+            v.accessibilityIdentifier = identifier
+        }
     }
 }
 
