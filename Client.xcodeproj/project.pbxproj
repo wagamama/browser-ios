@@ -480,6 +480,8 @@
 		EB9D8F241D9CCE5F00CA1624 /* BookmarksTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9D8F211D9CCE5F00CA1624 /* BookmarksTest.swift */; };
 		EB9D8F261D9CCE5F00CA1624 /* WebViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9D8F231D9CCE5F00CA1624 /* WebViewTest.swift */; };
 		EBA11E1A1E2EB84800C964E0 /* adblock-regions.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBA11E191E2EB84800C964E0 /* adblock-regions.txt */; };
+		EBA11E341E3018A100C964E0 /* TestPageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA11E331E3018A100C964E0 /* TestPageHelper.swift */; };
+		EBA11E411E301B5D00C964E0 /* test-russian-adblock.html in Resources */ = {isa = PBXBuildFile; fileRef = EBA11E401E301B5D00C964E0 /* test-russian-adblock.html */; };
 		EBACC8551DF9BB3500D5E048 /* SettingsViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */; };
 		EBB345801DAD465C00EE24F0 /* SQLite.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7B9A62DB1C4002B1005C83DC /* SQLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EBE50B831DAE8D77000BC0A1 /* BookmarksTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */; };
@@ -1290,6 +1292,8 @@
 		EB9D8F211D9CCE5F00CA1624 /* BookmarksTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksTest.swift; sourceTree = "<group>"; };
 		EB9D8F231D9CCE5F00CA1624 /* WebViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewTest.swift; sourceTree = "<group>"; };
 		EBA11E191E2EB84800C964E0 /* adblock-regions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "adblock-regions.txt"; path = "brave/adblock-regions.txt"; sourceTree = SOURCE_ROOT; };
+		EBA11E331E3018A100C964E0 /* TestPageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestPageHelper.swift; sourceTree = "<group>"; };
+		EBA11E401E301B5D00C964E0 /* test-russian-adblock.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "test-russian-adblock.html"; path = "Client/Assets/test-russian-adblock.html"; sourceTree = "<group>"; };
 		EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewTest.swift; sourceTree = "<group>"; };
 		EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksTest.swift; sourceTree = "<group>"; };
 		EBE50B861DAEC689000BC0A1 /* Deferred.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Deferred.framework; path = Carthage/Build/iOS/Deferred.framework; sourceTree = "<group>"; };
@@ -1861,6 +1865,7 @@
 				B68328D5B8841C75EC4CF248 /* NetError.css */,
 				CCF5EA52A3A0DB9B90E811B7 /* NetError.html */,
 				77608A4209364B0714688815 /* PrintHelper.js */,
+				EBA11E401E301B5D00C964E0 /* test-russian-adblock.html */,
 				613C23408ACD9671D68C805E /* scrape_defaults.py */,
 				9164CEA067CD6A2A4C4D2465 /* scrape_plugins.py */,
 				6B26ADF6A409A3662AAD829F /* Search */,
@@ -2520,6 +2525,7 @@
 		DD7766D867DDB5BB9D39E6ED /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EBA11E321E3018A100C964E0 /* testing */,
 				C75F23E274D805CF47CC56F4 /* adinfo */,
 				4A968F5D043E33C1866219E7 /* BraveApp.swift */,
 				6F8856E29DAA2D9EAC4F9A85 /* BraveUtil.swift */,
@@ -2727,6 +2733,15 @@
 			);
 			name = BraveShareTo;
 			path = brave/l10n/BraveShareTo;
+			sourceTree = "<group>";
+		};
+		EBA11E321E3018A100C964E0 /* testing */ = {
+			isa = PBXGroup;
+			children = (
+				EBA11E331E3018A100C964E0 /* TestPageHelper.swift */,
+			);
+			name = testing;
+			path = brave/src/testing;
 			sourceTree = "<group>";
 		};
 		F1D471871D777C7C007B443D /* OnePassword */ = {
@@ -3455,6 +3470,7 @@
 				59D6B30954B53C907F022CA7 /* FindInPage.js in Resources */,
 				FE87AE69E75D3BCA0217302B /* Images.xcassets in Resources */,
 				9EC9707BF7ABD93FBB0FFDB9 /* LoginsHelper.js in Resources */,
+				EBA11E411E301B5D00C964E0 /* test-russian-adblock.html in Resources */,
 				4D68B2825D2CAD5FB6098D21 /* NetError.css in Resources */,
 				EB8F56991DD13DF300679A78 /* CharisSILI.ttf in Resources */,
 				6B06EE00444FA99CCD366C2B /* NetError.html in Resources */,
@@ -3782,6 +3798,7 @@
 				002B85CD8B3F1E96C50DBAA1 /* options.cc in Sources */,
 				D974018CF8F1728469457616 /* status.cc in Sources */,
 				8C1EF9076148B5DE1EEC4A0B /* testharness.cc in Sources */,
+				EBA11E341E3018A100C964E0 /* TestPageHelper.swift in Sources */,
 				5F05A9BDFA985F96C2CFCA35 /* testutil.cc in Sources */,
 				23699E7ECA45D2C23FFEB992 /* NSData+GZIP.m in Sources */,
 				736EF030429F5288A4EDE179 /* NSFileManager+Tar.m in Sources */,

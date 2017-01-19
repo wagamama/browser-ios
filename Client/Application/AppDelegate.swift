@@ -347,6 +347,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let server = WebServer.sharedInstance
         ReaderModeHandlers.register(server, profile: profile)
         ErrorPageHelper.register(server, certStore: profile.certStore)
+        TestPageHelper.register(server)
         AboutHomeHandler.register(server)
         AboutLicenseHandler.register(server)
         SessionRestoreHandler.register(server)

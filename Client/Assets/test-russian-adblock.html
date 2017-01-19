@@ -1,0 +1,43 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+ - License, v. 2.0. If a copy of the MPL was not distributed with this
+ - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<html>
+
+<body>
+  <!-- iframe src='http://getitbit.net/ads/' / -->
+
+  <script>
+    
+    // blocked urls
+    var urls = ['waralbum.ru/br/']
+
+    var asyncLoop = function (o) {
+      var i = -1;
+      var loop = function () {
+        i++;
+        if (i == o.length) {
+          o.callback();
+          return;
+        }
+        o.functionToLoop(loop, i);
+      }
+      loop(); //init
+    }
+
+    asyncLoop({
+      length: urls.length,
+      functionToLoop: function (loop, i) {
+        setTimeout(function () {
+          var img = document.createElement('img');
+          img.src = urls[i];
+          document.body.appendChild(img);
+          loop();
+        }, 200);
+      },
+      callback: function () {}
+    });
+    
+  </script>
+</body>
+
+</html>
