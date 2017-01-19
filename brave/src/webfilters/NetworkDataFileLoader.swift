@@ -89,7 +89,7 @@ class NetworkDataFileLoader {
             }
             else {
                 if let data = data, response = response as? NSHTTPURLResponse {
-                    if response.statusCode / 100 == 4 { // error
+                    if 400...499 ~= response.statusCode { // error
                         print("Failed to download, error: \(response.statusCode), URL:\(response.URL)")
                     } else {
                         let etag = response.allHeaderFields["Etag"] as? String
