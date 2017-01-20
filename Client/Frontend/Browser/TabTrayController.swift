@@ -60,7 +60,7 @@ class TabCell: UICollectionViewCell {
     let favicon: UIImageView = UIImageView()
     let closeButton: UIButton
 
-    var title: UIVisualEffectView!
+    var titleWrapper: UIVisualEffectView!
     var animator: SwipeAnimator!
 
     weak var delegate: TabCellDelegate?
@@ -114,7 +114,7 @@ class TabCell: UICollectionViewCell {
     }
 
     private func applyStyle(style: Style) {
-        self.title?.removeFromSuperview()
+        self.titleWrapper?.removeFromSuperview()
 
         let title: UIVisualEffectView
         switch style {
@@ -138,7 +138,7 @@ class TabCell: UICollectionViewCell {
         backgroundHolder.addSubview(self.favicon)
 
         backgroundHolder.addSubview(title)
-        self.title = title
+        self.titleWrapper = title
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -164,9 +164,9 @@ class TabCell: UICollectionViewCell {
             make.width.height.equalTo(TabTrayControllerUX.FaviconSize)
         }
 
-        title.snp_makeConstraints { make in
-            make.left.top.equalTo(title.superview!)
-            make.width.equalTo(title.superview!.snp_width)
+        titleWrapper.snp_makeConstraints { make in
+            make.left.top.equalTo(titleWrapper.superview!)
+            make.width.equalTo(titleWrapper.superview!.snp_width)
             make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
         }
 
@@ -180,8 +180,8 @@ class TabCell: UICollectionViewCell {
         }
 
         closeButton.snp_makeConstraints { make in
-            make.size.equalTo(title.snp_height)
-            make.centerY.equalTo(title)
+            make.size.equalTo(titleWrapper.snp_height)
+            make.centerY.equalTo(titleWrapper)
             make.left.equalTo(closeButton.superview!)
         }
 
