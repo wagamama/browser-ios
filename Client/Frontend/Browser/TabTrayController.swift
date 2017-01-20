@@ -55,7 +55,7 @@ class TabCell: UICollectionViewCell {
 
     let backgroundHolder = UIView()
     let background = UIImageViewAligned()
-    let titleText: UILabel
+    let titleLbl: UILabel
     let innerStroke: InnerStrokedView
     let favicon: UIImageView = UIImageView()
     let closeButton: UIButton
@@ -83,11 +83,11 @@ class TabCell: UICollectionViewCell {
         self.favicon.layer.cornerRadius = 2.0
         self.favicon.layer.masksToBounds = true
 
-        self.titleText = UILabel()
-        self.titleText.textAlignment = NSTextAlignment.Left
-        self.titleText.userInteractionEnabled = false
-        self.titleText.numberOfLines = 1
-        self.titleText.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
+        self.titleLbl = UILabel()
+        self.titleLbl.textAlignment = NSTextAlignment.Left
+        self.titleLbl.userInteractionEnabled = false
+        self.titleLbl.numberOfLines = 1
+        self.titleLbl.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
 
         self.closeButton = UIButton()
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
@@ -120,13 +120,13 @@ class TabCell: UICollectionViewCell {
         switch style {
         case .Light:
             title = UIVisualEffectView(effect: UIBlurEffect(style: .ExtraLight))
-            self.titleText.textColor = LightTabCellUX.TabTitleTextColor
+            self.titleLbl.textColor = LightTabCellUX.TabTitleTextColor
         case .Dark:
             title = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
-            self.titleText.textColor = DarkTabCellUX.TabTitleTextColor
+            self.titleLbl.textColor = DarkTabCellUX.TabTitleTextColor
         }
 
-        titleText.backgroundColor = UIColor.clearColor()
+        titleLbl.backgroundColor = UIColor.clearColor()
 
         title.layer.shadowColor = UIColor.blackColor().CGColor
         title.layer.shadowOpacity = 0.2
@@ -134,7 +134,7 @@ class TabCell: UICollectionViewCell {
         title.layer.shadowRadius = 0
 
         title.addSubview(self.closeButton)
-        title.addSubview(self.titleText)
+        title.addSubview(self.titleLbl)
         backgroundHolder.addSubview(self.favicon)
 
         backgroundHolder.addSubview(title)
@@ -174,9 +174,9 @@ class TabCell: UICollectionViewCell {
             make.edges.equalTo(background)
         }
 
-        titleText.snp_makeConstraints { make in
+        titleLbl.snp_makeConstraints { make in
             make.left.equalTo(closeButton.snp_right)
-            make.top.right.bottom.equalTo(titleText.superview!)
+            make.top.right.bottom.equalTo(titleLbl.superview!)
         }
 
         closeButton.snp_makeConstraints { make in
@@ -185,8 +185,8 @@ class TabCell: UICollectionViewCell {
             make.left.equalTo(closeButton.superview!)
         }
 
-        let top = (TabTrayControllerUX.TextBoxHeight - titleText.bounds.height) / 2.0
-        titleText.frame.origin = CGPoint(x: titleText.frame.origin.x, y: max(0, top))
+        let top = (TabTrayControllerUX.TextBoxHeight - titleLbl.bounds.height) / 2.0
+        titleLbl.frame.origin = CGPoint(x: titleLbl.frame.origin.x, y: max(0, top))
     }
 
 
@@ -194,7 +194,7 @@ class TabCell: UICollectionViewCell {
         // Reset any close animations.
         backgroundHolder.transform = CGAffineTransformIdentity
         backgroundHolder.alpha = 1
-        self.titleText.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
+        self.titleLbl.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
     }
 
     override func accessibilityScroll(direction: UIAccessibilityScrollDirection) -> Bool {
@@ -759,7 +759,7 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
             return tabCell
         }
         tabCell.style = tab.isPrivate ? .Dark : .Light
-        tabCell.titleText.text = tab.displayTitle
+        tabCell.titleLbl.text = tab.displayTitle
 
         if !tab.displayTitle.isEmpty {
             tabCell.accessibilityLabel = tab.displayTitle
