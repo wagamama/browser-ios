@@ -231,6 +231,13 @@ class TabTrayController: UIViewController {
     var navBar: UIView!
     var addTabButton: UIButton!
     var collectionViewTransitionSnapshot: UIView?
+    
+    /// Views to be animationed when preseting the Tab Tray.
+    /// There is some bug related to the blurring background the tray controller attempts to handle.
+    /// On animating self.view the blur effect will not animate (just pops in at the animation end),
+    /// and must be animated manually. Instead of animating the larger view elements, smaller pieces
+    /// must be animated in order to achieve a blur-incoming animation
+    var viewsToAnimate: [UIView] = []
 
     private(set) internal var privateMode: Bool = false {
         didSet {
@@ -285,9 +292,6 @@ class TabTrayController: UIViewController {
         super.dismissViewControllerAnimated(flag, completion:completion)
 
         UIView.animateWithDuration(0.2) {
-            let braveTopVC = getApp().rootViewController.topViewController as? BraveTopViewController
-            braveTopVC?.view.backgroundColor = BraveUX.TopLevelBackgroundColor
-             getApp().browserViewController.view.alpha = 1.0
              getApp().browserViewController.toolbar?.leavingTabTrayMode()
         }
 
@@ -328,6 +332,13 @@ class TabTrayController: UIViewController {
         dismissViewControllerAnimated(true, completion: nil)
     }
 
+    override func viewDidAppear(animated: Bool) {
+        // TODO: centralize timing
+        UIView.animateWithDuration(0.2) {
+            self.viewsToAnimate.forEach { $0.alpha = 1.0 }
+        }
+    }
+    
 // MARK: View Controller Callbacks
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -352,19 +363,22 @@ class TabTrayController: UIViewController {
 
         collectionView.registerClass(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
         collectionView.backgroundColor = UIColor.clearColor()
-
+        
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .Light))
+        
         // Background view created for tapping background closure
-        collectionView.backgroundView = UIView(frame: view.frame)
-        collectionView.backgroundView?.snp_makeConstraints() {
-            make in
-            make.edges.equalTo(collectionView)
-        }
-        collectionView.backgroundView?.userInteractionEnabled = true
+        collectionView.backgroundView = UIView()
         collectionView.backgroundView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(TabTrayController.onTappedBackground(_:))))
 
-        view.addSubview(collectionView)
-        view.addSubview(navBar)
-        view.addSubview(addTabButton)
+        viewsToAnimate = [blur, collectionView, navBar, addTabButton]
+        viewsToAnimate.forEach {
+            $0.alpha = 0.0
+            view.addSubview($0)
+        }
+        
+        blur.snp_makeConstraints { (make) in
+            make.edges.equalTo(view)
+        }
 
         makeConstraints()
         
