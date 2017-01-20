@@ -240,8 +240,19 @@ class TabTrayController: UIViewController {
 
     private(set) internal var privateMode: Bool = false {
         didSet {
-            togglePrivateMode.selected = privateMode
-            togglePrivateMode.accessibilityValue = privateMode ? PrivateModeStrings.toggleAccessibilityValueOn : PrivateModeStrings.toggleAccessibilityValueOff
+            if privateMode {
+                togglePrivateMode.selected = true
+                togglePrivateMode.accessibilityValue = PrivateModeStrings.toggleAccessibilityValueOn
+                togglePrivateMode.backgroundColor = .whiteColor()
+                
+                addTabButton.tintColor = UIColor.whiteColor()
+            } else {
+                togglePrivateMode.selected = false
+                togglePrivateMode.accessibilityValue = PrivateModeStrings.toggleAccessibilityValueOff
+                togglePrivateMode.backgroundColor = .clearColor()
+                
+                addTabButton.tintColor = UIColor.blackColor()
+            }
             tabDataSource.updateData()
             collectionView?.reloadData()
         }
@@ -254,21 +265,15 @@ class TabTrayController: UIViewController {
     lazy var togglePrivateMode: UIButton = {
         let button = UIButton()
         button.setTitle(Strings.Private, forState: .Normal)
-        button.setTitleColor(UIColor.blackColor(), forState: .Selected)
-        button.setTitleColor(UIColor(white: 255/255.0, alpha: 1.0), forState: .Normal)
+        button.setTitleColor(UIColor.blackColor(), forState: .Normal)
         button.titleLabel!.font = UIFont.systemFontOfSize(button.titleLabel!.font.pointSize + 2)
         button.contentEdgeInsets = UIEdgeInsetsMake(0, 4 /* left */, 0, 4 /* right */)
+        button.layer.cornerRadius = 4.0
         button.addTarget(self, action: #selector(TabTrayController.SELdidTogglePrivateMode), forControlEvents: .TouchUpInside)
         button.accessibilityLabel = PrivateModeStrings.toggleAccessibilityLabel
         button.accessibilityHint = PrivateModeStrings.toggleAccessibilityHint
-        button.accessibilityValue = self.privateMode ? PrivateModeStrings.toggleAccessibilityValueOn : PrivateModeStrings.toggleAccessibilityValueOff
         button.accessibilityIdentifier = "TabTrayController.togglePrivateMode"
 
-        if PrivateBrowsing.singleton.isOn {
-            button.backgroundColor = UIColor.whiteColor()
-            button.layer.cornerRadius = 4.0
-            button.selected = true
-        }
         return button
     }()
 
@@ -349,7 +354,6 @@ class TabTrayController: UIViewController {
         addTabButton.addTarget(self, action: #selector(TabTrayController.SELdidClickAddTab), forControlEvents: .TouchUpInside)
         addTabButton.accessibilityLabel = Strings.Add_Tab
         addTabButton.accessibilityIdentifier = "TabTrayController.addTabButton"
-        addTabButton.tintColor = UIColor.whiteColor() // makes it stand out more
 
         let flowLayout = TabTrayCollectionViewLayout()
         collectionView = UICollectionView(frame: view.frame, collectionViewLayout: flowLayout)
@@ -388,11 +392,10 @@ class TabTrayController: UIViewController {
             make.edges.equalTo(self.view)
         }
 
-        if let tab = tabManager.selectedTab where tab.isPrivate {
-            privateMode = true
-        } else if PrivateBrowsing.singleton.isOn {
-            privateMode = true
-        }
+        // Make sure buttons are all setup before this, to allow
+        // privateMode setter to setup final visuals
+        let selectedTabIsPrivate = tabManager.selectedTab?.isPrivate ?? false
+        privateMode = PrivateBrowsing.singleton.isOn || selectedTabIsPrivate
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabTrayController.SELappWillResignActiveNotification), name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TabTrayController.SELappDidBecomeActiveNotification), name: UIApplicationDidBecomeActiveNotification, object: nil)
@@ -490,10 +493,7 @@ class TabTrayController: UIViewController {
         privateMode = !privateMode
         if privateMode {
             PrivateBrowsing.singleton.enter()
-            togglePrivateMode.backgroundColor = UIColor.whiteColor()
-            togglePrivateMode.layer.cornerRadius = 4.0
         } else {
-            self.togglePrivateMode.backgroundColor = UIColor.clearColor()
             view.userInteractionEnabled = false
             view.alpha = 0.5
             let activityView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
