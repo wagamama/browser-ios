@@ -228,7 +228,6 @@ class TabTrayController: UIViewController {
     weak var delegate: TabTrayDelegate?
 
     var collectionView: UICollectionView!
-    var navBar: UIView!
     var addTabButton: UIButton!
     var collectionViewTransitionSnapshot: UIView?
     
@@ -345,9 +344,6 @@ class TabTrayController: UIViewController {
 
         view.accessibilityLabel = Strings.Tabs_Tray
 
-        navBar = UIView()
-        navBar.backgroundColor = TabTrayControllerUX.BackgroundColor
-
         addTabButton = UIButton()
         addTabButton.setImage(UIImage(named: "add")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
         addTabButton.addTarget(self, action: #selector(TabTrayController.SELdidClickAddTab), forControlEvents: .TouchUpInside)
@@ -370,7 +366,7 @@ class TabTrayController: UIViewController {
         collectionView.backgroundView = UIView()
         collectionView.backgroundView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(TabTrayController.onTappedBackground(_:))))
 
-        viewsToAnimate = [blur, collectionView, navBar, addTabButton]
+        viewsToAnimate = [blur, collectionView, addTabButton, togglePrivateMode]
         viewsToAnimate.forEach {
             $0.alpha = 0.0
             view.addSubview($0)
@@ -384,12 +380,6 @@ class TabTrayController: UIViewController {
         
         if profile.prefs.boolForKey(kPrefKeyPrivateBrowsingAlwaysOn) ?? false {
             togglePrivateMode.hidden = true
-        }
-
-        view.addSubview(togglePrivateMode)
-        togglePrivateMode.snp_makeConstraints { make in
-            make.right.equalTo(addTabButton.snp_left).offset(-10)
-            make.centerY.equalTo(self.navBar)
         }
 
         view.insertSubview(emptyPrivateTabsView, aboveSubview: collectionView)
@@ -424,19 +414,20 @@ class TabTrayController: UIViewController {
     }
 
     private func makeConstraints() {
-        navBar.snp_makeConstraints { make in
-            make.top.equalTo(snp_topLayoutGuideBottom)
-            make.height.equalTo(UIConstants.ToolbarHeight)
-            make.left.right.equalTo(self.view)
+        
+        togglePrivateMode.snp_makeConstraints { make in
+            make.right.equalTo(addTabButton.snp_left).offset(-10)
+            make.centerY.equalTo(self.addTabButton.snp_centerY)
         }
 
         addTabButton.snp_makeConstraints { make in
-            make.trailing.bottom.equalTo(self.navBar)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(snp_topLayoutGuideBottom)
             make.size.equalTo(UIConstants.ToolbarHeight)
         }
 
         collectionView.snp_makeConstraints { make in
-            make.top.equalTo(navBar.snp_bottom)
+            make.top.equalTo(addTabButton.snp_bottom)
             make.left.right.bottom.equalTo(self.view)
         }
     }
