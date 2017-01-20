@@ -78,7 +78,7 @@ private extension TrayToBrowserAnimator {
             // Scale up the cell and reset the transforms for the header/footers
             cell.frame = finalFrame
             container.layoutIfNeeded()
-            cell.title.transform = CGAffineTransformMakeTranslation(0, -cell.title.frame.height)
+            cell.titleWrapper.transform = CGAffineTransformMakeTranslation(0, -cell.titleWrapper.frame.height)
 
             bvc.tabTrayDidDismiss(tabTray)
 
@@ -154,7 +154,7 @@ private extension BrowserToTrayAnimator {
 
         container.addSubview(cell)
         cell.layoutIfNeeded()
-        cell.title.transform = CGAffineTransformMakeTranslation(0, -cell.title.frame.size.height)
+        cell.titleWrapper.transform = CGAffineTransformMakeTranslation(0, -cell.titleWrapper.frame.size.height)
 
         // Hide views we don't want to show during the animation in the BVC
         bvc.homePanelController?.view.hidden = true
@@ -177,7 +177,7 @@ private extension BrowserToTrayAnimator {
                 animations:
             {
                 cell.frame = finalFrame
-                cell.title.transform = CGAffineTransformIdentity
+                cell.titleWrapper.transform = CGAffineTransformIdentity
                 cell.layoutIfNeeded()
 
                 transformHeaderFooterForBVC(bvc, toFrame: finalFrame, container: container)
