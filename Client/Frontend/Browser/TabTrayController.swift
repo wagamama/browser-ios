@@ -10,15 +10,13 @@ import ReadingList
 import Shared
 
 struct TabTrayControllerUX {
-    static let CornerRadius = CGFloat(BraveUX.TabTrayCellCornerRadius)
+    static let CornerRadius = BraveUX.TabTrayCellCornerRadius
     static let BackgroundColor = UIConstants.AppBackgroundColor
     static let CellBackgroundColor = UIColor(red:0.95, green:0.95, blue:0.95, alpha:1)
     static let TextBoxHeight = CGFloat(32.0)
-    static let FaviconSize = CGFloat(BraveUX.TabTrayCellFaviconSize)
     static let Margin = CGFloat(15)
     static let ToolbarBarTintColor = UIConstants.AppBackgroundColor
     static let ToolbarButtonOffset = CGFloat(10.0)
-    static let CloseButtonSize = CGFloat(BraveUX.TabTrayCellCloseButtonSize)
     static let CloseButtonMargin = CGFloat(2.0)
     static let CloseButtonEdgeInset = CGFloat(6)
 
@@ -91,7 +89,7 @@ class TabCell: UICollectionViewCell {
 
         self.closeButton = UIButton()
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
-        self.closeButton.tintColor = UIColor.lightGrayColor()
+        self.closeButton.tintColor = .blackColor()
 
         self.innerStroke = InnerStrokedView(frame: self.backgroundHolder.frame)
         self.innerStroke.layer.backgroundColor = UIColor.clearColor().CGColor
@@ -114,6 +112,9 @@ class TabCell: UICollectionViewCell {
     }
 
     private func applyStyle(style: Style) {
+        
+        // TODO: Just change the effect
+        
         self.titleWrapper?.removeFromSuperview()
 
         let title: UIVisualEffectView
@@ -135,7 +136,7 @@ class TabCell: UICollectionViewCell {
 
         title.addSubview(self.closeButton)
         title.addSubview(self.titleLbl)
-        backgroundHolder.addSubview(self.favicon)
+        title.addSubview(self.favicon)
 
         backgroundHolder.addSubview(title)
         self.titleWrapper = title
@@ -148,8 +149,8 @@ class TabCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        closeButton.tintColor = BraveUX.ProgressBarColor
-
+        let generalOffset = 4
+        
         backgroundHolder.snp_makeConstraints { make in
             make.edges.equalTo(backgroundHolder.superview!)
         }
@@ -160,8 +161,8 @@ class TabCell: UICollectionViewCell {
         }
 
         favicon.snp_makeConstraints { make in
-            make.bottom.left.equalTo(favicon.superview!)
-            make.width.height.equalTo(TabTrayControllerUX.FaviconSize)
+            make.top.left.equalTo(favicon.superview!).offset(generalOffset)
+            make.size.equalTo(titleWrapper.snp_height).offset(-generalOffset * 2)
         }
 
         titleWrapper.snp_makeConstraints { make in
@@ -175,14 +176,15 @@ class TabCell: UICollectionViewCell {
         }
 
         titleLbl.snp_makeConstraints { make in
-            make.left.equalTo(closeButton.snp_right)
-            make.top.right.bottom.equalTo(titleLbl.superview!)
+            make.left.equalTo(favicon.snp_right).offset(generalOffset)
+            make.right.equalTo(closeButton.snp_left).offset(generalOffset)
+            make.top.bottom.equalTo(titleLbl.superview!)
         }
 
         closeButton.snp_makeConstraints { make in
             make.size.equalTo(titleWrapper.snp_height)
             make.centerY.equalTo(titleWrapper)
-            make.left.equalTo(closeButton.superview!)
+            make.right.equalTo(closeButton.superview!)
         }
 
         let top = (TabTrayControllerUX.TextBoxHeight - titleLbl.bounds.height) / 2.0
