@@ -99,8 +99,6 @@ struct BraveUX {
 
     static let ProgressBarColor = UIColor(colorLiteralRed: 0/255.0, green: 118/255.0, blue: 255/255.0, alpha: 1.0)
     
-    static let TabTrayCellCornerRadius = 14.0
-    static let TabTrayCellFaviconSize = 54.0
-    static let TabTrayCellCloseButtonSize = 24.0
+    static let TabTrayCellCornerRadius = CGFloat(6.0)
     static let TabTrayCellBackgroundColor = UIColor.whiteColor()
 }
