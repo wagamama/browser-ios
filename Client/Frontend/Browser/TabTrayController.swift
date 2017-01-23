@@ -55,6 +55,7 @@ class TabCell: UICollectionViewCell {
     let background = UIImageViewAligned()
     let titleLbl: UILabel
     let favicon: UIImageView = UIImageView()
+    let titleWrapperBackground = UIView()
     let closeButton: UIButton
 
     var titleWrapper: UIView = UIView()
@@ -93,8 +94,11 @@ class TabCell: UICollectionViewCell {
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
         self.closeButton.tintColor = .blackColor()
         
-        self.titleWrapper.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        self.titleWrapperBackground.backgroundColor = UIColor.whiteColor()
+
+        self.titleWrapper.backgroundColor = .clearColor()
         
+        self.titleWrapper.addSubview(self.titleWrapperBackground)
         self.titleWrapper.addSubview(self.closeButton)
         self.titleWrapper.addSubview(self.titleLbl)
         self.titleWrapper.addSubview(self.favicon)
@@ -147,6 +151,10 @@ class TabCell: UICollectionViewCell {
             make.width.equalTo(titleWrapper.superview!.snp_width)
             make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
         }
+        
+        titleWrapperBackground.snp_remakeConstraints { make in
+            make.edges.equalTo(titleWrapper)
+        }
 
         titleLbl.snp_remakeConstraints { make in
             make.left.equalTo(favicon.snp_right).offset(generalOffset)
@@ -159,6 +167,12 @@ class TabCell: UICollectionViewCell {
             make.centerY.equalTo(titleWrapper)
             make.right.equalTo(closeButton.superview!)
         }
+        
+        
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = self.titleWrapperBackground.bounds
+        gradientLayer.colors = [UIColor.whiteColor().CGColor, UIColor.clearColor().CGColor]
+        self.titleWrapperBackground.layer.mask = gradientLayer
     }
 
 
