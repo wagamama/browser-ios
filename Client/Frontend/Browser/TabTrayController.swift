@@ -71,6 +71,8 @@ class TabCell: UICollectionViewCell {
         self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
         self.backgroundHolder.clipsToBounds = true
         self.backgroundHolder.backgroundColor = TabTrayControllerUX.CellBackgroundColor
+        self.backgroundHolder.layer.borderColor = UIColor.darkGrayColor().CGColor
+        self.backgroundHolder.layer.borderWidth = 0.2
 
         self.background.contentMode = UIViewContentMode.ScaleAspectFill
         self.background.clipsToBounds = true
