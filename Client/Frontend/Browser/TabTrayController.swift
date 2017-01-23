@@ -57,7 +57,7 @@ class TabCell: UICollectionViewCell {
     let favicon: UIImageView = UIImageView()
     let closeButton: UIButton
 
-    var titleWrapper: UIVisualEffectView!
+    var titleWrapper: UIView = UIView()
     var animator: SwipeAnimator!
 
     weak var delegate: TabCellDelegate?
@@ -83,6 +83,7 @@ class TabCell: UICollectionViewCell {
         self.favicon.layer.masksToBounds = true
 
         self.titleLbl = UILabel()
+        self.titleLbl.backgroundColor = .clearColor()
         self.titleLbl.textAlignment = NSTextAlignment.Left
         self.titleLbl.userInteractionEnabled = false
         self.titleLbl.numberOfLines = 1
@@ -91,6 +92,12 @@ class TabCell: UICollectionViewCell {
         self.closeButton = UIButton()
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
         self.closeButton.tintColor = .blackColor()
+        
+        self.titleWrapper.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        
+        self.titleWrapper.addSubview(self.closeButton)
+        self.titleWrapper.addSubview(self.titleLbl)
+        self.titleWrapper.addSubview(self.favicon)
 
         super.init(frame: frame)
 
@@ -99,6 +106,7 @@ class TabCell: UICollectionViewCell {
 
         contentView.addSubview(backgroundHolder)
         backgroundHolder.addSubview(self.background)
+        backgroundHolder.addSubview(self.titleWrapper)
 
         // Default style is light
         applyStyle(style)
@@ -109,34 +117,7 @@ class TabCell: UICollectionViewCell {
     }
 
     private func applyStyle(style: Style) {
-        
-        // TODO: Just change the effect
-        
-        self.titleWrapper?.removeFromSuperview()
-
-        let title: UIVisualEffectView
-        switch style {
-        case .Light:
-            title = UIVisualEffectView(effect: UIBlurEffect(style: .ExtraLight))
-            self.titleLbl.textColor = LightTabCellUX.TabTitleTextColor
-        case .Dark:
-            title = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
-            self.titleLbl.textColor = DarkTabCellUX.TabTitleTextColor
-        }
-
-        titleLbl.backgroundColor = UIColor.clearColor()
-
-        title.layer.shadowColor = UIColor.blackColor().CGColor
-        title.layer.shadowOpacity = 0.2
-        title.layer.shadowOffset = CGSize(width: 0, height: 0.5)
-        title.layer.shadowRadius = 0
-
-        title.addSubview(self.closeButton)
-        title.addSubview(self.titleLbl)
-        title.addSubview(self.favicon)
-
-        backgroundHolder.addSubview(title)
-        self.titleWrapper = title
+        // noop, remove
     }
 
     required init?(coder aDecoder: NSCoder) {
