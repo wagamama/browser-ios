@@ -112,6 +112,8 @@ class TabCell: UICollectionViewCell {
         backgroundHolder.addSubview(self.background)
         backgroundHolder.addSubview(self.titleWrapper)
 
+        setupConstraints()
+        
         // Default style is light
         applyStyle(style)
 
@@ -128,8 +130,7 @@ class TabCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    private func setupConstraints() {
         
         let generalOffset = 4
         
@@ -167,15 +168,20 @@ class TabCell: UICollectionViewCell {
             make.centerY.equalTo(titleWrapper)
             make.right.equalTo(closeButton.superview!)
         }
-        
-        
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = self.titleWrapperBackground.bounds
-        gradientLayer.colors = [UIColor.whiteColor().CGColor, UIColor.clearColor().CGColor]
-        self.titleWrapperBackground.layer.mask = gradientLayer
     }
-
-
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // Frames do not seem to update until next runloop cycle
+        dispatch_async(dispatch_get_main_queue()) {
+            let gradientLayer = CAGradientLayer()
+            gradientLayer.frame = self.titleWrapperBackground.bounds
+            gradientLayer.colors = [UIColor.whiteColor().CGColor, UIColor.clearColor().CGColor]
+            self.titleWrapperBackground.layer.mask = gradientLayer
+        }
+    }
+    
     override func prepareForReuse() {
         // Reset any close animations.
         backgroundHolder.transform = CGAffineTransformIdentity
