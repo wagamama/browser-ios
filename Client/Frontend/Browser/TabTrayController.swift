@@ -145,42 +145,39 @@ class TabCell: UICollectionViewCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-
+        
         let generalOffset = 4
         
-        backgroundHolder.snp_makeConstraints { make in
+        backgroundHolder.snp_remakeConstraints { make in
             make.edges.equalTo(backgroundHolder.superview!)
         }
 
-        background.snp_makeConstraints { make in
+        background.snp_remakeConstraints { make in
             make.edges.equalTo(background.superview!)
         }
 
-        favicon.snp_makeConstraints { make in
+        favicon.snp_remakeConstraints { make in
             make.top.left.equalTo(favicon.superview!).offset(generalOffset)
             make.size.equalTo(titleWrapper.snp_height).offset(-generalOffset * 2)
         }
 
-        titleWrapper.snp_makeConstraints { make in
+        titleWrapper.snp_remakeConstraints { make in
             make.left.top.equalTo(titleWrapper.superview!)
             make.width.equalTo(titleWrapper.superview!.snp_width)
             make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
         }
 
-        titleLbl.snp_makeConstraints { make in
+        titleLbl.snp_remakeConstraints { make in
             make.left.equalTo(favicon.snp_right).offset(generalOffset)
             make.right.equalTo(closeButton.snp_left).offset(generalOffset)
             make.top.bottom.equalTo(titleLbl.superview!)
         }
 
-        closeButton.snp_makeConstraints { make in
+        closeButton.snp_remakeConstraints { make in
             make.size.equalTo(titleWrapper.snp_height)
             make.centerY.equalTo(titleWrapper)
             make.right.equalTo(closeButton.superview!)
         }
-
-        let top = (TabTrayControllerUX.TextBoxHeight - titleLbl.bounds.height) / 2.0
-        titleLbl.frame.origin = CGPoint(x: titleLbl.frame.origin.x, y: max(0, top))
     }
 
 
