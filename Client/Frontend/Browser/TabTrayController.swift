@@ -13,7 +13,7 @@ struct TabTrayControllerUX {
     static let CornerRadius = BraveUX.TabTrayCellCornerRadius
     static let BackgroundColor = UIConstants.AppBackgroundColor
     static let CellBackgroundColor = UIColor(red:0.95, green:0.95, blue:0.95, alpha:1)
-    static let TextBoxHeight = CGFloat(32.0)
+    static let TitleBoxHeight = CGFloat(26.0)
     static let Margin = CGFloat(15)
     static let ToolbarBarTintColor = UIConstants.AppBackgroundColor
     static let ToolbarButtonOffset = CGFloat(10.0)
@@ -150,7 +150,7 @@ class TabCell: UICollectionViewCell {
         titleWrapper.snp_remakeConstraints { make in
             make.left.top.equalTo(titleWrapper.superview!)
             make.width.equalTo(titleWrapper.superview!.snp_width)
-            make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
+            make.height.equalTo(TabTrayControllerUX.TitleBoxHeight)
         }
         
         titleWrapperBackground.snp_remakeConstraints { make in
@@ -809,14 +809,14 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout {
 
     private func cellHeightForCurrentDevice() -> CGFloat {
         let compactLayout = profile.prefs.boolForKey("CompactTabLayout") ?? true
-        let shortHeight = (compactLayout ? TabTrayControllerUX.TextBoxHeight * 6 : TabTrayControllerUX.TextBoxHeight * 5)
+        let shortHeight = TabTrayControllerUX.TitleBoxHeight * (compactLayout ? 7 : 6)
 
         if self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
             return shortHeight
         } else if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
             return shortHeight
         } else {
-            return TabTrayControllerUX.TextBoxHeight * 8
+            return TabTrayControllerUX.TitleBoxHeight * 8
         }
     }
 
