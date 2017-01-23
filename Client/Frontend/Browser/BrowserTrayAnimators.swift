@@ -143,7 +143,6 @@ private extension BrowserToTrayAnimator {
 
         let cell = createTransitionCellFromBrowser(bvc.tabManager.selectedTab, withFrame: expandedFrame)
         cell.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
-        cell.innerStroke.hidden = true
 
         // Take a snapshot of the collection view to perform the scaling/alpha effect
         let tabCollectionViewSnapshot = tabTray.collectionView.snapshotViewAfterScreenUpdates(true)

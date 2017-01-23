@@ -54,7 +54,6 @@ class TabCell: UICollectionViewCell {
     let backgroundHolder = UIView()
     let background = UIImageViewAligned()
     let titleLbl: UILabel
-    let innerStroke: InnerStrokedView
     let favicon: UIImageView = UIImageView()
     let closeButton: UIButton
 
@@ -93,9 +92,6 @@ class TabCell: UICollectionViewCell {
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
         self.closeButton.tintColor = .blackColor()
 
-        self.innerStroke = InnerStrokedView(frame: self.backgroundHolder.frame)
-        self.innerStroke.layer.backgroundColor = UIColor.clearColor().CGColor
-
         super.init(frame: frame)
 
         self.animator = SwipeAnimator(animatingView: self.backgroundHolder, container: self)
@@ -103,7 +99,6 @@ class TabCell: UICollectionViewCell {
 
         contentView.addSubview(backgroundHolder)
         backgroundHolder.addSubview(self.background)
-        backgroundHolder.addSubview(innerStroke)
 
         // Default style is light
         applyStyle(style)
@@ -171,10 +166,6 @@ class TabCell: UICollectionViewCell {
             make.left.top.equalTo(titleWrapper.superview!)
             make.width.equalTo(titleWrapper.superview!.snp_width)
             make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
-        }
-
-        innerStroke.snp_makeConstraints { make in
-            make.edges.equalTo(background)
         }
 
         titleLbl.snp_makeConstraints { make in
