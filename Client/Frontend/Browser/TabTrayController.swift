@@ -153,8 +153,7 @@ class TabCell: UICollectionViewCell {
         }
 
         background.snp_makeConstraints { make in
-            make.bottom.left.right.equalTo(background.superview!)
-            make.top.equalTo(background.superview!).offset(TabTrayControllerUX.TextBoxHeight)
+            make.edges.equalTo(background.superview!)
         }
 
         favicon.snp_makeConstraints { make in
