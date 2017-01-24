@@ -96,7 +96,6 @@ class WebViewLoadTest: XCTestCase {
                     "viglink.com",
                     "bluekai.com",
                     "bkrtx.com",
-                    "truste.com",
                     "tubemogul.com",
                     "sitescout.com",]
 
@@ -104,7 +103,7 @@ class WebViewLoadTest: XCTestCase {
             let req = NSMutableURLRequest(URL: NSURL(string: "http://" + url)!)
             req.mainDocumentURL = NSURL(string: "http://www.example.com")
             let b = TrackingProtection.singleton.shouldBlock(req)
-            XCTAssert(b)
+            XCTAssert(b, "TrackingProtection failed: \(url)")
         }
     }
 
