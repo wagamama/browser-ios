@@ -243,8 +243,6 @@ class BraveURLBarView : URLBarView {
     override func transitionToSearch(didCancel: Bool = false) {
         super.transitionToSearch(didCancel)
         locationView.alpha = 0.0
-
-        locationView.superview?.backgroundColor = locationTextField?.backgroundColor
     }
 
     override func leaveSearchMode(didCancel cancel: Bool) {
