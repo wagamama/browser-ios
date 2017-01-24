@@ -38,18 +38,8 @@ protocol TabCellDelegate: class {
 }
 
 class TabCell: UICollectionViewCell {
-    enum Style {
-        case Light
-        case Dark
-    }
 
     static let Identifier = "TabCellIdentifier"
-
-    var style: Style = .Light {
-        didSet {
-            applyStyle(style)
-        }
-    }
 
     let backgroundHolder = UIView()
     let background = UIImageViewAligned()
@@ -113,17 +103,10 @@ class TabCell: UICollectionViewCell {
         backgroundHolder.addSubview(self.titleWrapper)
 
         setupConstraints()
-        
-        // Default style is light
-        applyStyle(style)
 
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(name: Strings.Close, target: self.animator, selector: #selector(SELclose))
         ]
-    }
-
-    private func applyStyle(style: Style) {
-        // noop, remove
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -750,7 +733,6 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
             assert(false)
             return tabCell
         }
-        tabCell.style = tab.isPrivate ? .Dark : .Light
         tabCell.titleLbl.text = tab.displayTitle
 
         if !tab.displayTitle.isEmpty {
