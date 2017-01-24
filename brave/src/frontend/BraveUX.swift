@@ -62,7 +62,7 @@ struct BraveUX {
 
     // LocationBar Coloring
     static let LocationBarTextColor = UIColor.blackColor()
-    static let LocationBarBackgroundColor = UIColor(white: 1.0, alpha: 0.3)
+    static let LocationBarBackgroundColor = UIColor.clearColor()
     
     // Editing colors same as standard coloring
     static let LocationBarEditModeTextColor = LocationBarTextColor
@@ -70,7 +70,7 @@ struct BraveUX {
     
     // LocationBar Private Coloring
     // TODO: Add text coloring
-    static let LocationBarBackgroundColor_PrivateMode = UIColor.blackColor()
+    static let LocationBarBackgroundColor_PrivateMode = UIColor.clearColor()
 
     static let LocationBarEditModeBackgroundColor_Private = UIColor(white: 0/255.0, alpha: 1.0)
     static let LocationBarEditModeTextColor_Private = UIColor(white: 242/255.0, alpha: 1)

@@ -108,6 +108,9 @@ class URLBarView: UIView {
 
         locationContainer.layer.cornerRadius = URLBarViewUX.TextFieldCornerRadius
         locationContainer.layer.borderWidth = URLBarViewUX.TextFieldBorderWidth
+        
+        // Currently static, relocate to theme application if it needs to be dynamic
+        locationContainer.backgroundColor = UIColor(white: 1.0, alpha: 0.3)
 
         return locationContainer
     }()
