@@ -13,6 +13,14 @@ sed -e "s/APPGROUP_PLACEHOLDER/group.$app_id/" Brave.entitlements.template > Bra
 
 # if a brave build, setup fabric and mixpanel
 if [[ $app_id == com.brave.ios.browser* ]]; then
+    if [ ! -f ~/.brave-fabric-keys ]; then
+       echo "Missing ~/.brave-fabric-keys"
+       exit 1
+    fi
+    if [ ! -f ~/.brave-mixpanel-key ]; then
+       echo "Missing ~/.brave-mixpanel-key"
+       exit 1
+    fi
     dev_team_id="KL8N8XSYF4"
     sed -i '' -e "s/KEYCHAIN_PLACEHOLDER/$dev_team_id.$app_id/" Brave.entitlements
     echo "DEVELOPMENT_TEAM=$dev_team_id" >> xcconfig/local-def.xcconfig
