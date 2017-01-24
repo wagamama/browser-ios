@@ -30,17 +30,20 @@ struct BrowserLocationViewUX {
 
     static var Themes: [String: Theme] = {
         var themes = [String: Theme]()
+        
         var theme = Theme()
-        theme.URLFontColor = UIColor.lightGrayColor()
-        theme.hostFontColor = UIColor.whiteColor()
-        theme.backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
-        themes[Theme.PrivateMode] = theme
-
-        theme = Theme()
-        theme.URLFontColor = BaseURLFontColor
-        theme.hostFontColor = HostFontColor
-        theme.backgroundColor = UIColor.whiteColor()
+        theme.URLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
+        theme.hostFontColor = BraveUX.LocationBarTextColor_URLHostComponent
+        theme.textColor = BraveUX.LocationBarTextColor
+        theme.backgroundColor = BraveUX.LocationBarBackgroundColor
         themes[Theme.NormalMode] = theme
+        
+        theme = Theme()
+        theme.URLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
+        theme.hostFontColor = BraveUX.LocationBarTextColor_URLHostComponent
+        theme.textColor = UIColor.lightGrayColor()
+        theme.backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
+        themes[Theme.PrivateMode] = theme
 
         return themes
     }()
