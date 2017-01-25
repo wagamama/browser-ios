@@ -96,24 +96,6 @@ class BraveURLBarView : URLBarView {
         braveButton.accessibilityLabel = Strings.Brave_Panel
         braveButton.tintColor = BraveUX.ActionButtonTintColor
 
-        var theme = Theme()
-        theme.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor
-        theme.textColor = BraveUX.LocationBarEditModeTextColor
-        ToolbarTextField.Themes[Theme.NormalMode] = theme
-
-        theme = Theme()
-        theme.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor_Private
-        theme.textColor = BraveUX.LocationBarEditModeTextColor_Private
-        theme.buttonTintColor = UIColor.whiteColor()
-        ToolbarTextField.Themes[Theme.PrivateMode] = theme
-
-        theme = Theme()
-        theme.tintColor = URLBarViewUX.ProgressTintColor
-        theme.textColor = BraveUX.LocationBarTextColor
-        // Only applies to iPad, iPhone uses non-tinted images
-        theme.buttonTintColor = BraveUX.ActionButtonTintColor
-        URLBarViewUX.Themes[Theme.NormalMode] = theme
-
         tabsBarController.view.alpha = 0.0
         addSubview(tabsBarController.view)
         getApp().browserViewController.addChildViewController(tabsBarController)

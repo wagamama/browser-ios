@@ -70,11 +70,6 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         if let img = backButton.imageView?.image {
             backButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
         }
-        
-        var theme = Theme()
-        theme.buttonTintColor = BraveUX.ActionButtonTintColor
-        theme.backgroundColor = UIColor.clearColor()
-        BrowserToolbar.Themes[Theme.NormalMode] = theme
     }
 
     required init?(coder aDecoder: NSCoder) {

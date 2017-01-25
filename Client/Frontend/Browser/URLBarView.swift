@@ -28,7 +28,7 @@ struct URLBarViewUX {
     static let TabsButtonHeight: CGFloat = 18.0
     static let ToolbarButtonInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-    static var Themes: [String: Theme] = {
+    static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
         theme.tintColor = UIConstants.PrivateModePurple
@@ -37,9 +37,9 @@ struct URLBarViewUX {
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
-        theme.tintColor = ProgressTintColor
-        theme.textColor = UIColor.blackColor()
-        theme.buttonTintColor = UIColor.darkGrayColor()
+        theme.tintColor = URLBarViewUX.ProgressTintColor
+        theme.textColor = BraveUX.LocationBarTextColor
+        theme.buttonTintColor = BraveUX.ActionButtonTintColor
         themes[Theme.NormalMode] = theme
 
         return themes
@@ -607,18 +607,18 @@ extension URLBarView: Themeable {
 class CurveView: UIView {}
 
 class ToolbarTextField: AutocompleteTextField {
-    static var Themes: [String: Theme] = {
+    static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
-        theme.backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
-        theme.textColor = UIColor.whiteColor()
+        theme.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor_Private
+        theme.textColor = BraveUX.LocationBarEditModeTextColor_Private
         theme.buttonTintColor = UIColor.whiteColor()
         theme.highlightColor = UIConstants.PrivateModeTextHighlightColor
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
-        theme.backgroundColor = UIColor.whiteColor()
-        theme.textColor = UIColor.blackColor()
+        theme.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor
+        theme.textColor = BraveUX.LocationBarEditModeTextColor
         theme.highlightColor = AutocompleteTextFieldUX.HighlightColor
         themes[Theme.NormalMode] = theme
 

@@ -115,14 +115,15 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     var helper: BrowserToolbarHelper?
 
-    static var Themes: [String: Theme] = {
+    static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
         theme.buttonTintColor = UIConstants.PrivateModeActionButtonTintColor
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
-        theme.buttonTintColor = UIColor.darkGrayColor()
+        theme.buttonTintColor = BraveUX.ActionButtonTintColor
+        theme.backgroundColor = UIColor.clearColor()
         themes[Theme.NormalMode] = theme
 
         return themes
