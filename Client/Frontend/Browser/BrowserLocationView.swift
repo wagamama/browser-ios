@@ -28,7 +28,7 @@ struct BrowserLocationViewUX {
     static let HostPitch = 1.0
     static let LocationContentInset = 8
 
-    static var Themes: [String: Theme] = {
+    static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         
         var theme = Theme()
