@@ -1290,6 +1290,8 @@
 		EB9D8F211D9CCE5F00CA1624 /* BookmarksTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksTest.swift; sourceTree = "<group>"; };
 		EB9D8F231D9CCE5F00CA1624 /* WebViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewTest.swift; sourceTree = "<group>"; };
 		EBA11E191E2EB84800C964E0 /* adblock-regions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "adblock-regions.txt"; path = "brave/adblock-regions.txt"; sourceTree = SOURCE_ROOT; };
+		EBA6F12E1E39312100F7B3D9 /* ad-hoc-export.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; name = "ad-hoc-export.applescript"; path = "brave/build-system/ad-hoc-export.applescript"; sourceTree = "<group>"; };
+		EBA6F13F1E39410E00F7B3D9 /* upload-to-app-store.applescript */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.applescript; name = "upload-to-app-store.applescript"; path = "brave/build-system/upload-to-app-store.applescript"; sourceTree = "<group>"; };
 		EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewTest.swift; sourceTree = "<group>"; };
 		EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksTest.swift; sourceTree = "<group>"; };
 		EBE50B861DAEC689000BC0A1 /* Deferred.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Deferred.framework; path = Carthage/Build/iOS/Deferred.framework; sourceTree = "<group>"; };
@@ -2150,6 +2152,8 @@
 		9D9FA65B7AF80B044B65F8B2 /* brave */ = {
 			isa = PBXGroup;
 			children = (
+				EBA6F13F1E39410E00F7B3D9 /* upload-to-app-store.applescript */,
+				EBA6F12E1E39312100F7B3D9 /* ad-hoc-export.applescript */,
 				AEC7CC1649CB3DF5D490AFD2 /* ThirdParty */,
 				B036144E80BFD02638E7E647 /* Brave.entitlements */,
 				B5EFAA129595C26547FDD70D /* BraveInfo.plist */,
