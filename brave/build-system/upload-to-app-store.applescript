@@ -1,6 +1,7 @@
 -- Opens Organizer, uploads to App Store
 -- Designed for a build mac that only does Brave builds
 -- That is, doesn't handle multiple developer IDs, doesn't handle different apps in the Organizer list (otherwise we need another step to pick Brave)
+-- NOTE: first time running these, you must have System Preferences>Security & Privacy>Privacy>Accessibility open to get a prompt to allow Xcode
 tell application "Xcode"
 	activate
 end tell
