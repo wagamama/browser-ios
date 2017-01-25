@@ -203,7 +203,15 @@ class TabTrayController: UIViewController {
     weak var delegate: TabTrayDelegate?
 
     var collectionView: UICollectionView!
-    var addTabButton: UIButton!
+    lazy var addTabButton: UIButton = {
+        let addTabButton = UIButton()
+        addTabButton.setImage(UIImage(named: "add")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
+        addTabButton.addTarget(self, action: #selector(TabTrayController.SELdidClickAddTab), forControlEvents: .TouchUpInside)
+        addTabButton.accessibilityLabel = Strings.Add_Tab
+        addTabButton.accessibilityIdentifier = "TabTrayController.addTabButton"
+        return addTabButton
+    }()
+    
     var collectionViewTransitionSnapshot: UIView?
     
     /// Views to be animationed when preseting the Tab Tray.
@@ -323,12 +331,6 @@ class TabTrayController: UIViewController {
         super.viewDidLoad()
 
         view.accessibilityLabel = Strings.Tabs_Tray
-
-        addTabButton = UIButton()
-        addTabButton.setImage(UIImage(named: "add")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
-        addTabButton.addTarget(self, action: #selector(TabTrayController.SELdidClickAddTab), forControlEvents: .TouchUpInside)
-        addTabButton.accessibilityLabel = Strings.Add_Tab
-        addTabButton.accessibilityIdentifier = "TabTrayController.addTabButton"
 
         let flowLayout = TabTrayCollectionViewLayout()
         collectionView = UICollectionView(frame: view.frame, collectionViewLayout: flowLayout)
