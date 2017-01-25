@@ -34,12 +34,14 @@ struct URLBarViewUX {
         theme.tintColor = UIConstants.PrivateModePurple
         theme.textColor = UIColor.blackColor()
         theme.buttonTintColor = UIConstants.PrivateModeActionButtonTintColor
+        theme.backgroundColor = .blackColor()
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
         theme.tintColor = URLBarViewUX.ProgressTintColor
         theme.textColor = BraveUX.LocationBarTextColor
         theme.buttonTintColor = BraveUX.ActionButtonTintColor
+        theme.backgroundColor = UIColor(white: 1.0, alpha: 0.3)
         themes[Theme.NormalMode] = theme
 
         return themes
@@ -108,9 +110,6 @@ class URLBarView: UIView {
 
         locationContainer.layer.cornerRadius = URLBarViewUX.TextFieldCornerRadius
         locationContainer.layer.borderWidth = URLBarViewUX.TextFieldBorderWidth
-        
-        // Currently static, relocate to theme application if it needs to be dynamic
-        locationContainer.backgroundColor = UIColor(white: 1.0, alpha: 0.3)
 
         return locationContainer
     }()
@@ -598,6 +597,7 @@ extension URLBarView: Themeable {
         currentTheme = themeName
         cancelTextColor = theme.textColor
         actionButtonTintColor = theme.buttonTintColor
+        locationContainer.backgroundColor = theme.backgroundColor
 
         tabsButton.applyTheme(themeName)
     }
