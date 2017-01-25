@@ -87,6 +87,8 @@ class BrowserViewController: UIViewController {
     var scrollController = BraveScrollController()
 
     private var keyboardState: KeyboardState?
+    
+    private var currentThemeName: String?
 
     let WhiteListedUrls = ["\\/\\/itunes\\.apple\\.com\\/"]
 
@@ -169,6 +171,9 @@ class BrowserViewController: UIViewController {
         let bottomToolbarIsHidden = shouldShowFooterForTraitCollection(newCollection)
 
         urlBar.hideBottomToolbar(!bottomToolbarIsHidden)
+        
+        // TODO: (IMO) should be refactored to not destroy and recreate the toolbar all the time
+        // This would prevent theme knowledge from being retained as well
         toolbar?.removeFromSuperview()
         toolbar?.browserToolbarDelegate = nil
         footerBackground?.removeFromSuperview()
@@ -180,16 +185,12 @@ class BrowserViewController: UIViewController {
             toolbar?.browserToolbarDelegate = self
             footerBackground = BlurWrapper(view: toolbar!)
             footerBackground?.translatesAutoresizingMaskIntoConstraints = false
-
-#if !BRAVE
-            // Need to reset the proper blur style
-            if let selectedTab = tabManager.selectedTab  where selectedTab.isPrivate {
-                footerBackground!.blurStyle = .Dark
-            }
-#else
-            footerBackground!.blurStyle = .Dark
-#endif
             footer.addSubview(footerBackground!)
+            
+            // Since this is freshly created, theme needs to be applied
+            if let currentThemeName = self.currentThemeName {
+                self.applyTheme(currentThemeName)
+            }
         }
 
         view.setNeedsUpdateConstraints()
@@ -1263,6 +1264,8 @@ extension BrowserViewController: Themeable {
         default:
             log.debug("Unknown Theme \(themeName)")
         }
+        
+        self.currentThemeName = themeName
     }
 }
 
