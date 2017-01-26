@@ -3,7 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include "./local-def.xcconfig"
-
+#include "./build-id.xcconfig"
 HEADER_SEARCH_PATHS = ./brave/ThirdParty/leveldb/include ./brave/ThirdParty/leveldb
 
 MOZ_BUNDLE_DISPLAY_NAME = Brave$(BETA)
