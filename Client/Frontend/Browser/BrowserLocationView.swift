@@ -234,7 +234,12 @@ class BrowserLocationView: UIView {
 
         urlTextField.snp_remakeConstraints { make in
             make.top.bottom.equalTo(self)
-            make.left.equalTo(self.lockImageView.snp_right).offset(BrowserLocationViewUX.LocationContentInset)
+
+            if lockImageView.hidden {
+                make.left.equalTo(self).offset(BrowserLocationViewUX.LocationContentInset)
+            } else {
+                make.left.equalTo(self.lockImageView.snp_right).offset(BrowserLocationViewUX.LocationContentInset)
+            }
 
             if readerModeButton.hidden {
                 make.right.equalTo(self.stopReloadButton.snp_left)
