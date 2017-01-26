@@ -9,15 +9,18 @@
 import UIKit
 import CoreData
 
+let CoreDataWriteQueue: dispatch_queue_t = dispatch_queue_create("BraveDataWriteQueue", DISPATCH_QUEUE_SERIAL)
+
 class DataController: NSObject {
     static let singleton = DataController()
     
     private var _managedObjectContext: NSManagedObjectContext? = nil
     var managedObjectContext: NSManagedObjectContext? {
         get {
-            if NSThread.isMainThread() == true {
+            if NSThread.isMainThread() {
                 return mainThreadContext()
-            } else {
+            }
+            else {
                 return writeContext()
             }
         }
@@ -31,9 +34,7 @@ class DataController: NSObject {
     private var managedObjectModel: NSManagedObjectModel!
     private var persistentStoreCoordinator: NSPersistentStoreCoordinator!
     
-    let CoreDataWriteQueue: dispatch_queue_t = dispatch_queue_create("BraveDataWriteQueue", DISPATCH_QUEUE_SERIAL)
-    
-    override init() {
+    private override init() {
         super.init()
         
         guard let modelURL = NSBundle.mainBundle().URLForResource("Model", withExtension:"momd") else {
@@ -48,16 +49,19 @@ class DataController: NSObject {
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
             let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-            let docURL = urls[urls.endIndex-1]
-            let storeURL = docURL.URLByAppendingPathComponent("Brave.sqlite")
-            do {
-                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
-            } catch {
-                fatalError("Error migrating store: \(error)")
+            if let docURL = urls.last {
+                let storeURL = docURL.URLByAppendingPathComponent("Brave.sqlite")
+                do {
+                    try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
+                }
+                catch {
+                    fatalError("Error migrating store: \(error)")
+                }
             }
         }
     }
     
+    // Writes could still be executed on main thread, but recommended to use DataController.write {...}
     static func saveContext() {
         guard let managedObjectContext: NSManagedObjectContext = DataController.singleton.managedObjectContext else {
             return
@@ -66,9 +70,18 @@ class DataController: NSObject {
         if managedObjectContext.hasChanges {
             do {
                 try managedObjectContext.save()
-            } catch {
+            }
+            catch {
                 fatalError("Error migrating store: \(error)")
             }
+        }
+    }
+    
+    // DataController.write {...} closure execute data updates before context save.
+    static func write(closure: ()->void) {
+        dispatch_async(CoreDataWriteQueue) {
+            closure()
+            DataController.saveContext()
         }
     }
     
@@ -77,10 +90,9 @@ class DataController: NSObject {
             return managedObjectContext!
         }
         
-        let coordinator: NSPersistentStoreCoordinator? = self.persistentStoreCoordinator
-        if coordinator != nil {
+        if let coordinator: NSPersistentStoreCoordinator = self.persistentStoreCoordinator {
             managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
-            managedObjectContext?.persistentStoreCoordinator = coordinator!
+            managedObjectContext?.persistentStoreCoordinator = coordinator
             managedObjectContext?.undoManager = nil
             managedObjectContext?.mergePolicy = NSErrorMergePolicy
             
