@@ -174,12 +174,10 @@ class BrowserLocationView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        stopReloadButton.tintColor = BraveUX.ActionButtonTintColor
         stopReloadButton.accessibilityIdentifier = "BrowserToolbar.stopReloadButton"
         
         stopReloadButton.setImage(UIImage.templateImage(named: "reload"), forState: .Normal)
         stopReloadButton.setImage(UIImage.templateImage(named: "stop"), forState: .Selected)
-        stopReloadButton.tintColor = .whiteColor()
         // Setup the state dependent visuals
         stopReloadButtonIsLoading(false)
         
@@ -326,6 +324,7 @@ extension BrowserLocationView: Themeable {
         baseURLFontColor = theme.URLFontColor!
         hostFontColor = theme.hostFontColor!
         fullURLFontColor = theme.textColor!
+        stopReloadButton.tintColor = theme.textColor!
         backgroundColor = theme.backgroundColor
     }
 }
