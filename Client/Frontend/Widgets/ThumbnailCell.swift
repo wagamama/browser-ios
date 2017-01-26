@@ -14,12 +14,11 @@ struct ThumbnailCellUX {
     static let LabelBackgroundColor = UIColor(white: 1.0, alpha: 0.7)
     static let LabelAlignment: NSTextAlignment = .Center
     static let SelectedOverlayColor = UIColor(white: 0.0, alpha: 0.25)
-//    static let InsetSize: CGFloat = 20
-//    static let InsetSizeCompact: CGFloat = 6
-#if BRAVE
     static let InsetSize: CGFloat = 10
     static let InsetSizeCompact: CGFloat = 3
-#endif
+    static let ImagePaddingWide: CGFloat = 4
+    static let ImagePaddingCompact: CGFloat = 2
+    
     static func insetsForCollectionViewSize(size: CGSize, traitCollection: UITraitCollection) -> UIEdgeInsets {
         let largeInsets = UIEdgeInsets(
                 top: ThumbnailCellUX.InsetSize,
@@ -40,10 +39,7 @@ struct ThumbnailCellUX {
             return largeInsets
         }
     }
-#if BRAVE
-    static let ImagePaddingWide: CGFloat = 4
-    static let ImagePaddingCompact: CGFloat = 2
-#endif
+
     static func imageInsetsForCollectionViewSize(size: CGSize, traitCollection: UITraitCollection) -> UIEdgeInsets {
         let largeInsets = UIEdgeInsets(
                 top: ThumbnailCellUX.ImagePaddingWide,
@@ -217,6 +213,7 @@ class ThumbnailCell: UICollectionViewCell {
         removeButton.center = CGPoint(x: buttonCenterX, y: buttonCenterY)
         return removeButton    }()
 
+    // TODO: Should be no longer needed
     lazy var backgroundImage: UIImageView = {
         let backgroundImage = UIImageView()
         backgroundImage.contentMode = UIViewContentMode.ScaleAspectFill
