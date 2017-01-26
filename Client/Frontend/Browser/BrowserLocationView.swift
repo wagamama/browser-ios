@@ -142,16 +142,6 @@ class BrowserLocationView: UIView {
         return lockImageView
     }()
 
-    private lazy var privateBrowsingIconView: UIImageView = {
-        let icon = UIImageView(image: UIImage(named: "privateBrowsingGlasses")!.imageWithRenderingMode(.AlwaysTemplate))
-        icon.tintColor = BraveUX.BraveOrange
-        icon.alpha = 0
-        icon.isAccessibilityElement = true
-        icon.contentMode = UIViewContentMode.ScaleAspectFit
-        icon.accessibilityLabel = Strings.Private_mode_icon
-        return icon
-    }()
-
     private lazy var readerModeButton: ReaderModeButton = {
         let readerModeButton = ReaderModeButton(frame: CGRectZero)
         readerModeButton.hidden = true
@@ -199,7 +189,6 @@ class BrowserLocationView: UIView {
         tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(BrowserLocationView.SELtapLocation(_:)))
 
         addSubview(urlTextField)
-        addSubview(privateBrowsingIconView)
         addSubview(lockImageView)
         addSubview(readerModeButton)
         addSubview(stopReloadButton)
@@ -214,7 +203,7 @@ class BrowserLocationView: UIView {
 
     override var accessibilityElements: [AnyObject]! {
         get {
-            return [privateBrowsingIconView, lockImageView, urlTextField, readerModeButton].filter { !$0.hidden }
+            return [lockImageView, urlTextField, readerModeButton].filter { !$0.hidden }
         }
         set {
             super.accessibilityElements = newValue
@@ -226,11 +215,10 @@ class BrowserLocationView: UIView {
     }
 
     override func updateConstraints() {
-        privateBrowsingIconLayout()
 
         lockImageView.snp_makeConstraints { make in
             make.centerY.equalTo(self)
-            make.left.equalTo(self.privateBrowsingIconView.snp_right).offset(BrowserLocationViewUX.LocationContentInset)
+            make.left.equalTo(self).offset(BrowserLocationViewUX.LocationContentInset)
             make.width.equalTo(self.lockImageView.intrinsicContentSize().width)
         }
 
@@ -248,12 +236,7 @@ class BrowserLocationView: UIView {
 
         urlTextField.snp_remakeConstraints { make in
             make.top.bottom.equalTo(self)
-
-            if lockImageView.hidden {
-                make.left.equalTo(self.privateBrowsingIconView.snp_right).offset(BrowserLocationViewUX.LocationContentInset)
-            } else {
-                make.left.equalTo(self.lockImageView.snp_right).offset(BrowserLocationViewUX.LocationContentInset)
-            }
+            make.left.equalTo(self.lockImageView.snp_right).offset(BrowserLocationViewUX.LocationContentInset)
 
             if readerModeButton.hidden {
                 make.right.equalTo(self.stopReloadButton.snp_left)
@@ -263,25 +246,6 @@ class BrowserLocationView: UIView {
         }
 
         super.updateConstraints()
-    }
-
-    func showPrivateBrowsingIcon(enabled: Bool) {
-        privateBrowsingIconView.alpha = enabled ? 1.0 : 0.0
-        setNeedsUpdateConstraints()
-    }
-
-    private func privateBrowsingIconLayout() {
-        privateBrowsingIconView.snp_remakeConstraints() { make in
-            make.centerY.equalTo(self)
-
-            if self.privateBrowsingIconView.alpha > 0 {
-                make.width.equalTo(16)
-                make.left.equalTo(self).offset(BrowserLocationViewUX.LocationContentInset)
-            } else {
-                make.left.equalTo(self)
-                make.width.equalTo(0)
-            }
-        }
     }
 
     func SELtapReaderModeButton() {
