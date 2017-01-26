@@ -163,23 +163,11 @@ class BrowserLocationView: UIView {
         return readerModeButton
     }()
 
-    let ImageReload = UIImage(named: "reload")
-    let ImageReloadPressed = UIImage(named: "reloadPressed")
-    let ImageStop = UIImage(named: "stop")
-    let ImageStopPressed = UIImage(named: "stopPressed")
-
-    var stopReloadButton: UIButton!
+    let stopReloadButton = UIButton()
 
     func stopReloadButtonIsLoading(isLoading: Bool) {
-        if isLoading {
-            stopReloadButton.setImage(ImageStop, forState: .Normal)
-            stopReloadButton.setImage(ImageStopPressed, forState: .Highlighted)
-            stopReloadButton.accessibilityLabel = Strings.Stop
-        } else {
-            stopReloadButton.setImage(ImageReload, forState: .Normal)
-            stopReloadButton.setImage(ImageReloadPressed, forState: .Highlighted)
-            stopReloadButton.accessibilityLabel = Strings.Reload
-        }
+        stopReloadButton.selected = isLoading
+        stopReloadButton.accessibilityLabel = isLoading ? Strings.Stop : Strings.Reload
     }
 
     func didClickStopReload() {
@@ -196,12 +184,15 @@ class BrowserLocationView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        stopReloadButton = UIButton()
         stopReloadButton.tintColor = BraveUX.ActionButtonTintColor
         stopReloadButton.accessibilityIdentifier = "BrowserToolbar.stopReloadButton"
-        stopReloadButton.setImage(UIImage(named: "reload"), forState: .Normal)
-        stopReloadButton.setImage(UIImage(named: "reloadPressed"), forState: .Highlighted)
-        stopReloadButton.accessibilityLabel = Strings.Reload
+        
+        stopReloadButton.setImage(UIImage.templateImage(named: "reload"), forState: .Normal)
+        stopReloadButton.setImage(UIImage.templateImage(named: "stop"), forState: .Selected)
+        stopReloadButton.tintColor = .whiteColor()
+        // Setup the state dependent visuals
+        stopReloadButtonIsLoading(false)
+        
         stopReloadButton.addTarget(self, action: #selector(BrowserLocationView.didClickStopReload), forControlEvents: UIControlEvents.TouchUpInside)
 
         longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(BrowserLocationView.SELlongPressLocation(_:)))
