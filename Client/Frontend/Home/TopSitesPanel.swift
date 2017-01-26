@@ -143,7 +143,10 @@ class TopSitesPanel: UIViewController {
             refreshTopSites(maxFrecencyLimit)
             break
         case NotificationPrivacyModeChanged:
+            // TODO: This entire blockshould be abstracted
+            //  to make code in this class DRY (duplicates from elsewhere)
             collection?.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
+            braveShieldStatsView?.timeStatView.color = PrivateBrowsing.singleton.isOn ? .whiteColor() : .blackColor()
             collection?.reloadData()
             break
         default:
