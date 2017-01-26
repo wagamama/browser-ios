@@ -32,7 +32,7 @@ struct URLBarViewUX {
         var themes = [String: Theme]()
         var theme = Theme()
         theme.tintColor = UIConstants.PrivateModePurple
-        theme.textColor = UIColor.blackColor()
+        theme.textColor = .whiteColor()
         theme.buttonTintColor = UIConstants.PrivateModeActionButtonTintColor
         theme.backgroundColor = .blackColor()
         themes[Theme.PrivateMode] = theme

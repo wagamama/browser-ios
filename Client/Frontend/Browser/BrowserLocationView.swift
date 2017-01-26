@@ -31,6 +31,9 @@ struct BrowserLocationViewUX {
     static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         
+        // TODO: Currently fontColor theme adjustments are being overriden by the textColor.
+        // This should be cleaned up.
+        
         var theme = Theme()
         theme.URLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
         theme.hostFontColor = BraveUX.LocationBarTextColor_URLHostComponent
@@ -41,7 +44,7 @@ struct BrowserLocationViewUX {
         theme = Theme()
         theme.URLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
         theme.hostFontColor = BraveUX.LocationBarTextColor_URLHostComponent
-        theme.textColor = UIColor.lightGrayColor()
+        theme.textColor = .whiteColor()
         theme.backgroundColor = BraveUX.LocationBarBackgroundColor_PrivateMode
         themes[Theme.PrivateMode] = theme
 
