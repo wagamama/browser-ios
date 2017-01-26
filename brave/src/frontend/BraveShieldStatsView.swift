@@ -33,7 +33,8 @@ class BraveShieldStatsView: UIView {
     lazy var timeStatView: StatView = {
         let statView = StatView(frame: CGRectZero)
         statView.title = "Est. Time \rSaved"
-        statView.color = UIColor.blackColor()
+        // Color dynamically set in controller: TopSitesPanel, should be abstracted
+        statView.color = PrivateBrowsing.singleton.isOn ? .whiteColor() : .blackColor()
         return statView
     }()
     

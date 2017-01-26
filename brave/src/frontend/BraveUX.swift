@@ -40,7 +40,7 @@ struct BraveUX {
 
     static let BackgroundColorForBookmarksHistoryAndTopSites = UIColor(white: 242/255.0, alpha: 1.0)
     
-    static let BackgroundColorForTopSitesPrivate = UIColor(red: 63/255.0, green: 63/255.0, blue: 63/255.0, alpha: 1.0)
+    static let BackgroundColorForTopSitesPrivate = UIColor(white: 42 / 255.0, alpha: 1.0)
     
     static let BackgroundColorForSideToolbars = UIColor(white: 248 / 255.0, alpha: 1.0)
     
