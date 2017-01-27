@@ -670,7 +670,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
 
     private func configureCell(cell: ThumbnailCell, forSuggestedSite site: SuggestedSite) {
         cell.textLabel.text = site.title.isEmpty ? NSURL(string: site.url)?.normalizedHostAndPath() : site.title.lowercaseString
-        cell.imageWrapper.backgroundColor = site.backgroundColor
+        cell.imageView.backgroundColor = site.backgroundColor
         cell.imageView.contentMode = .ScaleAspectFit
         cell.imageView.layer.minificationFilter = kCAFilterTrilinear
         cell.showBorder(!PrivateBrowsing.singleton.isOn)
