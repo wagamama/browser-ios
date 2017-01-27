@@ -89,6 +89,9 @@ class TopSitesPanel: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let statsHeight: CGFloat = 120.0
+        let statsBottomMargin: CGFloat = 20.0
+        
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
         collection.delegate = self
@@ -96,7 +99,8 @@ class TopSitesPanel: UIViewController {
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
         collection.keyboardDismissMode = .OnDrag
         collection.accessibilityIdentifier = "Top Sites View"
-        collection.contentInset = UIEdgeInsetsMake(120, 0, 0, 0)
+        // Entire site panel, including the stats view insets
+        collection.contentInset = UIEdgeInsetsMake(statsHeight, 0, 0, 0)
         view.addSubview(collection)
         collection.snp_makeConstraints { make in
             make.edges.equalTo(self.view)
@@ -113,9 +117,10 @@ class TopSitesPanel: UIViewController {
         // Quick-and-dirty layout here.
         var statsViewFrame: CGRect = braveShieldStatsView.frame
         statsViewFrame.origin.x = 10
-        statsViewFrame.origin.y = -120
+        // Offset the stats view from the inset set above
+        statsViewFrame.origin.y = -(statsHeight + statsBottomMargin)
         statsViewFrame.size.width = CGRectGetWidth(collection.frame) - CGRectGetMinX(statsViewFrame) * 2
-        statsViewFrame.size.height = 120
+        statsViewFrame.size.height = statsHeight
         braveShieldStatsView.frame = statsViewFrame
         braveShieldStatsView.autoresizingMask = [.FlexibleWidth]
 
