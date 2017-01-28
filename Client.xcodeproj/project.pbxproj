@@ -166,6 +166,7 @@
 		5C44C0CF1E3847A100B1FD81 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C44C0C21E38479200B1FD81 /* CoreData.framework */; };
 		5C44C0D21E384AE700B1FD81 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D11E384AE700B1FD81 /* DataController.swift */; };
 		5C44C0D51E39834600B1FD81 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */; };
+		5C44C0D71E3C08B400B1FD81 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */; };
 		5C67126F8B355442E99D9EDB /* BrowserViewController+FindInPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BA9175CB5140E6C4D47DC15 /* BrowserViewController+FindInPage.swift */; };
 		5CE70E451E022FAB008B307A /* BraveShieldStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */; };
 		5CE70E4D1E02831B008B307A /* IntExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE70E4C1E02831B008B307A /* IntExtensions.swift */; };
@@ -930,6 +931,7 @@
 		5C44C0C21E38479200B1FD81 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		5C44C0D11E384AE700B1FD81 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataController.swift; path = brave/src/data/DataController.swift; sourceTree = "<group>"; };
 		5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bookmark.swift; path = brave/src/data/Bookmark.swift; sourceTree = "<group>"; };
 		5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveShieldStatsView.swift; path = brave/src/frontend/BraveShieldStatsView.swift; sourceTree = "<group>"; };
 		5CE70E4C1E02831B008B307A /* IntExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IntExtensions.swift; path = Utils/Extensions/IntExtensions.swift; sourceTree = "<group>"; };
 		5CFC706C1D9D9F30008A7B7A /* BraveTermsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveTermsViewController.swift; path = brave/src/frontend/BraveTermsViewController.swift; sourceTree = "<group>"; };
@@ -1952,6 +1954,7 @@
 			children = (
 				5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */,
 				5C44C0D11E384AE700B1FD81 /* DataController.swift */,
+				5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */,
 			);
 			name = data;
 			sourceTree = "<group>";
@@ -3971,6 +3974,7 @@
 				D4D89E59C045D41A4853B20F /* SearchEnginePicker.swift in Sources */,
 				D22B5AC8588A48662FD6757A /* SearchSettingsTableViewController.swift in Sources */,
 				7DDC5DDFD3653B02726E925F /* SettingsContentViewController.swift in Sources */,
+				5C44C0D71E3C08B400B1FD81 /* Bookmark.swift in Sources */,
 				71016AB1FC1E6BA1ED8AE24B /* SettingsNavigationController.swift in Sources */,
 				5F75F6A942D553447FCA177F /* SettingsTableViewController.swift in Sources */,
 				A69BFC90988CE401E0A5A0E7 /* FindInPageActivity.swift in Sources */,
