@@ -570,42 +570,24 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     }
     
     private func setColorBackground(image: UIImage, withURL url: NSURL, forCell cell: ThumbnailCell) {
-        let colorKey = "\(url.absoluteString)!color"
-        if let backgroundImage = SDImageCache.sharedImageCache().imageFromMemoryCacheForKey(colorKey) {
-            cell.imageView.image = backgroundImage
-            cell.imageView.contentMode = .ScaleToFill
-            return
-        }
-        
-        guard let cgimage = image.CGImage else { return }
-        let contextImage: UIImage = UIImage(CGImage: cgimage)
-        let contextSize: CGSize = contextImage.size
+        // TODO:
+        // Currently just calculate the background image color everytime.
+        // This will be refactored when the switch to coredata happens (then the image color can be stored)
         
         let rgba = UnsafeMutablePointer<CUnsignedChar>.alloc(4)
-        let colorSpace: CGColorSpaceRef = CGColorSpaceCreateDeviceRGB()
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
         let info = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue)
         let context: CGContextRef = CGBitmapContextCreate(rgba, 1, 1, 8, 4, colorSpace, info.rawValue)!
 
-        guard let newImage = contextImage.CGImage else { return }
+        guard let newImage = image.CGImage else { return }
         CGContextDrawImage(context, CGRectMake(0, 0, 1, 1), newImage)
         
         let red = CGFloat(rgba[0]) / 255.0
         let green = CGFloat(rgba[1]) / 255.0
         let blue = CGFloat(rgba[2]) / 255.0
-        let alpha = CGFloat(1)
-        let colorFill: UIColor = UIColor(red: red, green: green, blue: blue, alpha: alpha)
+        let colorFill: UIColor = UIColor(red: red, green: green, blue: blue, alpha: 1.0)
         
-        let rect = CGRectMake(0, 0, contextSize.width, contextSize.height)
-        UIGraphicsBeginImageContextWithOptions(contextSize, false, 0)
-        colorFill.setFill()
-        UIRectFill(rect)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        SDImageCache.sharedImageCache().storeImage(image, forKey: colorKey, toDisk: false)
-        cell.imageView.image = image
-        cell.imageView.contentMode = .ScaleToFill
-        cell.imageView.alpha = 1
+        cell.imageView.backgroundColor = colorFill
     }
 
     private func downloadFaviconsAndUpdateForSite(site: Site) {
