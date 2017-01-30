@@ -84,8 +84,8 @@ class BraveApp {
         DataController.write {
             let bookmark = DataController.new("Bookmark") as! Bookmark
             bookmark.title = "Brave"
-            bookmark.location = "https://brave.com/"
-            bookmark.lastAccessed = NSDate()
+            bookmark.url = "https://brave.com/"
+            bookmark.lastVisited = NSDate()
         }
     }
 

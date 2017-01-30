@@ -167,7 +167,10 @@
 		5C44C0D21E384AE700B1FD81 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D11E384AE700B1FD81 /* DataController.swift */; };
 		5C44C0D51E39834600B1FD81 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */; };
 		5C44C0D71E3C08B400B1FD81 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */; };
+		5C44C0DA1E3EE42D00B1FD81 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D91E3EE42D00B1FD81 /* Domain.swift */; };
+		5C44C0DE1E3EE47B00B1FD81 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0DD1E3EE47B00B1FD81 /* History.swift */; };
 		5C67126F8B355442E99D9EDB /* BrowserViewController+FindInPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BA9175CB5140E6C4D47DC15 /* BrowserViewController+FindInPage.swift */; };
+		5CD7F38E1E3EFBF100A12BB9 /* FaviconMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */; };
 		5CE70E451E022FAB008B307A /* BraveShieldStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */; };
 		5CE70E4D1E02831B008B307A /* IntExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE70E4C1E02831B008B307A /* IntExtensions.swift */; };
 		5CFC706D1D9D9F30008A7B7A /* BraveTermsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFC706C1D9D9F30008A7B7A /* BraveTermsViewController.swift */; };
@@ -932,6 +935,9 @@
 		5C44C0D11E384AE700B1FD81 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataController.swift; path = brave/src/data/DataController.swift; sourceTree = "<group>"; };
 		5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bookmark.swift; path = brave/src/data/Bookmark.swift; sourceTree = "<group>"; };
+		5C44C0D91E3EE42D00B1FD81 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Domain.swift; path = brave/src/data/Domain.swift; sourceTree = "<group>"; };
+		5C44C0DD1E3EE47B00B1FD81 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = History.swift; path = brave/src/data/History.swift; sourceTree = "<group>"; };
+		5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FaviconMO.swift; path = brave/src/data/FaviconMO.swift; sourceTree = "<group>"; };
 		5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveShieldStatsView.swift; path = brave/src/frontend/BraveShieldStatsView.swift; sourceTree = "<group>"; };
 		5CE70E4C1E02831B008B307A /* IntExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IntExtensions.swift; path = Utils/Extensions/IntExtensions.swift; sourceTree = "<group>"; };
 		5CFC706C1D9D9F30008A7B7A /* BraveTermsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveTermsViewController.swift; path = brave/src/frontend/BraveTermsViewController.swift; sourceTree = "<group>"; };
@@ -1955,6 +1961,9 @@
 				5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */,
 				5C44C0D11E384AE700B1FD81 /* DataController.swift */,
 				5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */,
+				5C44C0D91E3EE42D00B1FD81 /* Domain.swift */,
+				5C44C0DD1E3EE47B00B1FD81 /* History.swift */,
+				5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */,
 			);
 			name = data;
 			sourceTree = "<group>";
@@ -3791,6 +3800,7 @@
 			files = (
 				C0725B9765E18BB98FA2C416 /* builder.cc in Sources */,
 				22A2D33804D88F8E5A828EB9 /* c.cc in Sources */,
+				5C44C0DA1E3EE42D00B1FD81 /* Domain.swift in Sources */,
 				0336F9B2BC7FF14F45DB681F /* db_impl.cc in Sources */,
 				DF0324E386DF0AAF40CEE51A /* db_iter.cc in Sources */,
 				E89DEAF4A642EA060CAC3883 /* dbformat.cc in Sources */,
@@ -3818,6 +3828,7 @@
 				D930735487A274E11203B106 /* table_builder.cc in Sources */,
 				9E08BE0D0C19A5DA7BA7BB52 /* two_level_iterator.cc in Sources */,
 				25EC5AB01633FAA4720D56C3 /* arena.cc in Sources */,
+				5C44C0DE1E3EE47B00B1FD81 /* History.swift in Sources */,
 				9936A9499C3DD474BF33C5A7 /* bloom.cc in Sources */,
 				66D96438D7A6745AE7673C3E /* cache.cc in Sources */,
 				015649F978DE96490BACE063 /* coding.cc in Sources */,
@@ -3861,6 +3872,7 @@
 				7F05CC97A91011D519E12402 /* BraveContextMenu.swift in Sources */,
 				B735CA1D323CBBD44E763DD9 /* BravePageUnloadHelper.swift in Sources */,
 				31CAC008CE6B2D73DBFC9A5E /* ElementAtPoint.swift in Sources */,
+				5CD7F38E1E3EFBF100A12BB9 /* FaviconMO.swift in Sources */,
 				67EBDA431847A8081DDCF90E /* FingerprintingProtection.swift in Sources */,
 				365D79EB4650B90378CCF45B /* HideEmptyImages.swift in Sources */,
 				A1CFE166EBD926880A69E052 /* LoginsHelper+1PW.swift in Sources */,
