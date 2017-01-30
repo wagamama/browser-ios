@@ -16,9 +16,16 @@ class Bookmark: NSManagedObject {
     @NSManaged var parentId: String?
     @NSManaged var title: String?
     @NSManaged var customTitle: String?
-    @NSManaged var location: String?
-    @NSManaged var favicon: String?
-    @NSManaged var lastAccessed: NSDate?
-    @NSManaged var Tags: [String]?
+    @NSManaged var url: String?
+    @NSManaged var visits: NSNumber?
+    @NSManaged var lastVisited: NSDate?
+    @NSManaged var tags: [String]?
+    @NSManaged var favIcon: FaviconMO?
+    
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        
+        lastVisited = NSDate()
+    }
     
 }
