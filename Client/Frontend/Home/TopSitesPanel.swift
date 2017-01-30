@@ -572,8 +572,8 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     private func setColorBackground(image: UIImage, withURL url: NSURL, forCell cell: ThumbnailCell) {
         let colorKey = "\(url.absoluteString)!color"
         if let backgroundImage = SDImageCache.sharedImageCache().imageFromMemoryCacheForKey(colorKey) {
-            cell.backgroundImage.image = backgroundImage
-            cell.backgroundImage.contentMode = .ScaleToFill
+            cell.imageView.image = backgroundImage
+            cell.imageView.contentMode = .ScaleToFill
             return
         }
         
@@ -603,9 +603,9 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         UIGraphicsEndImageContext()
         
         SDImageCache.sharedImageCache().storeImage(image, forKey: colorKey, toDisk: false)
-        cell.backgroundImage.image = image
-        cell.backgroundImage.contentMode = .ScaleToFill
-        cell.backgroundImage.alpha = 1
+        cell.imageView.image = image
+        cell.imageView.contentMode = .ScaleToFill
+        cell.imageView.alpha = 1
     }
 
     private func downloadFaviconsAndUpdateForSite(site: Site) {
