@@ -15,6 +15,9 @@ class FaviconMO: NSManagedObject {
     @NSManaged var url: String?
     @NSManaged var width: NSNumber?
     @NSManaged var height: NSNumber?
+    @NSManaged var bookmark: Bookmark?
+    @NSManaged var domain: Domain?
+    @NSManaged var tab: Tab?
     
     override func awakeFromInsert() {
         super.awakeFromInsert()

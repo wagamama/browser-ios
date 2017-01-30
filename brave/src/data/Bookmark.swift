@@ -19,6 +19,7 @@ class Bookmark: NSManagedObject {
     @NSManaged var url: String?
     @NSManaged var visits: NSNumber?
     @NSManaged var lastVisited: NSDate?
+    @NSManaged var order: NSNumber?
     @NSManaged var tags: [String]?
     @NSManaged var favIcon: FaviconMO?
     
