@@ -16,6 +16,7 @@ class History: NSManagedObject {
     @NSManaged var url: String?
     @NSManaged var visitedOn: NSDate?
     @NSManaged var domain: Domain?
+    @NSManaged var tab: Tab?
     
     override func awakeFromInsert() {
         super.awakeFromInsert()
