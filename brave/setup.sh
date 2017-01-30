@@ -36,7 +36,7 @@ else
     echo "// DEVELOPMENT_TEAM=" >> xcconfig/local-def.xcconfig
 fi
 
-echo GENERATED_BUILD_ID=`date +"%y.%m.%d.%H"` >> xcconfig/local-def.xcconfig
+echo GENERATED_BUILD_ID=`date +"%y.%m.%d.%H"` >> xcconfig/build-id.xcconfig
 
 npm update
 
