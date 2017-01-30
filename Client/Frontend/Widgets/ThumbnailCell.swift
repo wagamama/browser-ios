@@ -88,25 +88,8 @@ class ThumbnailCell: UICollectionViewCell {
     var imageInsets: UIEdgeInsets = UIEdgeInsetsZero
     var cellInsets: UIEdgeInsets = UIEdgeInsetsZero
 
-    var imagePadding: CGFloat = 0 {
-        didSet {
-            // Find out if our image is going to have fractional pixel width.
-            // If so, we inset by a tiny extra amount to get it down to an integer for better
-            // image scaling.
-            let parentWidth = self.imageWrapper.frame.width
-            let width = (parentWidth - imagePadding)
-            let fractionalW = width - floor(width)
-            let additionalW = fractionalW / 2
-
-            // TODO: Abstract...
-            imageView.snp_remakeConstraints { make in
-                make.top.equalTo(self.contentView).inset(imagePadding)
-                make.right.left.equalTo(self.contentView).inset(10 + additionalW)
-                make.height.equalTo(imageView.snp_width)
-            }
-            imageView.setNeedsUpdateConstraints()
-        }
-    }
+    // TODO: Remove
+    var imagePadding: CGFloat = 0
 
     static func imageWithSize(image: UIImage, size:CGSize, maxScale: CGFloat) -> UIImage {
         var scaledImageRect = CGRect.zero;
@@ -249,8 +232,8 @@ class ThumbnailCell: UICollectionViewCell {
 
         textLabel.snp_remakeConstraints { make in
             // TODO: relook at insets
-            make.left.right.bottom.equalTo(self.contentView).inset(ThumbnailCellUX.LabelInsets)
-            make.top.equalTo(imageView.snp_bottom)
+            make.left.right.equalTo(self.contentView).inset(ThumbnailCellUX.LabelInsets)
+            make.top.equalTo(imageView.snp_bottom).offset(5)
         }
 
         // Prevents the textLabel from getting squished in relation to other view priorities.
@@ -317,23 +300,21 @@ class ThumbnailCell: UICollectionViewCell {
      - parameter size: Size of the container collection view
      */
     func updateLayoutForCollectionViewSize(size: CGSize, traitCollection: UITraitCollection, forSuggestedSite: Bool) {
-        let cellInsets = ThumbnailCellUX.insetsForCollectionViewSize(size,
-            traitCollection: traitCollection)
-        let imageInsets = ThumbnailCellUX.imageInsetsForCollectionViewSize(size,
-            traitCollection: traitCollection)
-
-        if forSuggestedSite {
-            self.imagePadding = 0.0
-            return
+        
+        // Find out if our image is going to have fractional pixel width.
+        // If so, we inset by a tiny extra amount to get it down to an integer for better
+        // image scaling.
+        let parentWidth = self.imageWrapper.frame.width
+        let width = (parentWidth - imagePadding)
+        let fractionalW = width - floor(width)
+        let additionalW = fractionalW / 2
+        
+        // TODO: Should not remade on every layout call
+        imageView.snp_remakeConstraints { make in
+            make.top.equalTo(self.contentView).inset(8)
+            make.right.left.equalTo(self.contentView).inset(16 + additionalW)
+            make.height.equalTo(imageView.snp_width)
         }
-
-        // TODO: Abstract this, it is duplicate
-        if imageInsets != self.imageInsets {
-            imageView.snp_remakeConstraints { make in
-                make.top.equalTo(self.contentView).inset(imageInsets.top)
-                make.right.left.equalTo(self.contentView).inset(10)
-                make.height.equalTo(imageView.snp_width)
-            }
-        }
+        imageView.setNeedsUpdateConstraints()
     }
 }

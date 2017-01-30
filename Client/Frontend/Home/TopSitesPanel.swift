@@ -672,6 +672,8 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
 
         if icon.scheme == "asset" {
             if let image = UIImage(named: host) {
+                // TODO: Should no longer be needed
+                
                 // Brave hack. The images are too close to the top edge
                 UIGraphicsBeginImageContextWithOptions(image.size, false, 0)
                 image.drawInRect(CGRect(origin: CGPoint(x: 3, y: 6), size: CGSizeMake(image.size.width - 6, image.size.height - 6)))
@@ -769,22 +771,19 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         // Cells for the top site thumbnails.
         let site = self[indexPath.item]!
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(ThumbnailIdentifier, forIndexPath: indexPath) as! ThumbnailCell
-
-        let traitCollection = collectionView.traitCollection
-
+        
+        // TODO: Can be refactored, currently used primarily for title differences
         if let site = site as? SuggestedSite {
             configureCell(cell, forSuggestedSite: site)
-            cell.updateLayoutForCollectionViewSize(collectionView.bounds.size, traitCollection: traitCollection, forSuggestedSite: true)
-            return cell
+        } else {
+            configureCell(cell, forSite: site, isEditing: editingThumbnails, profile: profile)
         }
 
-        configureCell(cell, forSite: site, isEditing: editingThumbnails, profile: profile)
-        cell.updateLayoutForCollectionViewSize(collectionView.bounds.size, traitCollection: traitCollection, forSuggestedSite: false)
+        cell.updateLayoutForCollectionViewSize(collectionView.bounds.size, traitCollection: collectionView.traitCollection, forSuggestedSite: false)
         return cell
     }
 }
 
-#if BRAVE
 extension TopSitesPanel : WindowTouchFilter {
     func filterTouch(touch: UITouch) -> Bool {
         if (touch.view as? UIButton) == nil && touch.phase == .Began {
@@ -793,5 +792,4 @@ extension TopSitesPanel : WindowTouchFilter {
         return false
     }
 }
-#endif
 
