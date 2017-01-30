@@ -33,6 +33,10 @@ class DataController: NSObject {
     
     static var moc: NSManagedObjectContext {
         get {
+            if DataController.singleton.managedObjectContext == nil {
+                fatalError("DataController: Access to .moc contained nil value. A db connection has not yet been instantiated.")
+            }
+            
             return DataController.singleton.managedObjectContext!
         }
     }
