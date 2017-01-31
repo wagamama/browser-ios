@@ -23,17 +23,17 @@ class SyncWebView: UIViewController {
             let webCfg = WKWebViewConfiguration()
             let userController = WKUserContentController()
 
-            var config = "var injected_seed = new Uint8Array([243, 203, 185, 143, 101, 184, 134, 109, 69, 166, 218, 58, 63, 155, 158, 17, 31, 184, 175, 52, 73, 80, 190, 47, 45, 12, 59, 64, 130, 13, 146, 248]); " +
-                        "var injected_deviceId = new Uint8Array([1,2,3,4]); "
-            #if DEBUG
-                config += "const injected_braveSyncConfig = {apiVersion: '0', serverUrl: 'https://sync-staging.brave.com', debug:true}"
-            #else
-                config += "const injected_braveSyncConfig = {apiVersion: '0', serverUrl: 'https://sync.brave.com'}"
-            #endif
+//            var config = "var injected_deviceId = new Uint8Array([1,2,3,4]); "
+//            #if DEBUG
+//                config += "const injected_braveSyncConfig = {apiVersion: '0', serverUrl: 'https://sync-staging.brave.com', debug:true}"
+//            #else
+//                config += "const injected_braveSyncConfig = {apiVersion: '0', serverUrl: 'https://sync.brave.com'}"
+//            #endif
+//
+//            userController.addUserScript(WKUserScript(source: config, injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
 
-            userController.addUserScript(WKUserScript(source: config, injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
-
-            userController.addScriptMessageHandler(self, name: "syncToIOS")
+            userController.addScriptMessageHandler(self, name: "syncToIOS_on")
+            userController.addScriptMessageHandler(self, name: "syncToIOS_send")
 
             ["fetch", "ios-sync", "bundle"].forEach() {
                 userController.addUserScript(WKUserScript(source: getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
@@ -69,7 +69,7 @@ class SyncWebView: UIViewController {
 
 extension SyncWebView: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        print("😎 \(message.body)")
+        print("😎 \(message.name) \(message.body)")
         guard let data = message.body as? [String: AnyObject] else { assert(false) ; return }
         print(data)
     }
