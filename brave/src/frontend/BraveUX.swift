@@ -14,7 +14,7 @@ struct BraveUX {
 
     static let ReaderModeBarHeight = 28
 
-    static let BraveOrange = UIColor(colorLiteralRed: 1.0, green: 80/255.0, blue: 0, alpha: 1.0)
+    static let BraveOrange = UIColor(colorLiteralRed: 1.0, green: 60/255.0, blue: 0, alpha: 1.0)
     static let BraveButtonMessageInUrlBarColor = BraveOrange
     static let BraveButtonMessageInUrlBarShowTime = 0.5
     static let BraveButtonMessageInUrlBarFadeTime = 0.7
@@ -97,7 +97,7 @@ struct BraveUX {
     static let BottomToolbarNumberButtonsToRightOfBackForward = 3
     static let BackForwardButtonLeftOffset = CGFloat(10)
 
-    static let ProgressBarColor = UIColor(colorLiteralRed: 0/255.0, green: 118/255.0, blue: 255/255.0, alpha: 1.0)
+    static let ProgressBarColor = BraveOrange
     
     static let TabTrayCellCornerRadius = CGFloat(6.0)
     static let TabTrayCellBackgroundColor = UIColor.whiteColor()
