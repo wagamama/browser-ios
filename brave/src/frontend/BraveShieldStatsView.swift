@@ -19,7 +19,7 @@ class BraveShieldStatsView: UIView {
     lazy var trackersStatView: StatView = {
         let statView = StatView(frame: CGRectZero)
         statView.title = "Trackers \rBlocked"
-        statView.color = UIColor(red: 234/255.0, green: 90/255.0, blue: 45/255.0, alpha: 1.0)
+        statView.color = UIColor(red: 234/255.0, green: 58/255.0, blue: 58/255.0, alpha: 1.0)
         return statView
     }()
 
