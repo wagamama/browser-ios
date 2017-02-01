@@ -2,6 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16C67" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Bookmark" representedClassName=".Bookmark" syncable="YES">
         <attribute name="customTitle" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="folder" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="id" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
         <attribute name="lastVisited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
@@ -10,7 +11,6 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="favicon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Favicon" inverseName="bookmark" inverseEntity="Favicon" syncable="YES"/>
     </entity>
     <entity name="Domain" representedClassName=".Domain" syncable="YES">
         <attribute name="adblockAndTp" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
@@ -27,33 +27,30 @@
     </entity>
     <entity name="Favicon" representedClassName=".FaviconMO" syncable="YES">
         <attribute name="height" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="width" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="bookmark" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="favicon" inverseEntity="Bookmark" syncable="YES"/>
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="favicon" inverseEntity="Domain" syncable="YES"/>
-        <relationship name="tab" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tab" inverseName="favicon" inverseEntity="Tab" syncable="YES"/>
     </entity>
     <entity name="History" representedClassName=".History" syncable="YES">
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="visitedOn" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="history" inverseEntity="Domain" syncable="YES"/>
-        <relationship name="tab" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tab" inverseName="history" inverseEntity="Tab" syncable="YES"/>
     </entity>
     <entity name="Tab" representedClassName=".Tab" syncable="YES">
         <attribute name="closedOn" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="historySnapshot" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="privacy" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="favicon" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Favicon" inverseName="tab" inverseEntity="Favicon" syncable="YES"/>
-        <relationship name="history" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="History" inverseName="tab" inverseEntity="History" syncable="YES"/>
     </entity>
     <elements>
         <element name="Bookmark" positionX="-189" positionY="-414" width="128" height="195"/>
         <element name="Domain" positionX="252" positionY="-405" width="128" height="210"/>
-        <element name="Favicon" positionX="27" positionY="-288" width="128" height="135"/>
-        <element name="History" positionX="484" positionY="-216" width="128" height="120"/>
-        <element name="Tab" positionX="36" positionY="-261" width="128" height="150"/>
+        <element name="Favicon" positionX="27" positionY="-288" width="128" height="120"/>
+        <element name="History" positionX="484" positionY="-216" width="128" height="105"/>
+        <element name="Tab" positionX="36" positionY="-261" width="128" height="135"/>
     </elements>
 </model>
