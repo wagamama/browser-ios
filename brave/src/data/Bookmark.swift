@@ -13,7 +13,8 @@ import Foundation
 class Bookmark: NSManagedObject {
     
     @NSManaged var id: NSNumber?
-    @NSManaged var parentId: String?
+    @NSManaged var parentId: NSNumber?
+    @NSManaged var folder: NSNumber?
     @NSManaged var title: String?
     @NSManaged var customTitle: String?
     @NSManaged var url: String?
@@ -21,7 +22,6 @@ class Bookmark: NSManagedObject {
     @NSManaged var lastVisited: NSDate?
     @NSManaged var order: NSNumber?
     @NSManaged var tags: [String]?
-    @NSManaged var favIcon: FaviconMO?
     
     override func awakeFromInsert() {
         super.awakeFromInsert()

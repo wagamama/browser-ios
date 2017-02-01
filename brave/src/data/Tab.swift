@@ -17,7 +17,6 @@ class Tab: NSManagedObject {
     @NSManaged var order: NSNumber?
     @NSManaged var closedOn: NSDate?
     @NSManaged var privacy: NSNumber?
-    @NSManaged var favicon: FaviconMO?
     @NSManaged var history: NSSet?
     
     override func awakeFromInsert() {
