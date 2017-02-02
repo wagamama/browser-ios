@@ -90,6 +90,19 @@ class BraveBrowserViewController : BrowserViewController {
      //   scrollController.showToolbars(animated: true)
     }
 
+    var heightConstraint: Constraint?
+    override func setupConstraints() {
+        super.setupConstraints()
+
+        // TODO: Should be moved to parent class, but requires property moving too
+        webViewContainer.snp_makeConstraints { make in
+            make.left.right.equalTo(self.view)
+            heightConstraint = make.height.equalTo(self.view.snp_height).constraint
+            webViewContainerTopOffset = make.top.equalTo(self.statusBarOverlay.snp_bottom).offset(BraveURLBarView.CurrentHeight).constraint
+        }
+
+    }
+
     override func updateViewConstraints() {
         super.updateViewConstraints()
 

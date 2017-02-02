@@ -390,11 +390,8 @@ class BrowserViewController: UIViewController {
             }
         }
         
-        webViewContainer.snp_makeConstraints { make in
-            make.left.right.equalTo(self.view)
-            make.height.equalTo(self.view.snp_height).constraint
-            make.top.equalTo(header.snp_bottom)
-        }
+        // webViewContainer constraints set in Brave subclass.
+        // TODO: This should be centralized
 
         webViewContainerBackdrop.snp_makeConstraints { make in
             make.edges.equalTo(webViewContainer)
