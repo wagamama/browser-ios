@@ -88,7 +88,7 @@ class BraveSettingsView : AppSettingsTableViewController {
             if result {
                 postAsyncToMain(0) { // move from db thread back to main
                     generalSettings.append(PasswordManagerButtonSetting(profile: self.profile))
-                    self.settings[0] = SettingSection(title: NSAttributedString(string: Strings.General), children: generalSettings)
+                    self.settings[0] = SettingSection(title: NSAttributedString(string: Strings.General.uppercaseString), children: generalSettings)
                     let range = NSMakeRange(0, 1)
                     let section = NSIndexSet(indexesInRange: range)
                     self.tableView.reloadSections(section, withRowAnimation: .Automatic)
