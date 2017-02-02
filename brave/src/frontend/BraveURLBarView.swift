@@ -163,11 +163,22 @@ class BraveURLBarView : URLBarView {
         guard let theme = URLBarViewUX.Themes[themeName] else { return }
         
         leftSidePanelButton.tintColor = theme.buttonTintColor
+        
+        switch(themeName) {
+        case Theme.NormalMode:
+            backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
+        case Theme.PrivateMode:
+            backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
+        default:
+            break
+        }
     }
 
     override func updateAlphaForSubviews(alpha: CGFloat) {
         super.updateAlphaForSubviews(alpha)
-        self.superview?.alpha = alpha
+        
+        leftSidePanelButton.alpha = alpha
+        braveButton.alpha = alpha
     }
 
     @objc func onClickLeftSlideOut() {

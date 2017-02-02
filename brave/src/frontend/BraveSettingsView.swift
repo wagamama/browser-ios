@@ -111,8 +111,8 @@ class BraveSettingsView : AppSettingsTableViewController {
         }
 
         settings += [
-            SettingSection(title: NSAttributedString(string: Strings.General), children: generalSettings),
-            SettingSection(title: NSAttributedString(string: Strings.Privacy), children:
+            SettingSection(title: NSAttributedString(string: Strings.General.uppercaseString), children: generalSettings),
+            SettingSection(title: NSAttributedString(string: Strings.Privacy.uppercaseString), children:
                 [ClearPrivateDataSetting(settings: self), CookieSetting(profile: self.profile),
                     BoolSetting(prefs: prefs, prefKey: kPrefKeyPrivateBrowsingAlwaysOn, defaultValue: false, titleText: Strings.Private_Browsing_Only, statusText: nil, settingDidChange: { isOn in
                         if !isOn {
@@ -124,11 +124,11 @@ class BraveSettingsView : AppSettingsTableViewController {
                         }
                     })]
             ),
-            SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults), children: shieldSettingsList)]
+            SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults.uppercaseString), children: shieldSettingsList)]
 
         //#if !DISABLE_INTRO_SCREEN
         settings += [
-            SettingSection(title: NSAttributedString(string: Strings.Support), children: [
+            SettingSection(title: NSAttributedString(string: Strings.Support.uppercaseString), children: [
                 BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyUserAllowsTelemetry, defaultValue: true, titleText: Strings.Opt_in_to_telemetry),
                 ShowIntroductionSetting(settings: self),
                 BraveSupportLinkSetting(),
@@ -136,7 +136,7 @@ class BraveSettingsView : AppSettingsTableViewController {
                 ])]
         //#endif
         settings += [
-            SettingSection(title: NSAttributedString(string: Strings.About), children: [
+            SettingSection(title: NSAttributedString(string: Strings.About.uppercaseString), children: [
                 VersionSetting(settings: self),
                 ])
         ]

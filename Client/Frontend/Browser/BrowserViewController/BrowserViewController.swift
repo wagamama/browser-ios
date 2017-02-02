@@ -47,7 +47,7 @@ class BrowserViewController: UIViewController {
     var urlBar: URLBarView!
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
-    var statusBarOverlay: BlurWrapper!
+    var statusBarOverlay: UIView!
     private(set) var toolbar: BraveBrowserBottomToolbar?
     var searchController: SearchViewController?
     var screenshotHelper: ScreenshotHelper!
@@ -303,8 +303,8 @@ class BrowserViewController: UIViewController {
         view.addSubview(webViewContainer)
 
         log.debug("BVC setting up status bar…")
-        // Temporary work around for covering the non-clipped web view content
-        statusBarOverlay = BlurWrapper(view: UIView())
+        statusBarOverlay = UIView()
+        statusBarOverlay.backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
         view.addSubview(statusBarOverlay)
 
         log.debug("BVC setting up top touch area…")
@@ -1254,11 +1254,11 @@ extension BrowserViewController: Themeable {
         // Should be added to theme, instead of handled here
         switch(themeName) {
         case Theme.NormalMode:
-            statusBarOverlay.blurStyle = .Light
+            statusBarOverlay.backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
             header.blurStyle = .Light
             footerBackground?.blurStyle = .Light
         case Theme.PrivateMode:
-            statusBarOverlay.blurStyle = .Dark
+            statusBarOverlay.backgroundColor = BraveUX.DarkToolbarsBackgroundSolidColor
             header.blurStyle = .Dark
             footerBackground?.blurStyle = .Dark
         default:

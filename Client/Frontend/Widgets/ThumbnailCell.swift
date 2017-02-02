@@ -249,6 +249,7 @@ class ThumbnailCell: UICollectionViewCell {
         backgroundImage.image = nil
         removeButton.hidden = true
         textLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
+        textLabel.textColor = PrivateBrowsing.singleton.isOn ? UIColor(rgb: 0xDBDBDB) : UIColor(rgb: 0x2D2D2D)
     }
     
     private func updateSelectedHighlightedState() {

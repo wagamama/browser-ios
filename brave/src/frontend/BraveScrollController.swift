@@ -375,8 +375,9 @@ extension BraveScrollController: UIScrollViewDelegate {
         if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isRefreshBlockedDueToMomentumScroll && verticalTranslation == 0 && toolbarsShowing {
             if refreshControl == nil {
                 refreshControl = ODRefreshControl(inScrollView: getApp().rootViewController.view)
-                refreshControl?.backgroundColor = UIColor.blackColor()
             }
+            refreshControl?.backgroundColor = UIColor.clearColor()
+            refreshControl?.tintColor = BraveUX.BraveOrange
             refreshControl?.hidden = false
             refreshControl?.frame = CGRectMake(0, position, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
 

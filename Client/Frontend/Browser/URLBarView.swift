@@ -190,7 +190,7 @@ class URLBarView: UIView {
     }
 
     func commonInit() {
-        backgroundColor = URLBarViewUX.backgroundColorWithAlpha(0)
+        backgroundColor = BraveUX.ToolbarsBackgroundSolidColor
         addSubview(scrollToTopButton)
 
         addSubview(tabsButton)
@@ -267,7 +267,6 @@ class URLBarView: UIView {
     func updateAlphaForSubviews(alpha: CGFloat) {
         self.tabsButton.alpha = alpha
         self.locationContainer.alpha = alpha
-        self.backgroundColor = URLBarViewUX.backgroundColorWithAlpha(1 - alpha)
         self.actionButtons.forEach { $0.alpha = alpha }
     }
 

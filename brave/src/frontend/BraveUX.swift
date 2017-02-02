@@ -23,6 +23,11 @@ struct BraveUX {
     
     static let SwitchTintColor = UIColor(white: 0.8, alpha: 1.0)
     
+    static let ToolbarsBackgroundSolidColor = UIColor(red: 206/255.0, green: 206/255.0, blue: 206/255.0, alpha: 1.0)
+    static let DarkToolbarsBackgroundSolidColor = UIColor(red: 63/255.0, green: 63/255.0, blue: 63/255.0, alpha: 1.0)
+    static let ToolbarsBackgroundColor = UIColor(white: 0.0, alpha: 0.19)
+    static let DarkToolbarsBackgroundColor = UIColor(red: 57/255.0, green: 57/255.0, blue: 57/255.0, alpha: 0.8)
+    
     static let TopSitesStatTitleColor = UIColor(white: 0.6, alpha: 1.0)
 
     // I am considering using DeviceInfo.isBlurSupported() to set this, and reduce heavy animations
@@ -46,7 +51,7 @@ struct BraveUX {
     
     static let ColorForSidebarLineSeparators = UIColor(white: 224 / 255.0, alpha: 1.0)
 
-    static let DefaultBlue = UIColor(red: 28/255.0, green: 111/255.0, blue: 202/255.0, alpha: 1.0)
+    static let DefaultBlue = UIColor(red: 92/255.0, green: 185/255.0, blue: 247/255.0, alpha: 1.0)
     
     // debug settings
     //  static var IsToolbarHidingOff = false

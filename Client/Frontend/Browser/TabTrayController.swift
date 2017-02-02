@@ -342,7 +342,7 @@ class TabTrayController: UIViewController {
         collectionView.registerClass(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
         collectionView.backgroundColor = UIColor.clearColor()
         
-        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .Light))
+        let blur = UIVisualEffectView(effect: UIBlurEffect(style: PrivateBrowsing.singleton.isOn ? .Dark : .Light))
         
         // Background view created for tapping background closure
         collectionView.backgroundView = UIView()

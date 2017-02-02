@@ -134,6 +134,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
         super.init(frame: frame)
 
         self.helper = BrowserToolbarHelper(toolbar: self)
+        self.backgroundColor = BraveUX.ToolbarsBackgroundColor
 
         addButtons(actionButtons)
 
@@ -160,20 +161,6 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     func updatePageStatus(isWebPage isWebPage: Bool) {
         stopReloadButton.enabled = isWebPage
         shareButton.enabled = isWebPage
-    }
-
-    override func drawRect(rect: CGRect) {
-        if let context = UIGraphicsGetCurrentContext() {
-            drawLine(context, start: CGPoint(x: 0, y: 0), end: CGPoint(x: frame.width, y: 0))
-        }
-    }
-
-    private func drawLine(context: CGContextRef, start: CGPoint, end: CGPoint) {
-        CGContextSetStrokeColorWithColor(context, UIColor.blackColor().colorWithAlphaComponent(0.05).CGColor)
-        CGContextSetLineWidth(context, 2)
-        CGContextMoveToPoint(context, start.x, start.y)
-        CGContextAddLineToPoint(context, end.x, end.y)
-        CGContextStrokePath(context)
     }
 }
 

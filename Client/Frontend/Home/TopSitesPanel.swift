@@ -89,8 +89,9 @@ class TopSitesPanel: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let statsHeight: CGFloat = 120.0
-        let statsBottomMargin: CGFloat = 20.0
+        
+        let statsHeight: CGFloat = 150.0
+        let statsBottomMargin: CGFloat = 25.0
         
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
@@ -116,7 +117,7 @@ class TopSitesPanel: UIViewController {
         // Auto-layout subview within collection doesn't work properly,
         // Quick-and-dirty layout here.
         var statsViewFrame: CGRect = braveShieldStatsView.frame
-        statsViewFrame.origin.x = 10
+        statsViewFrame.origin.x = 20
         // Offset the stats view from the inset set above
         statsViewFrame.origin.y = -(statsHeight + statsBottomMargin)
         statsViewFrame.size.width = CGRectGetWidth(collection.frame) - CGRectGetMinX(statsViewFrame) * 2
@@ -456,7 +457,7 @@ class TopSitesLayout: UICollectionViewLayout {
     private var thumbnailHeight: CGFloat {
         assertIsMainThread("layout.thumbnailHeight interacts with UIKit components - cannot call from background thread.")
 
-        return floor(thumbnailWidth / CGFloat(ThumbnailCellUX.ImageAspectRatio))
+        return floor(thumbnailWidth / (CGFloat(ThumbnailCellUX.ImageAspectRatio) - 0.1))
     }
 
     // Used to calculate the height of the list.
