@@ -59,7 +59,6 @@ class TabCell: UICollectionViewCell {
     override init(frame: CGRect) {
         self.backgroundHolder.backgroundColor = UIColor.whiteColor()
         self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
-        self.backgroundHolder.clipsToBounds = true
         self.backgroundHolder.backgroundColor = TabTrayControllerUX.CellBackgroundColor
         self.backgroundHolder.layer.borderColor = UIColor.darkGrayColor().CGColor
         self.backgroundHolder.layer.borderWidth = 0.2
@@ -98,6 +97,8 @@ class TabCell: UICollectionViewCell {
 
         self.animator = SwipeAnimator(animatingView: self.backgroundHolder, container: self)
         self.closeButton.addTarget(self, action: #selector(TabCell.SELclose), forControlEvents: UIControlEvents.TouchUpInside)
+        self.layer.cornerRadius = TabTrayControllerUX.CornerRadius
+        self.clipsToBounds = true
 
         contentView.addSubview(backgroundHolder)
         backgroundHolder.addSubview(self.background)
@@ -761,6 +762,12 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         tabCell.background.image = tab.screenshot.image
         tab.screenshot.listenerImages.removeAll() // TODO maybe UIImageWithNotify should only ever have one listener?
         tab.screenshot.listenerImages.append(UIImageWithNotify.WeakImageView(tabCell.background))
+
+        // If the current tab add heightlighting
+        if getApp().tabManager.selectedTab == tab {
+            tabCell.layer.borderWidth = 1
+            tabCell.layer.borderColor = BraveUX.DefaultBlue.CGColor
+        }
         
         return tabCell
     }
