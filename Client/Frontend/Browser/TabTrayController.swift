@@ -17,7 +17,7 @@ struct TabTrayControllerUX {
     static let Margin = CGFloat(15)
     static let ToolbarBarTintColor = UIConstants.AppBackgroundColor
     static let ToolbarButtonOffset = CGFloat(10.0)
-    static let CloseButtonMargin = CGFloat(2.0)
+    static let CloseButtonMargin = CGFloat(4.0)
     static let CloseButtonEdgeInset = CGFloat(6)
 
     static let NumberOfColumnsThin = 1
@@ -67,6 +67,7 @@ class TabCell: UICollectionViewCell {
         self.background.contentMode = UIViewContentMode.ScaleAspectFill
         self.background.clipsToBounds = true
         self.background.userInteractionEnabled = false
+        self.background.alpha = 0.7
         self.background.alignLeft = true
         self.background.alignTop = true
 
@@ -798,7 +799,7 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout {
         if self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
             return shortHeight
         } else if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
-            return shortHeight
+            return shortHeight * 1.15
         } else {
             return TabTrayControllerUX.TitleBoxHeight * 8
         }
