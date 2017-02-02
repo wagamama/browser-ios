@@ -325,6 +325,10 @@ class TabTrayController: UIViewController {
         UIView.animateWithDuration(0.2) {
             self.viewsToAnimate.forEach { $0.alpha = 1.0 }
         }
+        
+        guard let selectedTab = tabManager.selectedTab else { return }
+        let selectedIndex = tabManager.tabs.tabs.indexOf(selectedTab) ?? 0
+        self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: selectedIndex, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.CenteredVertically, animated: false)
     }
     
 // MARK: View Controller Callbacks
