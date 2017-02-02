@@ -64,11 +64,10 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         rightSpacer.userInteractionEnabled = false
         leftSpacer.userInteractionEnabled = false
 
-        if let img = forwardButton.imageView?.image {
-            forwardButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
-        }
-        if let img = backButton.imageView?.image {
-            backButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
+        [backButton, forwardButton, shareButton].forEach {
+            if let img = $0.currentImage {
+                $0.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
+            }
         }
     }
 
