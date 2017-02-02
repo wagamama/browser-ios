@@ -456,8 +456,12 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         items.append(editBookmarksButton)
         items.append(UIBarButtonItem.createFixedSpaceItem(5))
         
+        items.forEach { $0.tintColor = BraveUX.DefaultBlue }
         
         editBookmarksToolbar.items = items
+        
+        // This removes the small top border from the toolbar
+        editBookmarksToolbar.clipsToBounds = true
     }
     
     func onDeleteBookmarksFolderButton() {
