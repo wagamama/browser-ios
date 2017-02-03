@@ -776,6 +776,7 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
             tabCell.layer.shadowRadius = 5
             tabCell.layer.shadowColor = BraveUX.DefaultBlue.CGColor
             tabCell.layer.shadowOpacity = 1.0
+            tabCell.layer.shadowOffset = CGSize(width: 0, height: 0)
             tabCell.layer.shadowPath = UIBezierPath(roundedRect: tabCell.bounds, cornerRadius: tabCell.layer.cornerRadius).CGPath
         }
         
