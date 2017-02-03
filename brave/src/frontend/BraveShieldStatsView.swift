@@ -144,7 +144,7 @@ class StatView: UIView {
         let label = UILabel()
         label.textAlignment = .Center
         label.numberOfLines = 0
-        label.font = UIFont.systemFontOfSize(24, weight: UIFontWeightHeavy)
+        label.font = UIFont.systemFontOfSize(24, weight: UIFontWeightBold)
         return label
     }()
     

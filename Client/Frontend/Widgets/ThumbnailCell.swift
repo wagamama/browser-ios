@@ -153,7 +153,7 @@ class ThumbnailCell: UICollectionViewCell {
     lazy var textLabel: UILabel = {
         let textLabel = UILabel()
         textLabel.setContentHuggingPriority(1000, forAxis: UILayoutConstraintAxis.Vertical)
-        textLabel.font = DynamicFontHelper.defaultHelper.ExtraSmallFont
+        textLabel.font = DynamicFontHelper.defaultHelper.DefaultSmallFont
         textLabel.textColor = ThumbnailCellUX.LabelColor
         textLabel.textAlignment = ThumbnailCellUX.LabelAlignment
         return textLabel

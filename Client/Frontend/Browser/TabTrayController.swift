@@ -41,6 +41,7 @@ class TabCell: UICollectionViewCell {
 
     static let Identifier = "TabCellIdentifier"
 
+    let shadowView = UIView()
     let backgroundHolder = UIView()
     let background = UIImageViewAligned()
     let titleLbl: UILabel
@@ -57,16 +58,19 @@ class TabCell: UICollectionViewCell {
     var margin = CGFloat(0)
 
     override init(frame: CGRect) {
-        self.backgroundHolder.backgroundColor = UIColor.whiteColor()
-        self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
+        self.shadowView.layer.cornerRadius = TabTrayControllerUX.CornerRadius
+        self.shadowView.layer.masksToBounds = false
+        
         self.backgroundHolder.backgroundColor = TabTrayControllerUX.CellBackgroundColor
+        self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
         self.backgroundHolder.layer.borderColor = UIColor(white: 0.0, alpha: 0.15).CGColor
         self.backgroundHolder.layer.borderWidth = 0.5
+        self.backgroundHolder.layer.masksToBounds = true
 
         self.background.contentMode = UIViewContentMode.ScaleAspectFill
-        self.background.clipsToBounds = true
         self.background.userInteractionEnabled = false
         self.background.alpha = 0.7
+        self.background.layer.masksToBounds = true
         self.background.alignLeft = true
         self.background.alignTop = true
 
@@ -95,16 +99,17 @@ class TabCell: UICollectionViewCell {
 
         super.init(frame: frame)
 
-        self.animator = SwipeAnimator(animatingView: self.backgroundHolder, container: self)
         self.closeButton.addTarget(self, action: #selector(TabCell.SELclose), forControlEvents: UIControlEvents.TouchUpInside)
-        self.contentView.layer.cornerRadius = TabTrayControllerUX.CornerRadius
-        self.contentView.layer.masksToBounds = true
+        self.contentView.clipsToBounds = false
         self.clipsToBounds = false
+        
+        self.animator = SwipeAnimator(animatingView: self.shadowView, container: self)
 
-        contentView.addSubview(backgroundHolder)
+        shadowView.addSubview(backgroundHolder)
         backgroundHolder.addSubview(self.background)
         backgroundHolder.addSubview(self.titleWrapper)
-
+        contentView.addSubview(shadowView)
+        
         setupConstraints()
 
         self.accessibilityCustomActions = [
@@ -119,6 +124,10 @@ class TabCell: UICollectionViewCell {
     private func setupConstraints() {
         
         let generalOffset = 4
+        
+        shadowView.snp_remakeConstraints { make in
+            make.edges.equalTo(shadowView.superview!)
+        }
         
         backgroundHolder.snp_remakeConstraints { make in
             make.edges.equalTo(backgroundHolder.superview!)
@@ -170,8 +179,11 @@ class TabCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         // Reset any close animations.
-        backgroundHolder.transform = CGAffineTransformIdentity
+        backgroundHolder.layer.borderColor = UIColor(white: 0.0, alpha: 0.15).CGColor
+        backgroundHolder.layer.borderWidth = 0.5
         backgroundHolder.alpha = 1
+        shadowView.transform = CGAffineTransformIdentity
+        shadowView.layer.shadowOpacity = 0
         self.titleLbl.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
     }
 
@@ -773,11 +785,11 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         if getApp().tabManager.selectedTab == tab {
             tabCell.backgroundHolder.layer.borderWidth = 1
             tabCell.backgroundHolder.layer.borderColor = BraveUX.DefaultBlue.CGColor
-            tabCell.layer.shadowRadius = 5
-            tabCell.layer.shadowColor = BraveUX.DefaultBlue.CGColor
-            tabCell.layer.shadowOpacity = 1.0
-            tabCell.layer.shadowOffset = CGSize(width: 0, height: 0)
-            tabCell.layer.shadowPath = UIBezierPath(roundedRect: tabCell.bounds, cornerRadius: tabCell.layer.cornerRadius).CGPath
+            tabCell.shadowView.layer.shadowRadius = 5
+            tabCell.shadowView.layer.shadowColor = BraveUX.DefaultBlue.CGColor
+            tabCell.shadowView.layer.shadowOpacity = 1.0
+            tabCell.shadowView.layer.shadowOffset = CGSize(width: 0, height: 0)
+            tabCell.shadowView.layer.shadowPath = UIBezierPath(roundedRect: tabCell.bounds, cornerRadius: tabCell.backgroundHolder.layer.cornerRadius).CGPath
         }
         
         return tabCell
