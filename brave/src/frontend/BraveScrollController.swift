@@ -158,7 +158,8 @@ class BraveScrollController: NSObject {
                 // Use offset of header and footer bar positions to determine contentInset and scrollIndicatorInsets
                 let top = max((CGRectGetMaxY(header?.frame ?? CGRectZero) - CGRectGetMaxY(UIApplication.sharedApplication().statusBarFrame)), 0)
                 let bottom = BraveApp.isIPhonePortrait() ? min((CGRectGetMaxY(UIApplication.sharedApplication().keyWindow?.frame ?? CGRectZero) - CGRectGetMinY(footer?.frame ?? CGRectZero)), 0) : 0
-                let h = keyboardIsShowing ? (header?.frame.height ?? 0) + (footer?.frame.height ?? 0)  : (top + bottom)
+                let oh = BraveApp.isIPhonePortrait() ? (header?.frame.height ?? 0) + (footer?.frame.height ?? 0) : (footer?.frame.height ?? 0)
+                let h = keyboardIsShowing ? oh : (top + bottom)
                 setContentInset(top: 0, bottom: h)
             }
         }
@@ -375,8 +376,9 @@ extension BraveScrollController: UIScrollViewDelegate {
         if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isRefreshBlockedDueToMomentumScroll && verticalTranslation == 0 && toolbarsShowing {
             if refreshControl == nil {
                 refreshControl = ODRefreshControl(inScrollView: getApp().rootViewController.view)
-                refreshControl?.backgroundColor = UIColor.blackColor()
             }
+            refreshControl?.backgroundColor = UIColor.clearColor()
+            refreshControl?.tintColor = BraveUX.BraveOrange
             refreshControl?.hidden = false
             refreshControl?.frame = CGRectMake(0, position, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
 

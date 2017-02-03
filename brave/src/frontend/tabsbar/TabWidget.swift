@@ -85,7 +85,7 @@ class TabWidget : UIView {
             make.left.equalTo(self).inset(4)
             make.width.equalTo(24)
         })
-        close.tintColor = UIColor.lightGrayColor()
+        close.tintColor = UIColor.blackColor()
 
         reinstallConstraints()
 
@@ -137,9 +137,9 @@ class TabWidget : UIView {
     }
 
     func deselect() {
-        backgroundColor = UIColor.init(white: 90/255, alpha: 1.0)
-        title.titleLabel!.font = UIFont.systemFontOfSize(11)
-        title.setTitleColor(UIColor.init(white: 230/255, alpha: 1.0), forState: .Normal)
+        backgroundColor = UIColor.init(white: 0.0, alpha: 0.1)
+        title.titleLabel!.font = UIFont.systemFontOfSize(12)
+        title.setTitleColor(UIColor(white: 0.0, alpha: 0.4), forState: .Normal)
         close.hidden = true
     }
 
@@ -148,8 +148,8 @@ class TabWidget : UIView {
     }
 
     func setStyleToSelected() {
-        title.titleLabel!.font = UIFont.systemFontOfSize(11, weight: UIFontWeightSemibold)
-        title.setTitleColor(UIColor.init(white: 255/255, alpha: 1.0), forState: .Normal)
+        title.titleLabel!.font = UIFont.systemFontOfSize(12, weight: UIFontWeightSemibold)
+        title.setTitleColor(UIColor.blackColor(), forState: .Normal)
         backgroundColor = UIColor.clearColor()
         close.hidden = false
     }
