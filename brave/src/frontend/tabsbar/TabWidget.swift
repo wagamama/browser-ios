@@ -89,7 +89,7 @@ class TabWidget : UIView {
 
         reinstallConstraints()
 
-        separatorLine.backgroundColor = UIColor.blackColor()
+        separatorLine.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.2)
         separatorLine.snp_makeConstraints { (make) in
             make.left.equalTo(self)
             make.width.equalTo(1)
