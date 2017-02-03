@@ -60,7 +60,7 @@ protocol URLBarDelegate: class {
     func urlBarDidPressStop(urlBar: URLBarView)
     func urlBarDidPressReload(urlBar: URLBarView)
     func urlBarDidEnterSearchMode(urlBar: URLBarView)
-    func urlBarDidLeaveSearchMode(urlBar: URLBarView, didCancel: Bool)
+    func urlBarDidLeaveSearchMode(urlBar: URLBarView)
     func urlBarDidLongPressLocation(urlBar: URLBarView)
     func urlBarLocationAccessibilityActions(urlBar: URLBarView) -> [UIAccessibilityCustomAction]?
     func urlBarDidPressScrollToTop(urlBar: URLBarView)
@@ -388,7 +388,7 @@ class URLBarView: UIView {
     func leaveSearchMode(didCancel cancel: Bool = false) {
         locationTextField?.resignFirstResponder()
         animateToSearchState(searchMode: false, didCancel: cancel)
-        delegate?.urlBarDidLeaveSearchMode(self, didCancel: cancel)
+        delegate?.urlBarDidLeaveSearchMode(self)
     }
 
     func prepareSearchAnimation() {
