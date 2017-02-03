@@ -412,6 +412,14 @@ class TabTrayController: UIViewController {
 
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        
+        // Used to update the glow effect on the selected tab
+        //  and update screenshot framing/positioning
+        // Must be scheduled on next runloop
+        dispatch_async(dispatch_get_main_queue()) { 
+            self.collectionView.reloadData()
+        }
+        
         coordinator.animateAlongsideTransition({ _ in
             self.collectionView.collectionViewLayout.invalidateLayout()
         }, completion: nil)
