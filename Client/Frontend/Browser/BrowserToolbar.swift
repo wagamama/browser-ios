@@ -131,6 +131,9 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     // This has to be here since init() calls it
     override init(frame: CGRect) {
+
+        shareButton.accessibilityIdentifier = "BrowserToolbar.shareButton"
+
         super.init(frame: frame)
 
         self.helper = BrowserToolbarHelper(toolbar: self)
