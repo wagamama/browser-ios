@@ -94,9 +94,9 @@ struct BraveUX {
     static let ActionButtonTintColor = UIColor.blackColor()
     
     // The toolbar button color when (for the Selected state).
-    static let ActionButtonSelectedTintColor = UIColor(red: 77/255.0, green: 169/255.0, blue: 245/255.0, alpha: 1.0)
+    static let ActionButtonSelectedTintColor = BraveUX.DefaultBlue
 
-    static let AutocompleteTextFieldHighlightColor = UIColor(colorLiteralRed: 0/255.0, green: 118/255.0, blue: 255/255.0, alpha: 1.0)
+    static let AutocompleteTextFieldHighlightColor = BraveUX.DefaultBlue
 
     // Yes it could be detected, just make life easier and set this number for now
     static let BottomToolbarNumberButtonsToRightOfBackForward = 3

@@ -10,8 +10,8 @@ struct ThumbnailCellUX {
     
     /// Ratio of width:height of the thumbnail image.
     static let ImageAspectRatio: Float = 1.0
-    static let BorderColor = UIColor.blackColor().colorWithAlphaComponent(0.2)
-    static let BorderWidth: CGFloat = 1
+    static let BorderColor = UIColor.blackColor().colorWithAlphaComponent(0.15)
+    static let BorderWidth: CGFloat = 0.5
     static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.blackColor() : UIColor(rgb: 0x353535)
     static let LabelAlignment: NSTextAlignment = .Center
     static let SelectedOverlayColor = UIColor(white: 0.0, alpha: 0.25)

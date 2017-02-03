@@ -12,8 +12,8 @@ import Shared
 struct TabTrayControllerUX {
     static let CornerRadius = BraveUX.TabTrayCellCornerRadius
     static let BackgroundColor = UIConstants.AppBackgroundColor
-    static let CellBackgroundColor = UIColor(red:0.95, green:0.95, blue:0.95, alpha:1)
-    static let TitleBoxHeight = CGFloat(26.0)
+    static let CellBackgroundColor = UIColor(red:1.0, green:1.0, blue:1.0, alpha:1)
+    static let TitleBoxHeight = CGFloat(32.0)
     static let Margin = CGFloat(15)
     static let ToolbarBarTintColor = UIConstants.AppBackgroundColor
     static let ToolbarButtonOffset = CGFloat(10.0)
@@ -60,8 +60,8 @@ class TabCell: UICollectionViewCell {
         self.backgroundHolder.backgroundColor = UIColor.whiteColor()
         self.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
         self.backgroundHolder.backgroundColor = TabTrayControllerUX.CellBackgroundColor
-        self.backgroundHolder.layer.borderColor = UIColor.darkGrayColor().CGColor
-        self.backgroundHolder.layer.borderWidth = 0.2
+        self.backgroundHolder.layer.borderColor = UIColor(white: 0.0, alpha: 0.15).CGColor
+        self.backgroundHolder.layer.borderWidth = 0.5
 
         self.background.contentMode = UIViewContentMode.ScaleAspectFill
         self.background.clipsToBounds = true
@@ -97,8 +97,9 @@ class TabCell: UICollectionViewCell {
 
         self.animator = SwipeAnimator(animatingView: self.backgroundHolder, container: self)
         self.closeButton.addTarget(self, action: #selector(TabCell.SELclose), forControlEvents: UIControlEvents.TouchUpInside)
-        self.layer.cornerRadius = TabTrayControllerUX.CornerRadius
-        self.clipsToBounds = true
+        self.contentView.layer.cornerRadius = TabTrayControllerUX.CornerRadius
+        self.contentView.layer.masksToBounds = true
+        self.clipsToBounds = false
 
         contentView.addSubview(backgroundHolder)
         backgroundHolder.addSubview(self.background)
@@ -327,8 +328,13 @@ class TabTrayController: UIViewController {
             self.viewsToAnimate.forEach { $0.alpha = 1.0 }
         }
         
+        let tabs = WeakList<Browser>()
+        getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.forEach {
+            tabs.insert($0)
+        }
+        
         guard let selectedTab = tabManager.selectedTab else { return }
-        let selectedIndex = tabManager.tabs.tabs.indexOf(selectedTab) ?? 0
+        let selectedIndex = tabs.indexOf(selectedTab) ?? 0
         self.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: selectedIndex, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.CenteredVertically, animated: false)
     }
     
@@ -765,8 +771,12 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
 
         // If the current tab add heightlighting
         if getApp().tabManager.selectedTab == tab {
-            tabCell.layer.borderWidth = 1
-            tabCell.layer.borderColor = BraveUX.DefaultBlue.CGColor
+            tabCell.backgroundHolder.layer.borderWidth = 1
+            tabCell.backgroundHolder.layer.borderColor = BraveUX.DefaultBlue.CGColor
+            tabCell.layer.shadowRadius = 5
+            tabCell.layer.shadowColor = BraveUX.DefaultBlue.CGColor
+            tabCell.layer.shadowOpacity = 1.0
+            tabCell.layer.shadowPath = UIBezierPath(roundedRect: tabCell.bounds, cornerRadius: tabCell.layer.cornerRadius).CGPath
         }
         
         return tabCell
@@ -810,7 +820,7 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout {
         if self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
             return shortHeight
         } else if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
-            return shortHeight * 1.15
+            return shortHeight * 1.13
         } else {
             return TabTrayControllerUX.TitleBoxHeight * 8
         }
