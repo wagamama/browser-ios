@@ -14,6 +14,7 @@ private let log = Logger.browserLogger
 protocol BrowserToolbarProtocol {
     weak var browserToolbarDelegate: BrowserToolbarDelegate? { get set }
     var shareButton: UIButton { get }
+    var pwdMgrButton: UIButton { get }
     var forwardButton: UIButton { get }
     var backButton: UIButton { get }
     var addTabButton: UIButton { get }
@@ -51,6 +52,8 @@ public class BrowserToolbarHelper: NSObject {
         self.toolbar = toolbar
         super.init()
 
+        // TODO: All of this should be configured directly inside the browser toolbar
+        
         toolbar.backButton.setImage(UIImage(named: "back"), forState: .Normal)
         toolbar.backButton.accessibilityLabel = Strings.Back
         toolbar.backButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickBack), forControlEvents: UIControlEvents.TouchUpInside)
@@ -66,6 +69,11 @@ public class BrowserToolbarHelper: NSObject {
         toolbar.addTabButton.setImage(UIImage(named: "add"), forState: .Normal)
         toolbar.addTabButton.accessibilityLabel = Strings.Add_Tab
         toolbar.addTabButton.addTarget(self, action: #selector(BrowserToolbarHelper.SELdidClickAddTab), forControlEvents: UIControlEvents.TouchUpInside)
+
+        toolbar.pwdMgrButton.setImage(UIImage(named: "passhelper_1pwd")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
+        toolbar.pwdMgrButton.hidden = true
+        toolbar.pwdMgrButton.tintColor = UIColor.whiteColor()
+        toolbar.pwdMgrButton.accessibilityLabel = Strings.PasswordManager
 
         setTintColor(buttonTintColor, forButtons: toolbar.actionButtons)
     }
@@ -99,6 +107,10 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     weak var browserToolbarDelegate: BrowserToolbarDelegate?
 
     let shareButton = UIButton()
+    
+    // Just used to conform to protocol, never used on this class, see BraveURLBarView for the one that is used on iPad
+    let pwdMgrButton = UIButton()
+    
     let forwardButton = UIButton()
     let backButton = UIButton()
     let addTabButton = UIButton()
