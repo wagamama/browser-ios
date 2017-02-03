@@ -190,11 +190,9 @@ extension BrowserViewController: URLBarDelegate {
         showHomePanelController(inline: false)
     }
 
-    func urlBarDidLeaveSearchMode(urlBar: URLBarView, didCancel: Bool) {
+    func urlBarDidLeaveSearchMode(urlBar: URLBarView) {
         hideSearchController()
-        if didCancel {
-            updateInContentHomePanel(tabManager.selectedTab?.url)
-        }
+        updateInContentHomePanel(tabManager.selectedTab?.url)
     }
 }
 
