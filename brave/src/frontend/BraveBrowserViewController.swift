@@ -111,9 +111,18 @@ class BraveBrowserViewController : BrowserViewController {
             make.edges.equalTo(self.footerBackground!)
         }
     }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        webViewContainerTopOffset?.updateOffset(BraveURLBarView.CurrentHeight)
+        heightConstraint?.updateOffset(-BraveApp.statusBarHeight())
+    }
     
     override func updateToolbarStateForTraitCollection(newCollection: UITraitCollection) {
         super.updateToolbarStateForTraitCollection(newCollection)
+
+        heightConstraint?.updateOffset(-BraveApp.statusBarHeight())
 
         postAsyncToMain(0) {
             self.urlBar.updateTabsBarShowing()
