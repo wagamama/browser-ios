@@ -192,7 +192,7 @@ class BrowserLocationView: UIView {
         addSubview(stopReloadButton)
 
         braveProgressView.accessibilityLabel = "braveProgressView"
-        braveProgressView.backgroundColor = BraveUX.ProgressBarColor
+        braveProgressView.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.ProgressBarDarkColor : BraveUX.ProgressBarColor
         braveProgressView.layer.cornerRadius = BraveUX.TextFieldCornerRadius
         braveProgressView.layer.masksToBounds = true
         self.addSubview(braveProgressView)

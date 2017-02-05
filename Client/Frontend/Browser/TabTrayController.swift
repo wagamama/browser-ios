@@ -149,7 +149,8 @@ class TabCell: UICollectionViewCell {
         }
         
         titleWrapperBackground.snp_remakeConstraints { make in
-            make.edges.equalTo(titleWrapper)
+            make.top.left.right.equalTo(titleWrapperBackground.superview!)
+            make.height.equalTo(TabTrayControllerUX.TitleBoxHeight + 15)
         }
 
         titleLbl.snp_remakeConstraints { make in
@@ -172,7 +173,7 @@ class TabCell: UICollectionViewCell {
         dispatch_async(dispatch_get_main_queue()) {
             let gradientLayer = CAGradientLayer()
             gradientLayer.frame = self.titleWrapperBackground.bounds
-            gradientLayer.colors = [UIColor.whiteColor().CGColor, UIColor.clearColor().CGColor]
+            gradientLayer.colors = [UIColor(white: 1.0, alpha: 0.98).CGColor, UIColor(white: 1.0, alpha: 0.9).CGColor, UIColor.clearColor().CGColor]
             self.titleWrapperBackground.layer.mask = gradientLayer
         }
     }

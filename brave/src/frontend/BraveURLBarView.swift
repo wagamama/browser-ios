@@ -386,6 +386,8 @@ class BraveURLBarView : URLBarView {
     override func updateProgressBar(progress: Float, dueToTabChange: Bool = false) {
         struct staticProgress { static var val = Float(0) }
         let minProgress = locationView.frame.width / 3.0
+        
+        locationView.braveProgressView.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.ProgressBarDarkColor : BraveUX.ProgressBarColor
 
         func setWidth(width: CGFloat) {
             var frame = locationView.braveProgressView.frame
