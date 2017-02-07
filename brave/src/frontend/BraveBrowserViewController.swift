@@ -33,7 +33,7 @@ class BraveBrowserViewController : BrowserViewController {
         RunOnceAtStartup.ran = true
 
         if syncWebView == nil {
-            syncWebView = SyncWebView()
+            syncWebView = SyncWebView.singleton
             addChildViewController(syncWebView!)
             view.addSubview(syncWebView!.view)
             syncWebView!.didMoveToParentViewController(self)
