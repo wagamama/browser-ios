@@ -699,6 +699,6 @@ extension ToolbarTextField: Themeable {
         backgroundColor = theme.backgroundColor
         textColor = theme.textColor
         clearButtonTintColor = theme.buttonTintColor
-        // BRAVE: use default iOS: highlightColor = theme.highlightColor!
+        highlightColor = theme.highlightColor!
     }
 }
