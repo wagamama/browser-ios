@@ -482,6 +482,7 @@
 		EBA11E1A1E2EB84800C964E0 /* adblock-regions.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBA11E191E2EB84800C964E0 /* adblock-regions.txt */; };
 		EBACC8551DF9BB3500D5E048 /* SettingsViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */; };
 		EBB345801DAD465C00EE24F0 /* SQLite.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7B9A62DB1C4002B1005C83DC /* SQLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EBD312D01E4967FE0077934D /* SyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD312CF1E4967FE0077934D /* SyncTest.swift */; };
 		EBDB7D471E14231900D744C7 /* SyncWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDB7D461E14231900D744C7 /* SyncWebView.swift */; };
 		EBDB7D501E1432E800D744C7 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D4E1E1432E800D744C7 /* bundle.js */; };
 		EBDB7D551E14331900D744C7 /* fetch.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D531E14331900D744C7 /* fetch.js */; };
@@ -1297,6 +1298,7 @@
 		EBA6F12E1E39312100F7B3D9 /* ad-hoc-export.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; name = "ad-hoc-export.applescript"; path = "brave/build-system/ad-hoc-export.applescript"; sourceTree = "<group>"; };
 		EBA6F13F1E39410E00F7B3D9 /* upload-to-app-store.applescript */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.applescript; name = "upload-to-app-store.applescript"; path = "brave/build-system/upload-to-app-store.applescript"; sourceTree = "<group>"; };
 		EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewTest.swift; sourceTree = "<group>"; };
+		EBD312CF1E4967FE0077934D /* SyncTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncTest.swift; sourceTree = "<group>"; };
 		EBDB7D461E14231900D744C7 /* SyncWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncWebView.swift; sourceTree = "<group>"; };
 		EBDB7D4E1E1432E800D744C7 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bundle.js; sourceTree = "<group>"; };
 		EBDB7D531E14331900D744C7 /* fetch.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = fetch.js; sourceTree = "<group>"; };
@@ -2704,6 +2706,7 @@
 		EB36616D1D9C3CEC00445C92 /* unit */ = {
 			isa = PBXGroup;
 			children = (
+				EBD312CF1E4967FE0077934D /* SyncTest.swift */,
 				EB8E3D651DF78237006EA0D1 /* FingerprintProtectionTest.swift */,
 				EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */,
 				EB36616E1D9C3CEC00445C92 /* HttpsEverywhereTest.swift */,
@@ -3772,6 +3775,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD312D01E4967FE0077934D /* SyncTest.swift in Sources */,
 				EB62B8021DB59EF9006FD479 /* WebViewLoadTest.swift in Sources */,
 				EB8E3D661DF78237006EA0D1 /* FingerprintProtectionTest.swift in Sources */,
 				EB3661761D9C3CEC00445C92 /* HttpsEverywhereTest.swift in Sources */,

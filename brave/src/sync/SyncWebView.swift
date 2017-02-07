@@ -15,8 +15,51 @@ import WebKit
  }
  */
 
+let NotificationSyncReady = "NotificationSyncReady"
+
+enum SyncRecordType : String {
+    case bookmark = "BOOKMARKS"
+    case history = "HISTORY_SITES"
+    case prefs = "PREFERENCES"
+}
+
+enum SyncActions: Int {
+    case create = 0
+    case update = 1
+    case delete = 2
+
+}
+
 class SyncWebView: UIViewController {
+    static let singleton = SyncWebView()
+
     var webView: WKWebView!
+
+    var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
+
+    let prefNameId = "device-id-js-array"
+    let prefNameSeed = "seed-js-array"
+    #if DEBUG
+    let isDebug = true
+    let serverUrl = "https://sync-staging.brave.com"
+    #else
+    let isDebug = false
+    let serverUrl = "https://sync.brave.com"
+    #endif
+
+    let apiVersion = 0
+
+    private init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    private override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+
+    internal required init?(coder aDecoder: NSCoder) {
+        fatalError("not implemented")
+    }
 
     var webConfig:WKWebViewConfiguration {
         get {
@@ -44,7 +87,6 @@ class SyncWebView: UIViewController {
         super.viewDidLoad()
         view.frame = CGRectMake(20, 20, 300, 300)
         webView = WKWebView(frame: view.frame, configuration: webConfig)
-        //webView.navigationDelegate = self
         view.addSubview(webView)
     }
 
@@ -56,9 +98,6 @@ class SyncWebView: UIViewController {
     func webView(webView: WKWebView, didFinish navigation: WKNavigation!) {
         print(#function)
     }
-
-    let prefNameId = "device-id-js-array"
-    let prefNameSeed = "seed-js-array"
 
     var syncDeviceId: String {
         get {
@@ -80,22 +119,109 @@ class SyncWebView: UIViewController {
         }
     }
 
-//    func getInitData() {
-//        var config =
-//            "var injected_deviceId = \(syncDeviceId); " +
-//            "var injected_seed = \(syncSeed); "
-//
-//        #if DEBUG
-//            config += "const injected_braveSyncConfig = {apiVersion: '0', serverUrl: 'https://sync-staging.brave.com', debug:true}"
-//        #else
-//            config += "const injected_braveSyncConfig = {apiVersion: '0', serverUrl: 'https://sync.brave.com'}"
-//        #endif
-//
-//        webView.evaluateJavaScript(config,
-//                                   completionHandler: { (result, error) in
-//                                    print(result);print(error) })
-//
-//    }
+    func checkIsSyncReady() -> Bool {
+        struct Static {
+            static var isReady = false
+        }
+        if Static.isReady {
+            return true
+        }
+
+        let mirror = Mirror(reflecting: isSyncFullyInitialized)
+        let ready = mirror.children.reduce(true) { $0 && $1.1 as! Bool }
+        if ready {
+            NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
+            Static.isReady = true
+        }
+        return ready
+    }
+ }
+
+// MARK: Native-initiated Message category
+extension SyncWebView {
+    func sendSyncRecords(recordType: [SyncRecordType], recordJson: String) {
+        /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
+         @param {string} categoryName, @param {Array.<Object>} records */
+        let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
+        webView.evaluateJavaScript("callbackList['send-sync-records'](null, \(arg1),\(recordJson))",
+                                   completionHandler: { (result, error) in
+                                    print(result)
+                                    print(error)
+        })
+    }
+
+    func gotInitData() {
+        let args = "(null, \(syncSeed), \(syncDeviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
+        print(args)
+        webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
+                                   completionHandler: { (result, error) in
+                                    print(result)
+                                    print(error)
+        })
+    }
+    func fetch() {
+        /*  browser -> webview: sent to fetch sync records after a given start time from the sync server.
+         @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
+        webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
+                                   completionHandler: { (result, error) in
+                                    print(result)
+                                    print(error)
+        })
+    }
+
+    func resolveSyncRecords(data: [String: AnyObject]) {
+        print("not implemented: resolveSyncRecords() \(data)")
+    }
+
+    func deleteSyncUser(data: [String: AnyObject]) {
+        print("not implemented: deleteSyncUser() \(data)")
+    }
+
+    func deleteSyncCategory(data: [String: AnyObject]) {
+        print("not implemented: deleteSyncCategory() \(data)")
+    }
+
+    func deleteSyncSiteSettings(data: [String: AnyObject]) {
+        print("not implemented: delete sync site settings \(data)")
+    }
+
+}
+
+// MARK: Server To Native Message category
+extension SyncWebView  {
+
+    func getExistingObjects(data: [String: AnyObject]) {
+        guard let typeName = data["arg1"] as? String,
+            let objects = data["arg2"] as? [[String: AnyObject]] else { return }
+        /*▿ Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
+        for item in objects {
+            if item["objectData"] as? String == "bookmark" {
+                print("parse a bookmark")
+            }
+        }
+    }
+
+    func saveInitData(data: [String: AnyObject]) {
+        if let seedDict = data["arg1"] as? [String: Int] {
+            var seedArray = [Int](count: 32, repeatedValue: 0)
+            for (k, v) in seedDict {
+                if let k = Int(k) where k < 32 {
+                    seedArray[k] = v
+                }
+            }
+            syncSeed = "\(seedArray)"
+
+            if let idDict = data["arg2"] as? [String: Int] {
+                if let id = idDict["0"] {
+                    syncDeviceId = "[\(id)]"
+                    print(id)
+                }
+            }
+        } else {
+            print("Seed expected.")
+        }
+    }
+
 }
 
 extension SyncWebView: WKScriptMessageHandler {
@@ -106,75 +232,37 @@ extension SyncWebView: WKScriptMessageHandler {
             return
         }
 
-        /*
-         resolve-sync-records not handled yet
-         delete-sync-user not handled yet
-         delete-sync-category not handled yet
-         delete-sync-site-settings not handled yet
-         */
         switch messageName {
         case "get-init-data":
             //getInitData()
             break
         case "got-init-data":
-//            if (cb) {
-//                initCb = cb
-//            }
-//            // native has injected these varibles into the js context, or from 'save-init-data'
-//            initCb(null, injected_seed, injected_deviceId, injected_braveSyncConfig)
-//        } else {
-            let args = "(null, \(syncSeed), \(syncDeviceId), {apiVersion: '0', serverUrl: 'https://sync-staging.brave.com', debug:true})"
-            print(args)
-            webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
-                                       completionHandler: { (result, error) in
-                                        print(result)
-                                        print(error)
-            })
-
-
+            gotInitData()
         case "save-init-data" :
-            if let seedDict = data["arg1"] as? [String: Int] {
-                var seedArray = [Int](count: 32, repeatedValue: 0)
-                for (k, v) in seedDict {
-                    if let k = Int(k) where k < 32 {
-                        seedArray[k] = v
-                    }
-                }
-                syncSeed = "\(seedArray)"
-
-                if let idDict = data["arg2"] as? [String: Int] {
-                    if let id = idDict["0"] {
-                        syncDeviceId = "[\(id)]"
-                        print(id)
-                    }
-                }
-            } else {
-                print("Seed expected.")
-            }
+            saveInitData(data)
+        case "get-existing-objects":
+            getExistingObjects(data)
         case "sync-debug":
             print("Sync Debug: \(data)")
         case "sync-ready":
-            break
+            isSyncFullyInitialized.syncReady = true
         case "fetch-sync-records":
-            /*  browser -> webview: sent to fetch sync records after a given start time from the sync server.
-            @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
-            webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
-                                       completionHandler: { (result, error) in
-                print(result)
-                print(error)
-            })
+            isSyncFullyInitialized.fetchReady = true
         case "send-sync-records":
-            /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
-            @param {string} categoryName, @param {Array.<Object>} records */
-            webView.evaluateJavaScript("callbackList['send-sync-records'](null, ['BOOKMARKS'], 0)",
-                                       completionHandler: { (result, error) in
-                print(result)
-                print(error)
-            })
+            isSyncFullyInitialized.sendRecordsReady = true
+        case "resolve-sync-records":
+            isSyncFullyInitialized.resolveRecordsReady = true
+        case "delete-sync-user":
+            isSyncFullyInitialized.deleteUserReady = true
+        case "delete-sync-site-settings":
+            isSyncFullyInitialized.deleteSiteSettingsReady = true
+        case "delete-sync-category":
+            isSyncFullyInitialized.deleteCategoryReady = true
         default:
             print("\(messageName) not handled yet")
         }
-    }
 
+        checkIsSyncReady()
+    }
 }
 
