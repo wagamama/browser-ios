@@ -321,11 +321,18 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         
         tableView.allowsSelectionDuringEditing = true
         
+        let navBar = self.navigationController?.navigationBar
+        navBar?.barTintColor = BraveUX.BackgroundColorForSideToolbars
+        navBar?.translucent = false
+        navBar?.titleTextAttributes = [NSFontAttributeName : UIFont.systemFontOfSize(18, weight: UIFontWeightMedium), NSForegroundColorAttributeName : UIColor.blackColor()]
+        navBar?.clipsToBounds = true
+        
         let width = self.view.bounds.size.width
         let toolbarHeight = CGFloat(44)
         editBookmarksToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: width, height: toolbarHeight))
         createEditBookmarksToolbar()
-        editBookmarksToolbar.barTintColor = UIColor(white: 225/255.0, alpha: 1.0)
+        editBookmarksToolbar.barTintColor = BraveUX.BackgroundColorForSideToolbars
+        editBookmarksToolbar.translucent = false
         
         self.view.addSubview(editBookmarksToolbar)
         
@@ -450,8 +457,12 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         items.append(editBookmarksButton)
         items.append(UIBarButtonItem.createFixedSpaceItem(5))
         
+        items.forEach { $0.tintColor = BraveUX.DefaultBlue }
         
         editBookmarksToolbar.items = items
+        
+        // This removes the small top border from the toolbar
+        editBookmarksToolbar.clipsToBounds = true
     }
     
     func onDeleteBookmarksFolderButton() {

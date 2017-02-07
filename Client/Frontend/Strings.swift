@@ -94,6 +94,7 @@ extension Strings {
     public static let Copy_Link = NSLocalizedString("Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
     public static let Share_Link = NSLocalizedString("Share Link", comment: "Context menu item for sharing a link URL")
     public static let Save_Image = NSLocalizedString("Save Image", comment: "Context menu item for saving an image")
+    public static let Open_Image_In_Background_Tab = NSLocalizedString("Open Image In New Tab", comment: "Context menu for opening image in new tab")
     public static let This_allows_you_to_save_the_image_to_your_CameraRoll = NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7")
     public static let Open_Settings = NSLocalizedString("Open Settings", comment: "See http://mzl.la/1G7uHo7")
     public static let Copy_Image = NSLocalizedString("Copy Image", comment: "Context menu item for copying an image to the clipboard")
