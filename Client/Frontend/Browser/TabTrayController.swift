@@ -182,7 +182,7 @@ class TabCell: UICollectionViewCell {
         // Reset any close animations.
         backgroundHolder.layer.borderColor = UIColor(white: 0.0, alpha: 0.15).CGColor
         backgroundHolder.layer.borderWidth = 0.5
-        backgroundHolder.alpha = 1
+        shadowView.alpha = 1
         shadowView.transform = CGAffineTransformIdentity
         shadowView.layer.shadowOpacity = 0
         self.titleLbl.font = DynamicFontHelper.defaultHelper.DefaultSmallFontBold
