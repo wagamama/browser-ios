@@ -67,7 +67,12 @@ struct BraveUX {
 
     // LocationBar Coloring
     static let LocationBarTextColor = UIColor.blackColor()
-    static let LocationBarBackgroundColor = UIColor.clearColor()
+    
+    // Setting this to clearColor() and setting LocationContainerBackgroundColor to a definitive color
+    //  with transparency (e.g. allwhile 0.3 alpha) is how to make a non-opaque URL bar (e.g. for blurring).
+    // Not currently needed since top bar is entirely opaque
+    static let LocationBarBackgroundColor = UIColor(white: 221 / 255, alpha: 1.0)
+    static let LocationContainerBackgroundColor = LocationBarBackgroundColor
     
     // Editing colors same as standard coloring
     static let LocationBarEditModeTextColor = LocationBarTextColor
@@ -75,7 +80,9 @@ struct BraveUX {
     
     // LocationBar Private Coloring
     // TODO: Add text coloring
-    static let LocationBarBackgroundColor_PrivateMode = UIColor.clearColor()
+    // See comment for LocationBarBackgroundColor is semi-transparent location bar is desired
+    static let LocationBarBackgroundColor_PrivateMode = UIColor.blackColor()
+    static let LocationContainerBackgroundColor_PrivateMode = LocationBarBackgroundColor_PrivateMode
 
     static let LocationBarEditModeBackgroundColor_Private = UIColor(white: 0/255.0, alpha: 1.0)
     static let LocationBarEditModeTextColor_Private = UIColor(white: 242/255.0, alpha: 1)

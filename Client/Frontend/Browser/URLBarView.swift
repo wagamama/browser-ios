@@ -34,14 +34,14 @@ struct URLBarViewUX {
         theme.tintColor = UIConstants.PrivateModePurple
         theme.textColor = .whiteColor()
         theme.buttonTintColor = UIConstants.PrivateModeActionButtonTintColor
-        theme.backgroundColor = .blackColor()
+        theme.backgroundColor = BraveUX.LocationContainerBackgroundColor_PrivateMode
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
         theme.tintColor = URLBarViewUX.ProgressTintColor
         theme.textColor = BraveUX.LocationBarTextColor
         theme.buttonTintColor = BraveUX.ActionButtonTintColor
-        theme.backgroundColor = UIColor(white: 1.0, alpha: 0.3)
+        theme.backgroundColor = BraveUX.LocationContainerBackgroundColor
         themes[Theme.NormalMode] = theme
 
         return themes
