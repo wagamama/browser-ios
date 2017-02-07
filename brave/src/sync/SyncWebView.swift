@@ -85,9 +85,11 @@ class SyncWebView: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.frame = CGRectMake(20, 20, 300, 300)
+        view.frame = CGRectMake(20, 20, 200, 100)
         webView = WKWebView(frame: view.frame, configuration: webConfig)
         view.addSubview(webView)
+        view.userInteractionEnabled = false
+        view.alpha = 0.5
     }
 
     override func viewDidAppear(animated: Bool) {
