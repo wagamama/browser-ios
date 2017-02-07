@@ -1,55 +1,5 @@
-Testing ad block
+<form action="https://www.google.com:81" target="aa" method="post" onsubmit="document.write('Fake Google!!!!');window.stop();">
+<input type="submit">
 
-<script>
-// Adblocked urls
-/*
-var urls = ["teads.tv",
-"netshelter.net",
-"tubemogul.com",
-"sitescout.com",
-"sharethrough.com"]
-*/
-  
-// TP blocked urls
-var urls = ["scorecardresearch.com",
-"imrworldwide.com",
-"google-analytics.com",
-"googletagservices.com",
-"googlesyndication.com",
-"quantserve.com",
-"teads.tv",
-"netshelter.net",
-"viglink.com",
-"bluekai.com",
-"bkrtx.com",
-"truste.com",
-"tubemogul.com",
-"sitescout.com"]
+</form>
 
-  var asyncLoop = function(o){
-    var i=-1;
-
-    var loop = function(){
-        i++;
-        if(i==o.length){o.callback(); return;}
-        o.functionToLoop(loop, i);
-    } 
-    loop();//init
-}
-
-asyncLoop({
-    length : urls.length,
-    functionToLoop : function(loop, i){
-        setTimeout(function() {
-          
-  var img = document.createElement('img');
-  img.src='https://' + urls[i];
-  document.body.appendChild(img);
-            
-            loop();
-        },1000);
-    },
-    callback : function() {}    
-});
-
-</script>
