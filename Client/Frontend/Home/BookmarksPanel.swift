@@ -290,7 +290,9 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     var addRemoveFolderButton:UIBarButtonItem!
     var removeFolderButton:UIBarButtonItem!
     var addFolderButton:UIBarButtonItem!
-    
+  
+    weak var addBookmarksFolderOkAction: UIAlertAction?
+  
     var isEditingInvidivualBookmark:Bool = false
 
     init() {
@@ -504,13 +506,25 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     func onAddBookmarksFolderButton() {
         
         let alert = UIAlertController(title: "New Folder", message: "Enter folder name", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        let removeTextFieldObserver = {
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: UITextFieldTextDidChangeNotification, object: alert.textFields!.first)
+        }
 
         let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (alertA: UIAlertAction!) in
             postAsyncToMain {
                 self.addFolder(alertA, alertController:alert)
             }
+            removeTextFieldObserver()
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        
+        okAction.enabled = false
+        
+        addBookmarksFolderOkAction = okAction
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (alertA: UIAlertAction!) in
+            removeTextFieldObserver()
+        }
         
         alert.addAction(okAction)
         alert.addAction(cancelAction)
@@ -518,13 +532,14 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         alert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
             textField.placeholder = "<folder name>"
             textField.secureTextEntry = false
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.notificationReceived(_:)), name: UITextFieldTextDidChangeNotification, object: textField)
         })
         
         self.presentViewController(alert, animated: true) {}
     }
 
     func addFolder(alert: UIAlertAction!, alertController: UIAlertController) {
-        if let folderName = alertController.textFields?[0].text  {
+        if let folderName = alertController.textFields?[0].text {
             if let sqllitbk = self.profile.bookmarks as? MergedSQLiteBookmarks {
                 sqllitbk.createFolder(folderName).upon { _ in
                     postAsyncToMain {
@@ -565,6 +580,11 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         switch notification.name {
         case NotificationFirefoxAccountChanged:
             self.reloadData()
+            break
+        case UITextFieldTextDidChangeNotification:
+            if let okAction = addBookmarksFolderOkAction, let textField = notification.object as? UITextField {
+                okAction.enabled = (textField.text?.characters.count > 0)
+            }
             break
         default:
             // no need to do anything at all
