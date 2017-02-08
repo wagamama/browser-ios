@@ -69,7 +69,6 @@ class TabCell: UICollectionViewCell {
 
         self.background.contentMode = UIViewContentMode.ScaleAspectFill
         self.background.userInteractionEnabled = false
-        self.background.alpha = 0.7
         self.background.layer.masksToBounds = true
         self.background.alignLeft = true
         self.background.alignTop = true
@@ -179,6 +178,7 @@ class TabCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
+        // TODO: Move more of this to cellForItem
         // Reset any close animations.
         backgroundHolder.layer.borderColor = UIColor(white: 0.0, alpha: 0.15).CGColor
         backgroundHolder.layer.borderWidth = 0.5
@@ -777,6 +777,7 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
         tab.screenshot.listenerImages.removeAll() // TODO maybe UIImageWithNotify should only ever have one listener?
         tab.screenshot.listenerImages.append(UIImageWithNotify.WeakImageView(tabCell.background))
 
+        // TODO: Move most view logic here instead of `init` or `prepareForReuse`
         // If the current tab add heightlighting
         if getApp().tabManager.selectedTab == tab {
             tabCell.backgroundHolder.layer.borderWidth = 1
@@ -786,6 +787,9 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
             tabCell.shadowView.layer.shadowOpacity = 1.0
             tabCell.shadowView.layer.shadowOffset = CGSize(width: 0, height: 0)
             tabCell.shadowView.layer.shadowPath = UIBezierPath(roundedRect: tabCell.bounds, cornerRadius: tabCell.backgroundHolder.layer.cornerRadius).CGPath
+            tabCell.background.alpha = 1.0
+        } else {
+            tabCell.background.alpha = 0.7
         }
         
         return tabCell
