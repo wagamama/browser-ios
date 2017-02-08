@@ -492,8 +492,6 @@ class TabTrayController: UIViewController {
     func SELdidTogglePrivateMode() {
         telemetry(action: "Private mode button tapped", props: nil)
 
-        let scaleDownTransform = CGAffineTransformMakeScale(0.9, 0.9)
-
         let fromView: UIView
         if privateTabsAreEmpty() {
             fromView = emptyPrivateTabsView
@@ -509,7 +507,6 @@ class TabTrayController: UIViewController {
             PrivateBrowsing.singleton.enter()
         } else {
             view.userInteractionEnabled = false
-            view.alpha = 0.5
             let activityView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
             activityView.center = view.center
             activityView.startAnimating()
@@ -517,7 +514,6 @@ class TabTrayController: UIViewController {
 
             PrivateBrowsing.singleton.exit().uponQueue(dispatch_get_main_queue()) {
                 self.view.userInteractionEnabled = true
-                self.view.alpha = 1.0
                 activityView.stopAnimating()
             }
         }
@@ -525,21 +521,12 @@ class TabTrayController: UIViewController {
 
         collectionView.layoutSubviews()
 
-        let toView: UIView
-        if privateTabsAreEmpty() {
-            toView = emptyPrivateTabsView
-        } else {
-            let newSnapshot = collectionView.snapshotViewAfterScreenUpdates(true)
-            newSnapshot!.frame = collectionView.frame
-            view.insertSubview(newSnapshot!, aboveSubview: fromView)
-            collectionView.alpha = 0
-            toView = newSnapshot!
-        }
-        toView.alpha = 0
+        let scaleDownTransform = CGAffineTransformMakeScale(0.9, 0.9)
+        let toView = privateTabsAreEmpty() ? emptyPrivateTabsView : collectionView
         toView.transform = scaleDownTransform
+        toView.alpha = 0
 
-        UIView.animateWithDuration(0.2, delay: 0, options: [], animations: { () -> Void in
-            fromView.transform = scaleDownTransform
+        UIView.animateWithDuration(0.4, delay: 0, options: [], animations: { () -> Void in
             fromView.alpha = 0
             toView.transform = CGAffineTransformIdentity
             toView.alpha = 1
@@ -547,10 +534,6 @@ class TabTrayController: UIViewController {
             if fromView != self.emptyPrivateTabsView {
                 fromView.removeFromSuperview()
             }
-            if toView != self.emptyPrivateTabsView {
-                toView.removeFromSuperview()
-            }
-            self.collectionView.alpha = 1
         }
     }
 
