@@ -245,12 +245,16 @@ class TabTrayController: UIViewController {
                 togglePrivateMode.backgroundColor = .whiteColor()
                 
                 addTabButton.tintColor = UIColor.whiteColor()
+                
+                blurBackdropView.effect = UIBlurEffect(style: .Dark)
             } else {
                 togglePrivateMode.selected = false
                 togglePrivateMode.accessibilityValue = PrivateModeStrings.toggleAccessibilityValueOff
                 togglePrivateMode.backgroundColor = .clearColor()
                 
                 addTabButton.tintColor = UIColor.blackColor()
+                
+                blurBackdropView.effect = UIBlurEffect(style: .Light)
             }
             tabDataSource.updateData()
             collectionView?.reloadData()
@@ -275,6 +279,8 @@ class TabTrayController: UIViewController {
 
         return button
     }()
+    
+    private var blurBackdropView = UIVisualEffectView()
 
     private lazy var emptyPrivateTabsView: UIView = {
         return self.newEmptyPrivateTabsView()
@@ -366,20 +372,14 @@ class TabTrayController: UIViewController {
         collectionView.registerClass(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
         collectionView.backgroundColor = UIColor.clearColor()
         
-        let blur = UIVisualEffectView(effect: UIBlurEffect(style: PrivateBrowsing.singleton.isOn ? .Dark : .Light))
-        
         // Background view created for tapping background closure
         collectionView.backgroundView = UIView()
         collectionView.backgroundView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(TabTrayController.onTappedBackground(_:))))
 
-        viewsToAnimate = [blur, collectionView, addTabButton, togglePrivateMode]
+        viewsToAnimate = [blurBackdropView, collectionView, addTabButton, togglePrivateMode]
         viewsToAnimate.forEach {
             $0.alpha = 0.0
             view.addSubview($0)
-        }
-        
-        blur.snp_makeConstraints { (make) in
-            make.edges.equalTo(view)
         }
 
         makeConstraints()
@@ -442,6 +442,10 @@ class TabTrayController: UIViewController {
         collectionView.snp_makeConstraints { make in
             make.top.equalTo(addTabButton.snp_bottom)
             make.left.right.bottom.equalTo(self.view)
+        }
+        
+        blurBackdropView.snp_makeConstraints { (make) in
+            make.edges.equalTo(view)
         }
     }
     
