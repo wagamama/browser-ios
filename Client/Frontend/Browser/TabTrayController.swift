@@ -833,7 +833,7 @@ private class TabLayoutDelegate: NSObject, UICollectionViewDelegateFlowLayout {
         if self.traitCollection.verticalSizeClass == UIUserInterfaceSizeClass.Compact {
             return shortHeight
         } else if self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClass.Compact {
-            return shortHeight * 1.13
+            return rint(CGRectGetHeight(UIScreen.mainScreen().bounds) / 3)
         } else {
             return TabTrayControllerUX.TitleBoxHeight * 8
         }
