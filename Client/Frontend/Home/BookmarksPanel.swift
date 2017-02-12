@@ -105,6 +105,15 @@ class BorderedButton: UIButton {
     }
 }
 
+class EurekaTextRowHelper: NSObject {
+    class func replaceNormalSpacesWithNonBreakingSpaces(textField: UITextField) {
+        textField.text = textField.text?.stringByReplacingOccurrencesOfString(" ", withString: "\u{00a0}")
+    }
+    
+    class func replaceNonBreakingSpacesWithNormalSpaces(textField: UITextField) {
+        textField.text = textField.text?.stringByReplacingOccurrencesOfString("\u{00a0}", withString: " ")
+    }
+}
 
 class BookmarkEditingViewController: FormViewController {
     var completionBlock:((controller:BookmarkEditingViewController) -> Void)?
@@ -173,7 +182,7 @@ class BookmarkEditingViewController: FormViewController {
             return originalTitle
         }
         
-        let newTitle:String! = possibleNewTitle.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        let newTitle:String! = possibleNewTitle.stringByTrimmingCharactersInSet(NSCharacterSet.newlineCharacterSet())
         
         if newTitle.characters.count == 0 {
             return originalTitle
@@ -209,6 +218,9 @@ class BookmarkEditingViewController: FormViewController {
                 row.title = Strings.Name
                 row.value = bookmark.title
                 self.titleRow = row
+            }.cellSetup { cell, row in
+                cell.textField.addTarget(EurekaTextRowHelper.self, action: #selector(EurekaTextRowHelper.replaceNormalSpacesWithNonBreakingSpaces(_:)), forControlEvents: .EditingChanged)
+                cell.textField.addTarget(EurekaTextRowHelper.self, action: #selector(EurekaTextRowHelper.replaceNonBreakingSpacesWithNormalSpaces(_:)), forControlEvents: .EditingDidEnd)
             }
         
         form +++ nameSection
