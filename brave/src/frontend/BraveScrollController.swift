@@ -132,23 +132,34 @@ class BraveScrollController: NSObject {
         }
     }
 
+    // Struct used to prevent inset adjustment based on runtime scenarios
+    struct RuntimeInsetChecks {
+        // If inset adjustment code is already being executed
+        static var isRunningCheck = false
+        
+        // Whether webview is currently being zoomed
+        // Should not update on zooming (e.g. issue #717)
+        static var isZoomingCheck = false
+    }
+    
     // This causes issue #216 if contentInset changed during a load
     func checkHeightOfPageAndAdjustWebViewInsets() {
-        struct StaticVar {
-            static var isRunningCheck = false
+
+        if RuntimeInsetChecks.isZoomingCheck {
+            return
         }
 
         if self.browser?.webView?.loading ?? false {
-            if StaticVar.isRunningCheck {
+            if RuntimeInsetChecks.isRunningCheck {
                 return
             }
-            StaticVar.isRunningCheck = true
+            RuntimeInsetChecks.isRunningCheck = true
             postAsyncToMain(0.2) {
-                StaticVar.isRunningCheck = false
+                RuntimeInsetChecks.isRunningCheck = false
                 self.checkHeightOfPageAndAdjustWebViewInsets()
             }
         } else {
-            StaticVar.isRunningCheck = false
+            RuntimeInsetChecks.isRunningCheck = false
 
             if !isScrollHeightIsLargeEnoughForScrolling() && !keyboardIsShowing {
                 let h = BraveApp.isIPhonePortrait() ? UIConstants.ToolbarHeight + BraveURLBarView.CurrentHeight : BraveURLBarView.CurrentHeight
@@ -452,6 +463,16 @@ extension BraveScrollController: UIScrollViewDelegate {
         footer?.layer.transform = CATransform3DIdentity
     }
 
+    func scrollViewWillBeginZooming(scrollView: UIScrollView, withView view: UIView?) {
+        // freeze
+        RuntimeInsetChecks.isZoomingCheck = true
+    }
+    
+    func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
+        // unfreeze
+        RuntimeInsetChecks.isZoomingCheck = false
+    }
+    
     func scrollViewWillBeginDragging(scrollView: UIScrollView) {
         self.scrollViewWillBeginDragPoint = scrollView.contentOffset.y
     }
