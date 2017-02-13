@@ -74,6 +74,21 @@ class BraveURLBarView : URLBarView {
 
     let tabsBarController = TabsBarViewController()
     var readerModeToolbar: ReaderModeBarView?
+    
+    var tabsBarShouldShow: Bool {
+        get {
+            let tabCount = getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count
+            
+            let showingPolicy = TabsBarShowPolicy(rawValue: Int(BraveApp.getPrefs()?.intForKey(kPrefKeyTabsBarShowPolicy) ?? Int32(kPrefKeyTabsBarOnDefaultValue.rawValue))) ?? kPrefKeyTabsBarOnDefaultValue
+            
+            let bvc = getApp().browserViewController
+            let noShowDueToPortrait =  UIDevice.currentDevice().userInterfaceIdiom == .Phone &&
+                bvc.shouldShowFooterForTraitCollection(bvc.traitCollection) &&
+                showingPolicy == TabsBarShowPolicy.LandscapeOnly
+            
+            return showingPolicy != TabsBarShowPolicy.Never && tabCount > 1 && !noShowDueToPortrait
+        }
+    }
 
     override func commonInit() {
         BraveURLBarView.currentInstance = self
@@ -122,29 +137,19 @@ class BraveURLBarView : URLBarView {
 
 
     override func updateTabsBarShowing() {
-        var tabCount = getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count
-
-        let showingPolicy = TabsBarShowPolicy(rawValue: Int(BraveApp.getPrefs()?.intForKey(kPrefKeyTabsBarShowPolicy) ?? Int32(kPrefKeyTabsBarOnDefaultValue.rawValue))) ?? kPrefKeyTabsBarOnDefaultValue
-
         let bvc = getApp().browserViewController
-        let noShowDueToPortrait =  UIDevice.currentDevice().userInterfaceIdiom == .Phone &&
-            bvc.shouldShowFooterForTraitCollection(bvc.traitCollection) &&
-            showingPolicy == TabsBarShowPolicy.LandscapeOnly
-
         let isShowing = tabsBarController.view.alpha > 0
-
-        let shouldShow = showingPolicy != TabsBarShowPolicy.Never && tabCount > 1 && !noShowDueToPortrait
 
         func updateOffsets() {
             bvc.headerHeightConstraint?.updateOffset(BraveURLBarView.CurrentHeight)
             bvc.webViewContainerTopOffset?.updateOffset(BraveURLBarView.CurrentHeight)
         }
 
-        if !isShowing && shouldShow {
+        if !isShowing && tabsBarShouldShow {
             self.tabsBarController.view.alpha = 1
             BraveURLBarView.CurrentHeight = TabsBarHeight + UIConstants.ToolbarHeight
             updateOffsets()
-        } else if isShowing && !shouldShow  {
+        } else if isShowing && !tabsBarShouldShow  {
             UIView.animateWithDuration(0.1, animations: {
                 self.tabsBarController.view.alpha = 0
                 }, completion: { _ in
@@ -179,6 +184,9 @@ class BraveURLBarView : URLBarView {
         readerModeToolbar?.alpha = alpha
         leftSidePanelButton.alpha = alpha
         braveButton.alpha = alpha
+        if tabsBarShouldShow {
+            tabsBarController.view.alpha = alpha
+        }
     }
 
     @objc func onClickLeftSlideOut() {
