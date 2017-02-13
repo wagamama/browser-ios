@@ -176,7 +176,7 @@ class BraveURLBarView : URLBarView {
 
     override func updateAlphaForSubviews(alpha: CGFloat) {
         super.updateAlphaForSubviews(alpha)
-        
+        readerModeToolbar?.alpha = alpha
         leftSidePanelButton.alpha = alpha
         braveButton.alpha = alpha
     }
