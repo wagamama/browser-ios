@@ -79,7 +79,7 @@ class TabWidget : UIView {
         title.setTitle("", forState: .Normal)
         [close, title, separatorLine].forEach { addSubview($0) }
 
-        close.setImage(UIImage(named: "stop")!, forState: .Normal)
+        close.setImage(UIImage(named: "stop")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
         close.snp_makeConstraints(closure: { (make) in
             make.top.bottom.equalTo(self)
             make.left.equalTo(self).inset(4)
@@ -139,8 +139,9 @@ class TabWidget : UIView {
     func deselect() {
         backgroundColor = UIColor.init(white: 0.0, alpha: 0.1)
         title.titleLabel!.font = UIFont.systemFontOfSize(12)
-        title.setTitleColor(UIColor(white: 0.0, alpha: 0.4), forState: .Normal)
+        title.setTitleColor(PrivateBrowsing.singleton.isOn ? UIColor(white: 1.0, alpha: 0.4) : UIColor(white: 0.0, alpha: 0.4), forState: .Normal)
         close.hidden = true
+        close.tintColor = PrivateBrowsing.singleton.isOn ? UIColor.whiteColor() : UIColor.blackColor()
     }
 
     func selected() {
@@ -149,9 +150,10 @@ class TabWidget : UIView {
 
     func setStyleToSelected() {
         title.titleLabel!.font = UIFont.systemFontOfSize(12, weight: UIFontWeightSemibold)
-        title.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        title.setTitleColor(PrivateBrowsing.singleton.isOn ? UIColor.whiteColor() : UIColor.blackColor(), forState: .Normal)
         backgroundColor = UIColor.clearColor()
         close.hidden = false
+        
     }
 
     func isSelectedStyle() -> Bool {
