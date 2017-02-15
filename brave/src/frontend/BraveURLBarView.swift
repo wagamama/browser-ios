@@ -176,7 +176,11 @@ class BraveURLBarView : URLBarView {
 
     override func updateAlphaForSubviews(alpha: CGFloat) {
         super.updateAlphaForSubviews(alpha)
-        
+        // TODO tabsBarController use view.alpha to determine if it is shown or hidden, ideally this could be refactored to that
+        // any callers can do tabsBarController.view.alpha == xx, without knowing that it has a side-effect
+        tabsBarController.view.subviews.forEach { $0.alpha = alpha }
+
+        readerModeToolbar?.alpha = alpha
         leftSidePanelButton.alpha = alpha
         braveButton.alpha = alpha
     }
