@@ -84,9 +84,9 @@ class BraveScrollController: NSObject {
     // This added check is a secondary validator of the scroll direction
     private var scrollViewWillBeginDragPoint: CGFloat = 0
 
-    func setContentInset(top top: CGFloat, bottom: CGFloat) {
-        scrollView?.contentInset = UIEdgeInsetsMake(top, 0, bottom, 0)
-        scrollView?.scrollIndicatorInsets = UIEdgeInsetsMake(top, 0, bottom, 0)
+    func setBottomInset(bottom: CGFloat) {
+        scrollView?.contentInset = UIEdgeInsetsMake(0, 0, bottom, 0)
+        scrollView?.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, bottom, 0)
     }
 
     override init() {
@@ -163,7 +163,7 @@ class BraveScrollController: NSObject {
 
             if !isScrollHeightIsLargeEnoughForScrolling() && !keyboardIsShowing {
                 let h = BraveApp.isIPhonePortrait() ? UIConstants.ToolbarHeight + BraveURLBarView.CurrentHeight : BraveURLBarView.CurrentHeight
-                setContentInset(top: 0, bottom: h)
+                setBottomInset(h)
             }
             else {
                 // Use offset of header and footer bar positions to determine contentInset and scrollIndicatorInsets
@@ -171,7 +171,7 @@ class BraveScrollController: NSObject {
                 let bottom = BraveApp.isIPhonePortrait() ? min((CGRectGetMaxY(UIApplication.sharedApplication().keyWindow?.frame ?? CGRectZero) - CGRectGetMinY(footer?.frame ?? CGRectZero)), 0) : 0
                 let oh = BraveApp.isIPhonePortrait() ? (header?.frame.height ?? 0) + (footer?.frame.height ?? 0) : (footer?.frame.height ?? 0)
                 let h = keyboardIsShowing ? oh : (top + bottom)
-                setContentInset(top: 0, bottom: h)
+                setBottomInset(h)
             }
         }
     }
