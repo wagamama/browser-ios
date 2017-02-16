@@ -40,6 +40,8 @@ class BraveBrowserViewController : BrowserViewController {
         }
 
         self.updateToolbarStateForTraitCollection(self.traitCollection)
+        
+        // TODO: Should never call setupConstraints multiple times, this can cause huge headaches. Constraints should mostly be static with adjustments made to those constraints.
         setupConstraints()
         if BraveApp.shouldRestoreTabs() {
             tabManager.restoreTabs()
@@ -95,7 +97,7 @@ class BraveBrowserViewController : BrowserViewController {
         super.setupConstraints()
 
         // TODO: Should be moved to parent class, but requires property moving too
-        webViewContainer.snp_makeConstraints { make in
+        webViewContainer.snp_remakeConstraints { make in
             make.left.right.equalTo(self.view)
             heightConstraint = make.height.equalTo(self.view.snp_height).constraint
             webViewContainerTopOffset = make.top.equalTo(self.statusBarOverlay.snp_bottom).offset(BraveURLBarView.CurrentHeight).constraint
