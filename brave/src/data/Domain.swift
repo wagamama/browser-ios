@@ -12,20 +12,46 @@ import Foundation
 
 class Domain: NSManagedObject {
     
-    @NSManaged var domain: String?
-    @NSManaged var visits: NSNumber?
-    @NSManaged var topsite: NSNumber?
-    @NSManaged var allOff: NSNumber?
-    @NSManaged var adblockAndTp: NSNumber?
-    @NSManaged var httpse: NSNumber?
-    @NSManaged var noScript: NSNumber?
-    @NSManaged var fpProtection: NSNumber?
-    @NSManaged var safeBrowsing: NSNumber?
+    @NSManaged var url: String?
+    @NSManaged var visits: Int32
+    @NSManaged var topsite: Bool
     @NSManaged var favicon: FaviconMO?
     @NSManaged var history: NSSet?
-    
+
+    @NSManaged var shield_allOff: NSNumber?
+    @NSManaged var shield_adblockAndTp: NSNumber?
+    @NSManaged var shield_httpse: NSNumber?
+    @NSManaged var shield_noScript: NSNumber?
+    @NSManaged var shield_fpProtection: NSNumber?
+    @NSManaged var shield_safeBrowsing: NSNumber?
+
+
+    static var entityInfo: NSEntityDescription {
+        return NSEntityDescription.entityForName("Domain", inManagedObjectContext: DataController.moc)!
+    }
+
     override func awakeFromInsert() {
         super.awakeFromInsert()
     }
-    
+
+    class func getOrCreateForUrl(url: NSURL) -> Domain? {
+        let domainUrl = url.domainURL()
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Domain.entityInfo
+        fetchRequest.predicate = NSPredicate(format: "url == %@", domainUrl)
+        var result: Domain? = nil
+        do {
+            let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [Domain]
+            if let item = results?.first {
+                result = item
+            } else {
+                result = Domain(entity: Domain.entityInfo, insertIntoManagedObjectContext: DataController.moc)
+                result?.url = domainUrl.absoluteString
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return result
+    }
 }

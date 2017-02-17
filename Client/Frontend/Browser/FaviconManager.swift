@@ -79,7 +79,7 @@ class FaviconManager : BrowserHelper {
                     }
 
                     if !tab.isPrivate {
-                        getApp().profile?.favicons.addFavicon(fav, forSite: site)
+                        FaviconMO.add(favicon: fav, forSiteUrl: currentUrl)
                         if tab.favicons.isEmpty {
                             spotlight?.updateImage(img, forURL: url)
                         }

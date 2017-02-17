@@ -12,10 +12,10 @@ import CoreData
 let CoreDataWriteQueue: dispatch_queue_t = dispatch_queue_create("BraveDataWriteQueue", DISPATCH_QUEUE_SERIAL)
 
 class DataController: NSObject {
-    static let singleton = DataController()
+    static let shared = DataController()
     
     private var _managedObjectContext: NSManagedObjectContext? = nil
-    var managedObjectContext: NSManagedObjectContext? {
+    private var managedObjectContext: NSManagedObjectContext? {
         get {
             if NSThread.isMainThread() {
                 return mainThreadContext()
@@ -33,11 +33,11 @@ class DataController: NSObject {
     
     static var moc: NSManagedObjectContext {
         get {
-            if DataController.singleton.managedObjectContext == nil {
+            if DataController.shared.managedObjectContext == nil {
                 fatalError("DataController: Access to .moc contained nil value. A db connection has not yet been instantiated.")
             }
             
-            return DataController.singleton.managedObjectContext!
+            return DataController.shared.managedObjectContext!
         }
     }
     
@@ -46,7 +46,9 @@ class DataController: NSObject {
     
     private override init() {
         super.init()
-        
+
+       // TransformerUUID.setValueTransformer(transformer: NSValueTransformer?, forName name: String)
+
         guard let modelURL = NSBundle.mainBundle().URLForResource("Model", withExtension:"momd") else {
             fatalError("Error loading model from bundle")
         }
@@ -76,16 +78,18 @@ class DataController: NSObject {
     
     // Writes could still be executed on main thread, but recommended to use DataController.write {...}
     static func saveContext() {
-        guard let managedObjectContext: NSManagedObjectContext = DataController.singleton.managedObjectContext else {
-            return
-        }
-        
-        if managedObjectContext.hasChanges {
-            do {
-                try managedObjectContext.save()
+        dispatch_async(CoreDataWriteQueue) {
+            guard let managedObjectContext: NSManagedObjectContext = DataController.shared.managedObjectContext else {
+                return
             }
-            catch {
-                fatalError("Error migrating store: \(error)")
+            
+            if managedObjectContext.hasChanges {
+                do {
+                    try managedObjectContext.save()
+                }
+                catch {
+                    fatalError("Error saving DB: \(error)")
+                }
             }
         }
     }
@@ -97,7 +101,17 @@ class DataController: NSObject {
             DataController.saveContext()
         }
     }
-    
+
+    // Ensure not to pass NSManagedObjects between closure and completionOnMain
+    static func asyncAccess(closure: ()->Void, completionOnMain: (() -> Void)? = nil) {
+        dispatch_async(CoreDataWriteQueue) {
+            closure()
+            postAsyncToMain {
+                completionOnMain?()
+            }
+        }
+    }
+
     func mainThreadContext() -> NSManagedObjectContext {
         if _managedObjectContext != nil {
             return _managedObjectContext!
