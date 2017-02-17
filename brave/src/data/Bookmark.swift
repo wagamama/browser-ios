@@ -22,7 +22,8 @@ class Bookmark: NSManagedObject {
     @NSManaged var lastVisited: NSDate?
     @NSManaged var order: NSNumber?
     @NSManaged var tags: [String]?
-    
+    @NSManaged var syncUUID: NSUUID?
+
     override func awakeFromInsert() {
         super.awakeFromInsert()
         

@@ -6,21 +6,7 @@ import UIKit
 
 import Shared
 import Storage
-import XCGLogger
-import Deferred
-
-private let log = Logger.browserLogger
-
-private func getDate(dayOffset dayOffset: Int) -> NSDate {
-    let calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)!
-    let nowComponents = calendar.components([NSCalendarUnit.Year, NSCalendarUnit.Month, NSCalendarUnit.Day], fromDate: NSDate())
-    let today = calendar.dateFromComponents(nowComponents)!
-    return calendar.dateByAddingUnit(NSCalendarUnit.Day, value: dayOffset, toDate: today, options: [])!
-}
-
-private typealias SectionNumber = Int
-private typealias CategoryNumber = Int
-private typealias CategorySpec = (section: SectionNumber?, rows: Int, offset: Int)
+import CoreData
 
 private struct HistoryPanelUX {
     static let WelcomeScreenPadding: CGFloat = 15
@@ -31,20 +17,10 @@ private struct HistoryPanelUX {
 class HistoryPanel: SiteTableViewController, HomePanel {
     weak var homePanelDelegate: HomePanelDelegate? = nil
     private lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverview()
+    private var kvoContext: UInt8 = 1
+    var frc: NSFetchedResultsController? = nil
 
-    private let QueryLimit = 100
-    private let NumSections = 4
-    private let Today = getDate(dayOffset: 0)
-    private let Yesterday = getDate(dayOffset: -1)
-    private let ThisWeek = getDate(dayOffset: -7)
-
-    // Category number (index) -> (UI section, row count, cursor offset).
-    private var categories: [CategorySpec] = [CategorySpec]()
-
-    // Reverse lookup from UI section to data category.
-    private var sectionLookup = [SectionNumber: CategoryNumber]()
-
-    var refreshControl: UIRefreshControl?
+    var domainToIndexPath = [String: NSIndexPath]()
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -54,8 +30,12 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     }
 
     override func viewDidLoad() {
+        frc = History.frc()
+        frc!.delegate = self
         super.viewDidLoad()
         self.tableView.accessibilityIdentifier = "History List"
+
+        reloadData()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -78,68 +58,29 @@ class HistoryPanel: SiteTableViewController, HomePanel {
             break
         default:
             // no need to do anything at all
-            log.warning("Received unexpected notification \(notification.name)")
             break
         }
     }
 
-    func addRefreshControl() {
-        let refresh = UIRefreshControl()
-        refresh.addTarget(self, action: #selector(HistoryPanel.refresh), forControlEvents: UIControlEvents.ValueChanged)
-        self.refreshControl = refresh
-        self.tableView.addSubview(refresh)
-    }
-
-    func removeRefreshControl() {
-        self.refreshControl?.removeFromSuperview()
-        self.refreshControl = nil
-    }
-
-    func endRefreshing() {
-        // Always end refreshing, even if we failed!
-        self.refreshControl?.endRefreshing()
-
-    }
-
-
-    /**
-    * called by the table view pull to refresh
-    **/
-    @objc func refresh() {
-        self.refreshControl?.beginRefreshing()
-    }
-
-    /**
-    * fetch from the profile
-    **/
-    private func fetchData() -> Deferred<Maybe<Cursor<Site>>> {
-        return profile.history.getSitesByLastVisit(QueryLimit)
-    }
-
-    private func setData(data: Cursor<Site>) {
-        self.data = data
-        self.computeSectionOffsets()
-    }
-
-    /**
-    * Update our view after a data refresh
-    **/
     override func reloadData() {
-        self.fetchData().uponQueue(dispatch_get_main_queue()) { result in
-            if let data = result.successValue {
-                self.setData(data)
+        if frc == nil {
+            return
+        }
+
+        DataController.asyncAccess({
+            do {
+                try self.frc?.performFetch()
+            } catch let error as NSError {
+                print(error.description)
+            }
+            }, completionOnMain: {
                 self.tableView.reloadData()
                 self.updateEmptyPanelState()
-            }
-
-            self.endRefreshing()
-
-            // TODO: error handling.
-        }
+        })
     }
 
     private func updateEmptyPanelState() {
-        if data.count == 0 {
+        if frc?.fetchedObjects?.count == 0 {
             if self.emptyStateOverlayView.superview == nil {
                 self.tableView.addSubview(self.emptyStateOverlayView)
                 self.emptyStateOverlayView.snp_makeConstraints { make -> Void in
@@ -161,232 +102,129 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-        let category = self.categories[indexPath.section]
-        if let site = data[indexPath.row + category.offset] {
-            if let cell = cell as? TwoLineTableViewCell {
-                cell.setLines(site.title, detailText: site.url)
-                if let siteId = site.id, icon = iconForSiteId[siteId] {
-                    cell.imageView?.setIcon(icon, withPlaceholder: FaviconFetcher.defaultFavicon)
-                } else {
-                    cell.imageView?.setIcon(nil, withPlaceholder: FaviconFetcher.defaultFavicon)
-
-                    profile.favicons.getFavicon(forSite: site) >>== { cursor in
-                        if cursor.count < 1 {
-                            return
-                        }
-                        let favicons = cursor.asArray().flatMap{ $0 } // remove optionals
-                        guard let best = getBestFavicon(favicons) else { return }
-                        if let id = site.id {
-                            self.iconForSiteId[id] = best
-                        }
-                        cell.imageView?.setIcon(best, withPlaceholder: FaviconFetcher.defaultFavicon)
-                    }
-                }
-            }
-        }
-
-
-#if BRAVE
-        cell.backgroundColor = UIColor.clearColor()
-#endif
+        configureCell(cell, atIndexPath: indexPath)
         return cell
     }
 
-    private func siteForIndexPath(indexPath: NSIndexPath) -> Site? {
-        let offset = self.categories[sectionLookup[indexPath.section]!].offset
-        return data[indexPath.row + offset]
+    func configureCell(_cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
+        guard let cell = _cell as? TwoLineTableViewCell else { return }
+        let site = frc!.objectAtIndexPath(indexPath) as! History
+        cell.backgroundColor = UIColor.clearColor()
+        cell.setLines(site.title, detailText: site.url)
+        cell.imageView!.image = FaviconFetcher.defaultFavicon
+        if let faviconMO = site.domain?.favicon, let url = faviconMO.url {
+            let favicon = Favicon(url: url, type: IconType(rawValue: Int(faviconMO.type)) ?? IconType.Guess)
+            postAsyncToBackground {
+                let best = getBestFavicon([favicon])
+                postAsyncToMain {
+                    cell.imageView!.setIcon(best, withPlaceholder: FaviconFetcher.defaultFavicon)
+                }
+            }
+        }
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         telemetry(action: "history item picked", props: nil)
-        if let site = self.siteForIndexPath(indexPath),
-           let url = NSURL(string: site.url) {
-            let visitType = VisitType.Typed    // Means History, too.
-            homePanelDelegate?.homePanel(self, didSelectURL: url, visitType: visitType)
-            return
+        let site = frc?.objectAtIndexPath(indexPath) as! History
+
+        if let u = site.url, let url = NSURL(string: u) {
+            homePanelDelegate?.homePanel(self, didSelectURL: url, visitType: VisitType.Typed)
         }
-        log.warning("No site or no URL when selecting row.")
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 
-    // Functions that deal with showing header rows.
+    // Minimum of 1 section
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        var count = 0
-        for category in self.categories {
-            if category.rows > 0 {
-                count += 1
-            }
-        }
-        return count
+        let count = frc?.sections?.count ?? 0
+        return max(count, 1)
     }
 
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        var title = String()
-        switch sectionLookup[section]! {
-        case 0: title = Strings.Today
-        case 1: title = Strings.Yesterday
-        case 2: title = Strings.Last_week
-        case 3: title = Strings.Last_month
-        default:
-            assertionFailure("Invalid history section \(section)")
-        }
-        return title
-    }
-
-    func categoryForDate(date: MicrosecondTimestamp) -> Int {
-        let date = Double(date)
-        if date > (1000000 * Today.timeIntervalSince1970) {
-            return 0
-        }
-        if date > (1000000 * Yesterday.timeIntervalSince1970) {
-            return 1
-        }
-        if date > (1000000 * ThisWeek.timeIntervalSince1970) {
-            return 2
-        }
-        return 3
-    }
-
-    private func isInCategory(date: MicrosecondTimestamp, category: Int) -> Bool {
-        return self.categoryForDate(date) == category
-    }
-
-    func computeSectionOffsets() {
-        var counts = [Int](count: NumSections, repeatedValue: 0)
-
-        // Loop over all the data. Record the start of each "section" of our list.
-        for i in 0..<data.count {
-            if let site = data[i] {
-                counts[categoryForDate(site.latestVisit!.date)] += 1
-            }
-        }
-
-        var section = 0
-        var offset = 0
-        self.categories = [CategorySpec]()
-        for i in 0..<NumSections {
-            let count = counts[i]
-            if count > 0 {
-                log.debug("Category \(i) has \(count) rows, and thus is section \(section).")
-                self.categories.append((section: section, rows: count, offset: offset))
-                sectionLookup[section] = i
-                offset += count
-                section += 1
-            } else {
-                log.debug("Category \(i) has 0 rows, and thus has no section.")
-                self.categories.append((section: nil, rows: 0, offset: offset))
-            }
-        }
-    }
-
-    // UI sections disappear as categories empty. We need to translate back and forth.
-    private func uiSectionToCategory(section: SectionNumber) -> CategoryNumber {
-        for i in 0..<self.categories.count {
-            if let s = self.categories[i].section  where s == section {
-                return i
-            }
-        }
-        return 0
-    }
-
-    private func categoryToUISection(category: CategoryNumber) -> SectionNumber? {
-        return self.categories[category].section
+        guard let sections = frc?.sections else { return nil }
+        return sections.indices ~= section ? sections[section].name : nil
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.categories[uiSectionToCategory(section)].rows
+        guard let sections = frc?.sections else { return 0 }
+        return sections.indices ~= section ? sections[section].numberOfObjects : 0
+    }
+
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
     }
 
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        // Intentionally blank. Required to use UITableViewRowActions
-    }
-
-    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
-        let title = Strings.Remove
-
-        let delete = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: title, handler: { (action, indexPath) in
-            if let site = self.siteForIndexPath(indexPath) {
-                // Why the dispatches? Because we call success and failure on the DB
-                // queue, and so calling anything else that calls through to the DB will
-                // deadlock. This problem will go away when the history API switches to
-                // Deferred instead of using callbacks.
-                self.profile.history.removeHistoryForURL(site.url)
-                    .upon { res in
-                        self.fetchData().uponQueue(dispatch_get_main_queue()) { result in
-                            // If a section will be empty after removal, we must remove the section itself.
-                            if let data = result.successValue {
-
-                                let oldCategories = self.categories
-                                self.data = data
-                                self.computeSectionOffsets()
-
-                                let sectionsToDelete = NSMutableIndexSet()
-                                var rowsToDelete = [NSIndexPath]()
-                                let sectionsToAdd = NSMutableIndexSet()
-                                var rowsToAdd = [NSIndexPath]()
-
-                                for (index, category) in self.categories.enumerate() {
-                                    let oldCategory = oldCategories[index]
-
-                                    // don't bother if we're not displaying this category
-                                    if oldCategory.section == nil && category.section == nil {
-                                        continue
-                                    }
-
-                                    // 1. add a new section if the section didn't previously exist
-                                    if oldCategory.section == nil && category.section != oldCategory.section {
-                                        log.debug("adding section \(category.section)")
-                                        sectionsToAdd.addIndex(category.section!)
-                                    }
-
-                                    // 2. add a new row if there are more rows now than there were before
-                                    if oldCategory.rows < category.rows {
-                                        log.debug("adding row to \(category.section) at \(category.rows-1)")
-                                        rowsToAdd.append(NSIndexPath(forRow: category.rows-1, inSection: category.section!))
-                                    }
-
-                                    // if we're dealing with the section where the row was deleted:
-                                    // 1. if the category no longer has a section, then we need to delete the entire section
-                                    // 2. delete a row if the number of rows has been reduced
-                                    // 3. delete the selected row and add a new one on the bottom of the section if the number of rows has stayed the same
-                                    if oldCategory.section == indexPath.section {
-                                        if category.section == nil {
-                                            log.debug("deleting section \(indexPath.section)")
-                                            sectionsToDelete.addIndex(indexPath.section)
-                                        } else if oldCategory.section == category.section {
-                                            if oldCategory.rows > category.rows {
-                                                log.debug("deleting row from \(category.section) at \(indexPath.row)")
-                                                rowsToDelete.append(indexPath)
-                                            } else if category.rows == oldCategory.rows {
-                                                log.debug("in section \(category.section), removing row at \(indexPath.row) and inserting row at \(category.rows-1)")
-                                                rowsToDelete.append(indexPath)
-                                                rowsToAdd.append(NSIndexPath(forRow: category.rows-1, inSection: indexPath.section))
-                                            }
-                                        }
-                                    }
-                                }
-
-                                tableView.beginUpdates()
-                                if sectionsToAdd.count > 0 {
-                                    tableView.insertSections(sectionsToAdd, withRowAnimation: UITableViewRowAnimation.Left)
-                                }
-                                if sectionsToDelete.count > 0 {
-                                    tableView.deleteSections(sectionsToDelete, withRowAnimation: UITableViewRowAnimation.Right)
-                                }
-                                if !rowsToDelete.isEmpty {
-                                    tableView.deleteRowsAtIndexPaths(rowsToDelete, withRowAnimation: UITableViewRowAnimation.Right)
-                                }
-
-                                if !rowsToAdd.isEmpty {
-                                    tableView.insertRowsAtIndexPaths(rowsToAdd, withRowAnimation: UITableViewRowAnimation.Right)
-                                }
-
-                                tableView.endUpdates()
-                                self.updateEmptyPanelState()
-                            }
-                        }
+        if (editingStyle == UITableViewCellEditingStyle.Delete) {
+            if let obj = self.frc?.objectAtIndexPath(indexPath) as? History {
+                let id = obj.objectID
+                DataController.write {
+                    let obj = DataController.moc.objectWithID(id)
+                    DataController.moc.deleteObject(obj)
                 }
             }
-        })
-        return [delete]
+        }
+    }
+
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+        if let domain = object as? Domain where context == &kvoContext && keyPath == "favicon" {
+            domain.removeObserver(self, forKeyPath: "favicon")
+            if let index = domainToIndexPath[domain.url ?? ""], let cell = tableView.cellForRowAtIndexPath(index) {
+                configureCell(cell, atIndexPath: index)
+                domainToIndexPath[domain.url ?? ""] = nil
+            }
+        }
+    }
+}
+
+extension HistoryPanel : NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        tableView.beginUpdates()
+    }
+
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        tableView.endUpdates()
+    }
+
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        switch (type) {
+        case .Insert:
+            if let indexPath = newIndexPath {
+                let obj = anObject as! History
+                if let domain = obj.domain?.url where obj.domain?.favicon == nil {
+                    domainToIndexPath[domain] = indexPath
+                    obj.domain?.addObserver(self, forKeyPath: "favicon", options: .New, context: &kvoContext)
+                }
+                tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+            }
+            break;
+        case .Delete:
+            if let indexPath = indexPath {
+                if tableView.numberOfRowsInSection(indexPath.section) == 1 && tableView.numberOfSections > 1 {
+                    tableView.deleteSections(NSIndexSet(index: indexPath.section), withRowAnimation: .Automatic)
+                } else {
+                    tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+                }
+            }
+            break;
+        case .Update:
+            if let indexPath = indexPath, let cell = tableView.cellForRowAtIndexPath(indexPath) {
+                configureCell(cell, atIndexPath: indexPath)
+            }
+            break;
+        case .Move:
+            if let indexPath = indexPath {
+                if tableView.numberOfRowsInSection(indexPath.section) == 1 && tableView.numberOfSections > 1 {
+                    tableView.deleteSections(NSIndexSet(index: indexPath.section), withRowAnimation: .Automatic)
+                } else {
+                    tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+                }
+            }
+
+            if let newIndexPath = newIndexPath {
+                tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
+            }
+            break;
+        }
+        updateEmptyPanelState()
     }
 }

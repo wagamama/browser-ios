@@ -82,10 +82,10 @@ class BraveApp {
         
         // TODO: CoreData Migration...
         DataController.write {
-            let bookmark = DataController.new("Bookmark") as! Bookmark
-            bookmark.title = "Brave"
-            bookmark.url = "https://brave.com/"
-            bookmark.lastVisited = NSDate()
+//            let bookmark = DataController.new("Bookmark") as! Bookmark
+//            bookmark.title = "Brave"
+//            bookmark.url = "https://brave.com/"
+//            bookmark.lastVisited = NSDate()
         }
     }
 

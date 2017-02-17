@@ -79,12 +79,6 @@ class MainSidePanelViewController : SidePanelBaseViewController {
 
     @objc func historyItemAdded() {
         telemetry(action: "page changed", props: nil)
-        if self.view.hidden {
-            return
-        }
-        postAsyncToMain {
-            self.history.refresh()
-        }
     }
     
     func willHide() {
