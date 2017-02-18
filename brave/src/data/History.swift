@@ -101,6 +101,8 @@ class History: NSManagedObject {
     }
 
     class func getExisting(url: NSURL) -> History? {
+        assert(!NSThread.isMainThread())
+
         guard let urlString = url.absoluteString else { return nil }
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = History.entityInfo
