@@ -35,6 +35,8 @@ class Domain: NSManagedObject {
     }
 
     class func getOrCreateForUrl(url: NSURL) -> Domain? {
+        assert(!NSThread.isMainThread())
+
         let domainUrl = url.domainURL()
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Domain.entityInfo

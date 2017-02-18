@@ -24,6 +24,8 @@ class FaviconMO: NSManagedObject {
     }
 
     class func get(forFaviconUrl urlString: String) -> FaviconMO? {
+        assert(!NSThread.isMainThread())
+
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = FaviconMO.entityInfo
         fetchRequest.predicate = NSPredicate(format: "url == %@", urlString)
