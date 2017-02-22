@@ -15,6 +15,8 @@ if (!self.chrome || !self.chrome.ipc) {
         callbackList[message] = cb
         window.webkit.messageHandlers.syncToIOS_on.postMessage({message: message});
     }
+    
+    ipc.on = ipc.once
 
     ipc.send = (message, arg1, arg2) => {
         window.webkit.messageHandlers.syncToIOS_send.postMessage({message: message, arg1: arg1, arg2: arg2});
