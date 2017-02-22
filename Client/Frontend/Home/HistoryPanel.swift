@@ -20,7 +20,19 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     private var kvoContext: UInt8 = 1
     var frc: NSFetchedResultsController? = nil
 
-    var domainToIndexPath = [String: NSIndexPath]()
+
+    // This list is used for observing when the domain.favicon is updated.
+    // I called these faviconless-domains for clarity.
+    private var faviconlessDomainToIndexPaths = [String: [NSIndexPath]]()
+    private func addFaviconlessDomain(domain: Domain, forIndexPath: NSIndexPath) {
+        guard let url = domain.url else { return }
+
+        if faviconlessDomainToIndexPaths[url] == nil {
+            faviconlessDomainToIndexPaths[url] = [NSIndexPath]()
+            domain.addObserver(self, forKeyPath: "favicon", options: .New, context: &kvoContext)
+        }
+        faviconlessDomainToIndexPaths[url]!.append(forIndexPath)
+    }
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -120,6 +132,8 @@ class HistoryPanel: SiteTableViewController, HomePanel {
                     cell.imageView!.setIcon(best, withPlaceholder: FaviconFetcher.defaultFavicon)
                 }
             }
+        } else if let domain = site.domain {
+            addFaviconlessDomain(domain, forIndexPath: indexPath)
         }
     }
 
@@ -168,9 +182,13 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if let domain = object as? Domain where context == &kvoContext && keyPath == "favicon" {
             domain.removeObserver(self, forKeyPath: "favicon")
-            if let index = domainToIndexPath[domain.url ?? ""], let cell = tableView.cellForRowAtIndexPath(index) {
-                configureCell(cell, atIndexPath: index)
-                domainToIndexPath[domain.url ?? ""] = nil
+            if let url = domain.url, let indexes = faviconlessDomainToIndexPaths[url] {
+                for index in indexes {
+                    if let cell = tableView.cellForRowAtIndexPath(index) {
+                        configureCell(cell, atIndexPath: index)
+                    }
+                }
+                faviconlessDomainToIndexPaths[url] = nil
             }
         }
     }
@@ -190,9 +208,8 @@ extension HistoryPanel : NSFetchedResultsControllerDelegate {
         case .Insert:
             if let indexPath = newIndexPath {
                 let obj = anObject as! History
-                if let domain = obj.domain?.url where obj.domain?.favicon == nil {
-                    domainToIndexPath[domain] = indexPath
-                    obj.domain?.addObserver(self, forKeyPath: "favicon", options: .New, context: &kvoContext)
+                if let domain = obj.domain where obj.domain?.favicon == nil {
+                    addFaviconlessDomain(domain, forIndexPath: indexPath)
                 }
                 tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             }
