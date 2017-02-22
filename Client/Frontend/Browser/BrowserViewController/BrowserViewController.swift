@@ -6,7 +6,7 @@ import Foundation
 import UIKit
 import WebKit
 import Shared
-import Storage
+import CoreData
 import SnapKit
 import XCGLogger
 import Shared
@@ -95,7 +95,7 @@ class BrowserViewController: UIViewController {
     // Tracking navigation items to record history types.
     // TODO: weak references?
     var ignoredNavigation = Set<WKNavigation>()
-    var typedNavigation = [WKNavigation: VisitType]()
+
     var navigationToolbar: BrowserToolbarProtocol {
         return toolbar ?? urlBar
     }
@@ -674,7 +674,7 @@ class BrowserViewController: UIViewController {
     }
 
     
-    func finishEditingAndSubmit(url: NSURL, visitType: VisitType) {
+    func finishEditingAndSubmit(url: NSURL) {
         guard let tab = tabManager.selectedTab else {
             return
         }
@@ -692,21 +692,26 @@ class BrowserViewController: UIViewController {
             resetSpoofedUserAgentIfRequired(webView, newURL: url)
         }
 #endif
-        if let nav = tab.loadRequest(NSURLRequest(URL: url)) {
-            self.recordNavigationInTab(tab, navigation: nav, visitType: visitType)
-        }
+        tab.loadRequest(NSURLRequest(URL: url))
     }
 
-    func addBookmark(url: String, title: String?, folderId:String? = nil, folderTitle:String? = nil) -> Success {
-        let shareItem = ShareItem(url: url, title: title, favicon: nil, folderId: folderId, folderTitle: folderTitle)
-        let deferred = Success()
-        profile.bookmarks.shareItem(shareItem).upon { result in
-            postAsyncToMain {
+    func addBookmark(url: String, title: String?, parentFolder: NSManagedObjectID? = nil, completion:(()->Void)?) {
+        //let shareItem = ShareItem(url: url, title: title, favicon: nil, folderId: folderId, folderTitle: folderTitle)
+
+        DataController.asyncAccess({ 
+            Bookmark.add(url: url, title: title, parentFolder: parentFolder)
+            }, completionOnMain: {
                 self.urlBar.updateBookmarkStatus(true)
-            }
-            deferred.fill(result)
-        }
-        return deferred
+                completion?()
+        })
+
+//        profile.bookmarks.shareItem(shareItem).upon { result in
+//            postAsyncToMain {
+//                self.urlBar.updateBookmarkStatus(true)
+//            }
+//            deferred.fill(result)
+//        }
+
     }
 
     func removeBookmark(url: String, completion: dispatch_block_t? = nil) {
@@ -724,7 +729,7 @@ class BrowserViewController: UIViewController {
     }
 
     func SELBookmarkStatusDidChange(notification: NSNotification) {
-        if let bookmark = notification.object as? BookmarkItem {
+        if let bookmark = notification.object as? Bookmark {
             if bookmark.url == urlBar.currentURL?.absoluteString {
                 if let userInfo = notification.userInfo as? Dictionary<String, Bool>{
                     if let added = userInfo["added"]{
@@ -993,24 +998,8 @@ extension BrowserViewController {
         self.ignoredNavigation.insert(navigation)
     }
 
-    func recordNavigationInTab(tab: Browser, navigation: WKNavigation, visitType: VisitType) {
-        self.typedNavigation[navigation] = visitType
-    }
-
-    /**
-     * Untrack and do the right thing.
-     */
-    func getVisitTypeForTab(tab: Browser, navigation: WKNavigation?) -> VisitType? {
-        guard let navigation = navigation else {
-            // See https://github.com/WebKit/webkit/blob/master/Source/WebKit2/UIProcess/Cocoa/NavigationState.mm#L390
-            return VisitType.Link
-        }
-
-        if let _ = self.ignoredNavigation.remove(navigation) {
-            return nil
-        }
-
-        return self.typedNavigation.removeValueForKey(navigation) ?? VisitType.Link
+    func recordNavigationInTab(tab: Browser, navigation: WKNavigation) {
+        //self.typedNavigation[navigation] = visitType
     }
 }
 
@@ -1022,9 +1011,9 @@ extension BrowserViewController: WindowCloseHelperDelegate {
 
 
 extension BrowserViewController: HomePanelViewControllerDelegate {
-    func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL, visitType: VisitType) {
+    func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL) {
         hideHomePanelController()
-        finishEditingAndSubmit(url, visitType: visitType)
+        finishEditingAndSubmit(url)
     }
 
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectPanel panel: Int) {
@@ -1048,7 +1037,7 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
 
 extension BrowserViewController: SearchViewControllerDelegate {
     func searchViewController(searchViewController: SearchViewController, didSelectURL url: NSURL) {
-        finishEditingAndSubmit(url, visitType: VisitType.Typed)
+        finishEditingAndSubmit(url)
     }
 
     func presentSearchSettingsController() {
@@ -1225,7 +1214,7 @@ extension BrowserViewController: TabTrayDelegate {
 
     func tabTrayDidAddBookmark(tab: Browser) {
         guard let url = tab.url?.absoluteString where url.characters.count > 0 else { return }
-        self.addBookmark(url, title: tab.title)
+        self.addBookmark(url, title: tab.title, completion: nil)
     }
 
 

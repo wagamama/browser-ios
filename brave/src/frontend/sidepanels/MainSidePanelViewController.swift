@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Storage
+import CoreData
 import SnapKit
 import Shared
 
@@ -74,13 +74,13 @@ class MainSidePanelViewController : SidePanelBaseViewController {
 
         containerView.bringSubviewToFront(topButtonsView)
 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(historyItemAdded), name: kNotificationSiteAddedToHistory, object: nil)
+       // NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(historyItemAdded), name: kNotificationSiteAddedToHistory, object: nil)
     }
 
-    @objc func historyItemAdded() {
-        telemetry(action: "page changed", props: nil)
-    }
-    
+//    @objc func historyItemAdded() {
+//        telemetry(action: "page changed", props: nil)
+//    }
+
     func willHide() {
         //check if we are editing bookmark, if so pop controller then continue
         if self.bookmarksNavController?.visibleViewController is BookmarkEditingViewController {
@@ -121,18 +121,15 @@ class MainSidePanelViewController : SidePanelBaseViewController {
                 self.bookmarksPanel.currentBookmarksPanel().reloadData()
             }
         } else {
-            var folderId:String? = nil
-            var folderTitle:String? = nil
-            if let currentFolder = self.bookmarksPanel.currentBookmarksPanel().bookmarkFolder {
-                folderId = currentFolder.guid
-                folderTitle = currentFolder.title
+            var folderId: NSManagedObjectID? = nil
+            var folderTitle: String? = nil
+            if let currentFolder = self.bookmarksPanel.currentBookmarksPanel().currentFolder {
+                folderId = currentFolder.objectID
             }
 
-            browserViewController?.addBookmark(url, title: tab.title, folderId: folderId, folderTitle: folderTitle).upon { _ in
-                postAsyncToMain {
-                    self.bookmarksPanel.currentBookmarksPanel().reloadData()
-                }
-            }
+            browserViewController?.addBookmark(url, title: tab.title, parentFolder: folderId, completion: {
+                self.bookmarksPanel.currentBookmarksPanel().reloadData()
+            })
         }
     }
 

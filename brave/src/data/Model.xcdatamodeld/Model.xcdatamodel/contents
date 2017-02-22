@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16C67" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Bookmark" representedClassName=".Bookmark" syncable="YES">
+        <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="customTitle" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="folder" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isFolder" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="lastVisited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="order" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="parentId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="syncUUID" optional="YES" attributeType="Transformable" indexed="YES" syncable="YES"/>
         <attribute name="tags" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="childFolders" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="parentFolder" inverseEntity="Bookmark" syncable="YES"/>
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="bookmark" inverseEntity="Domain" syncable="YES"/>
+        <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="childFolders" inverseEntity="Bookmark" syncable="YES"/>
     </entity>
     <entity name="Domain" representedClassName=".Domain" syncable="YES">
         <attribute name="shield_adblockAndTp" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
@@ -53,7 +55,7 @@
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="tabs" inverseEntity="Domain" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Bookmark" positionX="45" positionY="-433" width="128" height="208"/>
+        <element name="Bookmark" positionX="45" positionY="-433" width="128" height="240"/>
         <element name="Domain" positionX="234" positionY="-324" width="128" height="240"/>
         <element name="Favicon" positionX="412" positionY="-399" width="128" height="118"/>
         <element name="History" positionX="441" positionY="-157" width="128" height="133"/>

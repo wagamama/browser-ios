@@ -142,7 +142,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         let site = frc?.objectAtIndexPath(indexPath) as! History
 
         if let u = site.url, let url = NSURL(string: u) {
-            homePanelDelegate?.homePanel(self, didSelectURL: url, visitType: VisitType.Typed)
+            homePanelDelegate?.homePanel(self, didSelectURL: url)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
