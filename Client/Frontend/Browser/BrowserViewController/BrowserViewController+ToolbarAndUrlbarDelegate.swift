@@ -183,7 +183,7 @@ extension BrowserViewController: URLBarDelegate {
                 return
         }
 
-        finishEditingAndSubmit(url, visitType: VisitType.Typed)
+        finishEditingAndSubmit(url)
     }
 
     func urlBarDidEnterSearchMode(urlBar: URLBarView) {
@@ -229,7 +229,7 @@ extension BrowserViewController: BrowserToolbarDelegate {
                 if isBookmarked {
                     self.removeBookmark(url)
                 } else {
-                    self.addBookmark(url, title: tab.title)
+                    self.addBookmark(url, title: tab.title, completion: nil)
                 }
             }
         }
