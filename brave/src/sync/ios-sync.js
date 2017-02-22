@@ -11,7 +11,7 @@ if (!self.chrome || !self.chrome.ipc) {
     self.chrome = {}
     const ipc = {}
 
-    ipc.on = (message, cb) => {
+    ipc.once = (message, cb) => {
         callbackList[message] = cb
         window.webkit.messageHandlers.syncToIOS_on.postMessage({message: message});
     }
