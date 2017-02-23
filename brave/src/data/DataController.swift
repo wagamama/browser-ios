@@ -28,9 +28,8 @@ class DataController: NSObject {
             _managedObjectContext = value
         }
     }
-    var writeObjectContext: NSManagedObjectContext?
-    var writeSemaphore: dispatch_semaphore_t?
-    
+    private var writeObjectContext: NSManagedObjectContext?
+
     static var moc: NSManagedObjectContext {
         get {
             if DataController.shared.managedObjectContext == nil {
@@ -76,20 +75,17 @@ class DataController: NSObject {
         return NSEntityDescription.insertNewObjectForEntityForName(model, inManagedObjectContext: DataController.moc)
     }
     
-    // Writes could still be executed on main thread, but recommended to use DataController.write {...}
     static func saveContext() {
-        dispatch_async(CoreDataWriteQueue) {
-            guard let managedObjectContext: NSManagedObjectContext = DataController.shared.managedObjectContext else {
-                return
+        guard let managedObjectContext: NSManagedObjectContext = DataController.shared.managedObjectContext else {
+            return
+        }
+        
+        if managedObjectContext.hasChanges {
+            do {
+                try managedObjectContext.save()
             }
-            
-            if managedObjectContext.hasChanges {
-                do {
-                    try managedObjectContext.save()
-                }
-                catch {
-                    fatalError("Error saving DB: \(error)")
-                }
+            catch {
+                fatalError("Error saving DB: \(error)")
             }
         }
     }
@@ -112,85 +108,56 @@ class DataController: NSObject {
         }
     }
 
-    func mainThreadContext() -> NSManagedObjectContext {
+    private func mainThreadContext() -> NSManagedObjectContext {
         if _managedObjectContext != nil {
             return _managedObjectContext!
         }
-        
-        if let coordinator: NSPersistentStoreCoordinator = self.persistentStoreCoordinator {
-            managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
-            managedObjectContext?.persistentStoreCoordinator = coordinator
-            managedObjectContext?.undoManager = nil
-            managedObjectContext?.mergePolicy = NSErrorMergePolicy
-            
-            // when main context is saved, we need to propagate the changes to our insertion thread's context
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(mainThreadContextDidSave(_:)), name: NSManagedObjectContextDidSaveNotification, object: managedObjectContext!)
-        }
-        
+
+        // do not set a persistent store for main thread context.
+        // The parent of the main context is the writeContext, and when the main context is saved
+        // the mainThreadContextDidSave
+
+        managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+        managedObjectContext?.undoManager = nil
+        managedObjectContext?.mergePolicy = NSErrorMergePolicy
+        managedObjectContext?.parentContext = writeContext()
+
+        // when main context is saved, we need to propagate the changes to our insertion thread's context
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(mainThreadContextDidSaveInMem(_:)), name: NSManagedObjectContextDidSaveNotification, object: managedObjectContext!)
+
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(bgContextDidSaveToDisk(_:)), name: NSManagedObjectContextDidSaveNotification, object: writeContext())
+
         return managedObjectContext!
     }
-    
-    func mainThreadContextDidSave(notification: NSNotification) {
-        // This notification will always be received on the main thread.
-        // Need to tell insertion context to merge in changes that occurred on the main thread's context.
-        if writeObjectContext != nil {
-            dispatch_async(CoreDataWriteQueue, {
-                self.writeObjectContext?.mergeChangesFromContextDidSaveNotification(notification)
-            })
+
+    @objc private func bgContextDidSaveToDisk(notification: NSNotification) {
+        assert(!NSThread.isMainThread())
+        postAsyncToMain {
+            self.managedObjectContext?.mergeChangesFromContextDidSaveNotification(notification)
         }
     }
+
+    @objc private func mainThreadContextDidSaveInMem(notification: NSNotification) {
+        assert(NSThread.isMainThread())
+        dispatch_async(CoreDataWriteQueue, {
+            self.writeObjectContext?.mergeChangesFromContextDidSaveNotification(notification)
+            DataController.saveContext()
+        })
+    }
     
-    func writeContext() -> NSManagedObjectContext {
+    private func writeContext() -> NSManagedObjectContext {
         // This will only ever be called from a dispatch thread.
         if writeObjectContext == nil {
             writeObjectContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
             writeObjectContext?.persistentStoreCoordinator = persistentStoreCoordinator
             writeObjectContext?.undoManager = nil
             writeObjectContext?.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
-            
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(writeContextDidSave(_:)), name: NSManagedObjectContextDidSaveNotification, object: writeObjectContext!)
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(writeContextWillSave(_:)), name: NSManagedObjectContextWillSaveNotification, object: writeObjectContext!)
-            
         }
         return writeObjectContext!
     }
     
     // To be called only from the main thread.
-    func mergeSaveNotification(notification: NSNotification) {
+    @objc private func mergeSaveNotification(notification: NSNotification) {
         managedObjectContext?.mergeChangesFromContextDidSaveNotification(notification)
-    }
-    
-    func waitForSaveToBegin() {
-        // To be called only from the main thread.
-        if writeSemaphore != nil {
-            dispatch_semaphore_wait(writeSemaphore!, DISPATCH_TIME_FOREVER)
-            writeSemaphore = nil
-        }
-    }
-    
-    func writeContextWillSave(notification: NSNotification) {
-        let context: NSManagedObjectContext = notification.object as! NSManagedObjectContext
-        if context.deletedObjects.count > 0 {
-            if writeSemaphore == nil {
-                writeSemaphore = dispatch_semaphore_create(0)
-            }
-            
-            self.performSelectorOnMainThread(#selector(waitForSaveToBegin), withObject: nil, waitUntilDone: false)
-        }
-    }
-    
-    func writeContextDidSave(notification: NSNotification) {
-        // This notification will always be received on a dispatch thread.
-        // Need to tell main thread's context to merge in changes that occurred on the background thread's context.
-        
-        // If we are resetting CoreData, managedObjectContext will be nil, and we'll be blocking on main thread, so don't try to synchronously merge.
-        
-        if writeSemaphore != nil {
-            dispatch_semaphore_signal(writeSemaphore!)
-        }
-        
-        if managedObjectContext != nil {
-            self.performSelectorOnMainThread(#selector(mergeSaveNotification(_:)), withObject: notification, waitUntilDone: true)
-        }
     }
 }
