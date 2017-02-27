@@ -20,6 +20,7 @@ extension Strings {
 // Settings.
 extension Strings {
     public static let ClearPrivateData = NSLocalizedString("Clear Private Data", comment: "Button in settings that clears private data for the selected items. Also used as section title in settings panel")
+    public static let SyncDevices = NSLocalizedString("Devices & Settings", comment: "Sync you browser settings across devices.")
 }
 
 // Error pages.
@@ -196,6 +197,7 @@ extension Strings {
     public static let Dark = NSLocalizedString("Dark", comment: "Dark theme setting in Reading View settings")
     public static let Sepia = NSLocalizedString("Sepia", comment: "Sepia theme setting in Reading View settings")
     public static let General = NSLocalizedString("General", comment: "General settings section title")
+    public static let Sync = NSLocalizedString("Sync", comment: "Sync settings section title")
     public static let Close_Private_Tabs = NSLocalizedString("Close Private Tabs", comment: "Setting for closing private tabs")
     public static let When_Leaving_Private_Browsing = NSLocalizedString("When Leaving Private Browsing", comment: "Will be displayed in Settings under 'Close Private Tabs'")
     public static let Saved_Logins = NSLocalizedString("Saved Logins", comment: "Settings item for clearing passwords and login data")
