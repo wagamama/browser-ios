@@ -49,9 +49,9 @@ class History: NSManagedObject {
     // are displayed in a table and waiting for a favicon, you can change markDirty, and the favicon will update
     @NSManaged var markDirty: Int16
     
-    let Today = getDate(dayOffset: 0)
-    let Yesterday = getDate(dayOffset: -1)
-    let ThisWeek = getDate(dayOffset: -7)
+    static let Today = getDate(dayOffset: 0)
+    static let Yesterday = getDate(dayOffset: -1)
+    static let ThisWeek = getDate(dayOffset: -7)
     static let ThisMonth = getDate(dayOffset: -31)
 
     static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
@@ -92,11 +92,11 @@ class History: NSManagedObject {
             return
         }
 
-        if visitedOn?.compare(Today) == NSComparisonResult.OrderedDescending {
+        if visitedOn?.compare(History.Today) == NSComparisonResult.OrderedDescending {
             sectionIdentifier = Strings.Today
-        } else if visitedOn?.compare(Yesterday) == NSComparisonResult.OrderedDescending {
+        } else if visitedOn?.compare(History.Yesterday) == NSComparisonResult.OrderedDescending {
             sectionIdentifier = Strings.Yesterday
-        } else if visitedOn?.compare(ThisWeek) == NSComparisonResult.OrderedDescending {
+        } else if visitedOn?.compare(History.ThisWeek) == NSComparisonResult.OrderedDescending {
             sectionIdentifier = Strings.Last_week
         } else {
             sectionIdentifier = Strings.Last_month
@@ -122,5 +122,25 @@ class History: NSManagedObject {
         }
         return result
     }
+
+    class func frecencyQuery(context: NSManagedObjectContext) -> [History] {
+        assert(!NSThread.isMainThread())
+
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.fetchLimit = 100
+        fetchRequest.entity = History.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "visitedOn > %@", History.ThisWeek)
+
+        do {
+            if let results = try context.executeFetchRequest(fetchRequest) as? [History] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [History]()
+    }
+    
 
 }
