@@ -49,7 +49,6 @@ class FaviconMO: NSManagedObject {
             // Go up the relationship chain, mark objects as dirty that are waiting for favicons to be set
             (item!.domain?.bookmarks?.allObjects as? [Bookmark])?.forEach {
                 $0.markDirty += 1
-                print("👽 dirty \($0.url)")
             }
 
             (item!.domain?.historyItems?.allObjects as? [History])?.forEach {
