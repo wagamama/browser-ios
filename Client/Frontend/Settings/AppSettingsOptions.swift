@@ -149,6 +149,27 @@ class LoginsSetting: Setting {
     }
 }
 
+class SyncDevicesSetting: Setting {
+    let profile: Profile
+    //var tabManager: TabManager!
+    
+    override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
+    
+    override var accessibilityIdentifier: String? { return "SyncDevices" }
+    
+    init(settings: SettingsTableViewController) {
+        self.profile = settings.profile
+        //self.tabManager = settings.tabManager
+        
+        let clearTitle = Strings.SyncDevices
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+    }
+    
+    override func onClick(navigationController: UINavigationController?) {
+        let viewController = SyncWelcomeViewController()
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+}
 
 class ClearPrivateDataSetting: Setting {
     let profile: Profile

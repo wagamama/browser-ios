@@ -161,6 +161,14 @@
 		59D6B30954B53C907F022CA7 /* FindInPage.js in Resources */ = {isa = PBXBuildFile; fileRef = EA59A531812A82B1DAC03D72 /* FindInPage.js */; };
 		59F67C0B4DAA5B488E2C83EF /* SpotlightHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = E76112E70EDA47CD3A7F2845 /* SpotlightHelper.js */; };
 		5B352CB4FE3A4ED634975490 /* WebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E56C0216FAEB62B2CDF5FE7 /* WebViewProgress.swift */; };
+		5C0FCE4D1E5FB3810016DF0F /* SyncWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */; };
+		5C0FCE531E637B9D0016DF0F /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */; };
+		5C0FCE5C1E637C160016DF0F /* SyncPairCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */; };
+		5C0FCE5E1E6381B70016DF0F /* SyncSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5D1E6381B70016DF0F /* SyncSettingsViewController.swift */; };
+		5C0FCE601E63E1790016DF0F /* SyncBarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5F1E63E1790016DF0F /* SyncBarcodeView.swift */; };
+		5C0FCE621E63E1D90016DF0F /* SyncCodewordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE611E63E1D90016DF0F /* SyncCodewordsView.swift */; };
+		5C0FCE641E63EA170016DF0F /* SyncPairWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE631E63EA170016DF0F /* SyncPairWordsViewController.swift */; };
+		5C0FCE661E63EB8B0016DF0F /* SyncCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE651E63EB8B0016DF0F /* SyncCameraView.swift */; };
 		5C32C7B6034B41A9C822555E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1D74E40F9E392FFCE9F2F /* main.swift */; };
 		5C404E1B2531DC2E178F80F8 /* ReaderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F8C87651157C51F01D4D96F /* ReaderPanel.swift */; };
 		5C44C0CF1E3847A100B1FD81 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C44C0C21E38479200B1FD81 /* CoreData.framework */; };
@@ -936,6 +944,14 @@
 		5B60ED58454699DB9549B34B /* AutocompleteTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AutocompleteTextField.swift; path = ./Client/Frontend/Widgets/AutocompleteTextField.swift; sourceTree = "<group>"; };
 		5B7417C2784852C8AA016A94 /* filename.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = filename.cc; path = ./brave/ThirdParty/leveldb/db/filename.cc; sourceTree = "<group>"; };
 		5B8A3FF8C10C5708D9DAD03D /* BraveUX.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BraveUX.swift; path = ./brave/src/frontend/BraveUX.swift; sourceTree = "<group>"; };
+		5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncWelcomeViewController.swift; path = brave/src/frontend/sync/SyncWelcomeViewController.swift; sourceTree = "<group>"; };
+		5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncAddDeviceViewController.swift; path = brave/src/frontend/sync/SyncAddDeviceViewController.swift; sourceTree = "<group>"; };
+		5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncPairCameraViewController.swift; path = brave/src/frontend/sync/SyncPairCameraViewController.swift; sourceTree = "<group>"; };
+		5C0FCE5D1E6381B70016DF0F /* SyncSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncSettingsViewController.swift; path = brave/src/frontend/sync/SyncSettingsViewController.swift; sourceTree = "<group>"; };
+		5C0FCE5F1E63E1790016DF0F /* SyncBarcodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncBarcodeView.swift; path = brave/src/frontend/sync/SyncBarcodeView.swift; sourceTree = "<group>"; };
+		5C0FCE611E63E1D90016DF0F /* SyncCodewordsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncCodewordsView.swift; path = brave/src/frontend/sync/SyncCodewordsView.swift; sourceTree = "<group>"; };
+		5C0FCE631E63EA170016DF0F /* SyncPairWordsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncPairWordsViewController.swift; path = brave/src/frontend/sync/SyncPairWordsViewController.swift; sourceTree = "<group>"; };
+		5C0FCE651E63EB8B0016DF0F /* SyncCameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncCameraView.swift; path = brave/src/frontend/sync/SyncCameraView.swift; sourceTree = "<group>"; };
 		5C39A9721F0FECF98A48015E /* BraveBrowserViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BraveBrowserViewController.swift; path = ./brave/src/frontend/BraveBrowserViewController.swift; sourceTree = "<group>"; };
 		5C44C0C21E38479200B1FD81 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		5C44C0D11E384AE700B1FD81 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataController.swift; path = brave/src/data/DataController.swift; sourceTree = "<group>"; };
@@ -1536,6 +1552,7 @@
 				2C3C78F7F3FB6427BD51A1E8 /* sidepanels */,
 				430FDA25DAA3C35191998991 /* SwizzlingToHideSharePicker.h */,
 				84C51F13ADC0C2BC71D40BEF /* SwizzlingToHideSharePicker.m */,
+				5C0FCE4B1E5FB32F0016DF0F /* sync */,
 				3A6E86EA8E9535F4C6C7B748 /* tabsbar */,
 				5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */,
 			);
@@ -1965,6 +1982,21 @@
 				88ED2F5C9425FC56B427D327 /* UIImage+Snapshot.m */,
 			);
 			name = FBSnapshotTestCase;
+			sourceTree = "<group>";
+		};
+		5C0FCE4B1E5FB32F0016DF0F /* sync */ = {
+			isa = PBXGroup;
+			children = (
+				5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */,
+				5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */,
+				5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */,
+				5C0FCE631E63EA170016DF0F /* SyncPairWordsViewController.swift */,
+				5C0FCE5D1E6381B70016DF0F /* SyncSettingsViewController.swift */,
+				5C0FCE5F1E63E1790016DF0F /* SyncBarcodeView.swift */,
+				5C0FCE611E63E1D90016DF0F /* SyncCodewordsView.swift */,
+				5C0FCE651E63EB8B0016DF0F /* SyncCameraView.swift */,
+			);
+			name = sync;
 			sourceTree = "<group>";
 		};
 		5C44C0D01E384AB300B1FD81 /* data */ = {
@@ -3905,6 +3937,7 @@
 				184619D873835F18B9731D1E /* BraveScrollController.swift in Sources */,
 				8999244A8E5D55AF862B8167 /* BraveSettingsView.swift in Sources */,
 				42BB62D8A935B31499CE77E3 /* BraveTopViewController.swift in Sources */,
+				5C0FCE4D1E5FB3810016DF0F /* SyncWelcomeViewController.swift in Sources */,
 				6287F57212354177AA5D5F28 /* BraveURLBarView.swift in Sources */,
 				F1D4718F1D777C7C007B443D /* OnePasswordExtension.m in Sources */,
 				D36C19A448AA81DB6DFD701D /* BraveUX.swift in Sources */,
@@ -3923,6 +3956,7 @@
 				B735CA1D323CBBD44E763DD9 /* BravePageUnloadHelper.swift in Sources */,
 				31CAC008CE6B2D73DBFC9A5E /* ElementAtPoint.swift in Sources */,
 				5CD7F38E1E3EFBF100A12BB9 /* FaviconMO.swift in Sources */,
+				5C0FCE621E63E1D90016DF0F /* SyncCodewordsView.swift in Sources */,
 				67EBDA431847A8081DDCF90E /* FingerprintingProtection.swift in Sources */,
 				365D79EB4650B90378CCF45B /* HideEmptyImages.swift in Sources */,
 				A1CFE166EBD926880A69E052 /* LoginsHelper+1PW.swift in Sources */,
@@ -3951,6 +3985,7 @@
 				C5A2E6F2033E5897F1F43AD7 /* WebViewDocScale.m in Sources */,
 				5B352CB4FE3A4ED634975490 /* WebViewProgress.swift in Sources */,
 				968634F419DEA85A0922394A /* WebViewScripting.swift in Sources */,
+				5C0FCE5C1E637C160016DF0F /* SyncPairCameraViewController.swift in Sources */,
 				CCAC3364419AA9AB527A29B9 /* TPParser.cpp in Sources */,
 				D50043B62400690CFBBB5859 /* AdjustIntegration.swift in Sources */,
 				5E6571D452F3C000461D2481 /* AppDelegate.swift in Sources */,
@@ -4005,10 +4040,13 @@
 				F9DDDE64CF5ACAD94F495B1D /* SessionData.swift in Sources */,
 				9BFE547FF9C37E82814BA9C6 /* SessionRestoreHandler.swift in Sources */,
 				715CCD78C38B066CA39D4E10 /* SessionRestoreHelper.swift in Sources */,
+				5C0FCE641E63EA170016DF0F /* SyncPairWordsViewController.swift in Sources */,
 				5CFC706D1D9D9F30008A7B7A /* BraveTermsViewController.swift in Sources */,
 				D84AAF7ADCD719C5A45AFCEE /* SwipeAnimator.swift in Sources */,
 				3D25335ED4A5C9DA042516E9 /* TabManager.swift in Sources */,
+				5C0FCE661E63EB8B0016DF0F /* SyncCameraView.swift in Sources */,
 				EA13B15D4D6AF3EAC2B3177D /* TabTrayController.swift in Sources */,
+				5C0FCE601E63E1790016DF0F /* SyncBarcodeView.swift in Sources */,
 				1A23068D5E66CD83B1512D15 /* URIFixup.swift in Sources */,
 				7A4740A67EFB857AA6E9944A /* URLBarView.swift in Sources */,
 				EB00A2F51E1BF4CC00680DB8 /* BloomFilter.cpp in Sources */,
@@ -4034,6 +4072,7 @@
 				4A6B728ACF11D1753EB947C3 /* Clearables.swift in Sources */,
 				C430DD4BD879C97025E308CB /* ClearPrivateDataTableViewController.swift in Sources */,
 				4AEC1270F1F51DE3120C8E86 /* LoginDetailViewController.swift in Sources */,
+				5C0FCE5E1E6381B70016DF0F /* SyncSettingsViewController.swift in Sources */,
 				D4D89E59C045D41A4853B20F /* SearchEnginePicker.swift in Sources */,
 				D22B5AC8588A48662FD6757A /* SearchSettingsTableViewController.swift in Sources */,
 				7DDC5DDFD3653B02726E925F /* SettingsContentViewController.swift in Sources */,
@@ -4063,6 +4102,7 @@
 				10443C68C8505F7FDDE1C6F2 /* ThumbnailCell.swift in Sources */,
 				E9788E828C3C9FEF2E9BD34E /* ToggleButton.swift in Sources */,
 				98AAC06AB032F173C2F60733 /* Toolbar.swift in Sources */,
+				5C0FCE531E637B9D0016DF0F /* SyncAddDeviceViewController.swift in Sources */,
 				EEEF79E07492339CF13D856A /* TwoLineCell.swift in Sources */,
 				3696DC8F3824B7E55FDE2466 /* SpotlightHelper.swift in Sources */,
 				E7026A766AA17FE4022C8F83 /* NSUserDefaultsPrefs.swift in Sources */,
