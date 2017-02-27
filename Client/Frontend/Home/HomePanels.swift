@@ -28,7 +28,7 @@ class HomePanels {
         HomePanelDescriptor(
             makeViewController: { profile in
                 let bookmarks = BookmarksPanel()
-                bookmarks.profile = profile
+
                 let controller = UINavigationController(rootViewController: bookmarks)
                 controller.setNavigationBarHidden(true, animated: false)
                 // this re-enables the native swipe to pop gesture on UINavigationController for embedded, navigation bar-less UINavigationControllers
@@ -45,7 +45,6 @@ class HomePanels {
         HomePanelDescriptor(
             makeViewController: { profile in
                 let controller = HistoryPanel()
-                controller.profile = profile
                 return controller
             },
             imageName: "History",

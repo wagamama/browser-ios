@@ -200,7 +200,7 @@ class BrowserViewController: UIViewController {
 
         if let tab = tabManager.selectedTab,
                webView = tab.webView {
-            updateURLBarDisplayURL(tab)
+            updateURLBarDisplayURL(tab: tab)
             navigationToolbar.updateBackStatus(webView.canGoBack)
             navigationToolbar.updateForwardStatus(webView.canGoForward)
             navigationToolbar.updateReloadStatus(tab.loading ?? false)
@@ -266,7 +266,6 @@ class BrowserViewController: UIViewController {
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: BookmarkStatusChangedNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillEnterForegroundNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationDidEnterBackgroundNotification, object: nil)
@@ -281,7 +280,7 @@ class BrowserViewController: UIViewController {
         log.debug("BVC viewDidLoad…")
         super.viewDidLoad()
         log.debug("BVC super viewDidLoad called.")
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELBookmarkStatusDidChange(_:)), name: BookmarkStatusChangedNotification, object: nil)
+
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELappWillResignActiveNotification), name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELappDidBecomeActiveNotification), name: UIApplicationDidBecomeActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELappDidEnterBackgroundNotification), name: UIApplicationDidEnterBackgroundNotification, object: nil)
@@ -695,48 +694,14 @@ class BrowserViewController: UIViewController {
         tab.loadRequest(NSURLRequest(URL: url))
     }
 
-    func addBookmark(url: String, title: String?, parentFolder: NSManagedObjectID? = nil, completion:(()->Void)?) {
-        //let shareItem = ShareItem(url: url, title: title, favicon: nil, folderId: folderId, folderTitle: folderTitle)
-
-        DataController.asyncAccess({ 
-            Bookmark.add(url: url, title: title, parentFolder: parentFolder)
-            }, completionOnMain: {
-                self.urlBar.updateBookmarkStatus(true)
-                completion?()
-        })
-
-//        profile.bookmarks.shareItem(shareItem).upon { result in
-//            postAsyncToMain {
-//                self.urlBar.updateBookmarkStatus(true)
-//            }
-//            deferred.fill(result)
-//        }
-
+    func addBookmark(url: NSURL, title: String?, parentFolder: NSManagedObjectID? = nil) {
+        Bookmark.add(url: url, title: title, parentFolder: parentFolder)
+        self.urlBar.updateBookmarkStatus(true)
     }
 
-    func removeBookmark(url: String, completion: dispatch_block_t? = nil) {
-        profile.bookmarks.modelFactory >>== {
-            $0.removeByURL(url).uponQueue(dispatch_get_main_queue()) { res in
-                if res.isSuccess {
-                    self.urlBar.updateBookmarkStatus(false)
-                    if let completionBlock = completion {
-                        completionBlock()
-                    }
-
-                }
-            }
-        }
-    }
-
-    func SELBookmarkStatusDidChange(notification: NSNotification) {
-        if let bookmark = notification.object as? Bookmark {
-            if bookmark.url == urlBar.currentURL?.absoluteString {
-                if let userInfo = notification.userInfo as? Dictionary<String, Bool>{
-                    if let added = userInfo["added"]{
-                        self.urlBar.updateBookmarkStatus(added)
-                    }
-                }
-            }
+    func removeBookmark(url: NSURL) {
+        if Bookmark.remove(forUrl: url) {
+            self.urlBar.updateBookmarkStatus(false)
         }
     }
 
@@ -756,7 +721,7 @@ class BrowserViewController: UIViewController {
 //    }
 
     func updateUIForReaderHomeStateForTab(tab: Browser) {
-        updateURLBarDisplayURL(tab)
+        updateURLBarDisplayURL(tab: tab)
         updateInContentHomePanel(tab.url)
 
         if let url = tab.url {
@@ -779,29 +744,22 @@ class BrowserViewController: UIViewController {
 
     /// Updates the URL bar text and button states.
     /// Call this whenever the page URL changes.
-    func updateURLBarDisplayURL(tab: Browser) {
+    func updateURLBarDisplayURL(tab _tab: Browser?) {
+        guard let selected = tabManager.selectedTab else { return }
+        let tab = _tab != nil ? _tab! : selected
+
         urlBar.currentURL = tab.displayURL
 
         let isPage = tab.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isWebPage: isPage)
 
-        guard let url = tab.displayURL?.absoluteString else {
+        guard let url = tab.url else {
             return
         }
 
-        succeed().upon { _ in
-            self.profile.bookmarks.modelFactory >>== {
-                $0.isBookmarked(url).uponQueue(dispatch_get_main_queue()) { result in
-                    guard let bookmarked = result.successValue else {
-                        log.error("Error getting bookmark status: \(result.failureValue).")
-                        return
-                    }
-                    postAsyncToMain {
-                        self.urlBar.updateBookmarkStatus(bookmarked)
-                    }
-                }
-            }
-        }
+        Bookmark.contains(url: url, completionOnMain: { isBookmarked in
+            self.urlBar.updateBookmarkStatus(isBookmarked)
+        })
     }
     // Mark: Opening New Tabs
 
@@ -921,7 +879,7 @@ class BrowserViewController: UIViewController {
             if completed {
                 // We don't know what share action the user has chosen so we simply always
                 // update the toolbar and reader mode bar to reflect the latest status.
-                self.updateURLBarDisplayURL(tab)
+                self.updateURLBarDisplayURL(tab: tab)
                 self.updateReaderModeBar()
             }
         })
@@ -1213,8 +1171,8 @@ extension BrowserViewController: TabTrayDelegate {
     }
 
     func tabTrayDidAddBookmark(tab: Browser) {
-        guard let url = tab.url?.absoluteString where url.characters.count > 0 else { return }
-        self.addBookmark(url, title: tab.title, completion: nil)
+        guard let url = tab.url else { return }
+        self.addBookmark(url, title: tab.title)
     }
 
 

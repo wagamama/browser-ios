@@ -72,9 +72,8 @@ class SiteTableViewHeader : UITableViewHeaderFooterView {
 class SiteTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private let CellIdentifier = "CellIdentifier"
     private let HeaderIdentifier = "HeaderIdentifier"
-    var profile: Profile!
     var iconForSiteId = [Int : Favicon]()
-    var data: Cursor<Site> = Cursor<Site>(status: .Success, msg: "No data set")
+
     var tableView = UITableView()
 
     override func viewDidLoad() {
@@ -110,19 +109,11 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func reloadData() {
-        if data.status != .Success {
-            print("Err: \(data.statusMessage)", terminator: "\n")
-        } else {
-            debugNoteIfNotMainThread() // Guard against misuse
-            postAsyncToMain { // TODO remove this, see comment below
-                // By bad design, when self.profile is set, this func is called, profile usage (possibly assignment) is not restricted to main thread.
-                self.tableView.reloadData()
-            }
-        }
+        self.tableView.reloadData()
     }
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return data.count
+        return 0
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -155,6 +146,11 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
         return false
     }
 
+    func getLongPressUrl(forIndexPath indexPath: NSIndexPath) -> NSURL? {
+        print("override in subclass for long press behaviour")
+        return nil
+    }
+
     @objc func longPressOnCell(gesture: UILongPressGestureRecognizer) {
         if tableView.editing { //disable context menu on editing mode
             return
@@ -163,27 +159,11 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
         if gesture.state != .Began {
             return
         }
-        
-        guard let cell = gesture.view as? UITableViewCell else { return }
-        var url:NSURL? = nil
+        guard let cell = gesture.view as? UITableViewCell, let indexPath = tableView.indexPathForCell(cell) else { return }
 
-//        if let bookmarks = self as? BookmarksPanel,
-//            source = bookmarks.source,
-//            let indexPath = tableView.indexPathForCell(cell) {
-//            let bookmark = source.current[indexPath.row]
-//            if let b = bookmark as? BookmarkItem {
-//                url = NSURL(string: b.url)
-//            }
-//
-//        } else if let path = cell.detailTextLabel?.text {
-//            url = NSURL(string: path)
-//        }
-//
-//        guard let _ = url else { return }
-//
-//        let tappedElement = ContextMenuHelper.Elements(link: url, image: nil)
-//        var p = getApp().window!.convertPoint(cell.center, fromView:cell.superview!)
-//        p.x += cell.frame.width * 0.33
-//        getApp().browserViewController.showContextMenu(elements: tappedElement, touchPoint: p)
+        let tappedElement = ContextMenuHelper.Elements(link: getLongPressUrl(forIndexPath: indexPath), image: nil)
+        var p = getApp().window!.convertPoint(cell.center, fromView:cell.superview!)
+        p.x += cell.frame.width * 0.33
+        getApp().browserViewController.showContextMenu(elements: tappedElement, touchPoint: p)
     }
 }

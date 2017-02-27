@@ -7,13 +7,19 @@ import Storage
 import WebImage
 
 public extension UIImageView {
-    public func setIcon(icon: Favicon?, withPlaceholder placeholder: UIImage) {
+    public func setIcon(icon: Favicon?, withPlaceholder placeholder: UIImage, completion: (()->())? = nil) {
         if let icon = icon {
             let imageURL = NSURL(string: icon.url)
-            self.sd_setImageWithURL(imageURL, placeholderImage: placeholder)
-            return
+            self.sd_setImageWithURL(imageURL) { (img, err, type, url) -> Void in
+                if err != nil {
+                    self.image = placeholder
+                } 
+                completion?()
+            }
+        } else {
+            self.image = placeholder
+            completion?()
         }
-        self.image = placeholder
     }
 }
 

@@ -389,7 +389,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 viewURLInNewTab(notification)
                 switch(action) {
                 case .Bookmark:
-                    addBookmark(notification)
+                    //addBookmark(notification)
                     break
                 case .ReadingList:
                     addToReadingList(notification)
@@ -458,18 +458,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    private func addBookmark(notification: UILocalNotification) {
-//        if let alertURL = notification.userInfo?[TabSendURLKey] as? String,
-//            let title = notification.userInfo?[TabSendTitleKey] as? String {
-//                browserViewController.addBookmark(alertURL, title: title)
-//
-////                if #available(iOS 9, *) {
-////                    let userData = [QuickActions.TabURLKey: alertURL,
-////                        QuickActions.TabTitleKey: title]
-////                    QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastBookmark, withUserData: userData, toApplication: UIApplication.sharedApplication())
-////                }
-//        }
-    }
 
     private func addToReadingList(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String,

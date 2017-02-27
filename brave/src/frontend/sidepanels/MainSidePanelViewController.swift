@@ -109,27 +109,32 @@ class MainSidePanelViewController : SidePanelBaseViewController {
     //see MainSidePanelViewController#updateBookmarkStatus(isBookmarked,url)
     func onClickBookmarksButton() {
         guard let tab = browserViewController?.tabManager.selectedTab else { return }
-        guard let url = tab.displayURL?.absoluteString else { return }
-        
+        guard let url = tab.url else { return }
+
+        // stop from spamming the button, and enabled is used elsewhere, so create a guard
+        struct Guard { static var block = false }
+        if Guard.block {
+            return
+        }
+        postAsyncToMain(0.3) {
+            Guard.block = false
+        }
+        Guard.block = true
+
         //switch to bookmarks 'tab' in case we're looking at history and tapped the add/remove bookmark button
         onClickPageButton(bookmarksButton)
 
         //TODO -- need to separate the knowledge of whether current site is bookmarked or not from this UI button
         //tracked in https://github.com/brave/browser-ios/issues/375
         if addBookmarkButton.selected {
-            browserViewController?.removeBookmark(url) {
-                self.bookmarksPanel.currentBookmarksPanel().reloadData()
-            }
+            browserViewController?.removeBookmark(url)
         } else {
             var folderId: NSManagedObjectID? = nil
-            var folderTitle: String? = nil
             if let currentFolder = self.bookmarksPanel.currentBookmarksPanel().currentFolder {
                 folderId = currentFolder.objectID
             }
 
-            browserViewController?.addBookmark(url, title: tab.title, parentFolder: folderId, completion: {
-                self.bookmarksPanel.currentBookmarksPanel().reloadData()
-            })
+            browserViewController?.addBookmark(url, title: tab.title, parentFolder: folderId)
         }
     }
 
@@ -211,8 +216,6 @@ class MainSidePanelViewController : SidePanelBaseViewController {
     }
 
     override func setHomePanelDelegate(delegate: HomePanelDelegate?) {
-        bookmarksPanel.profile = getApp().profile
-        history.profile = getApp().profile
         bookmarksPanel.homePanelDelegate = delegate
         history.homePanelDelegate = delegate
         

@@ -260,7 +260,6 @@ class Browser: NSObject, BrowserWebViewDelegate {
                 }
                 prev = curr
                 updatedURLs.append(updatedURL!)
-                print("😇" + updatedURL!)
             }
             let currentPage = sessionData.currentPage
             self.sessionData = nil
@@ -361,7 +360,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
         var width = 0
         var largest: Favicon?
         for icon in favicons {
-            if icon.0 != webView?.URL?.baseDomain() {
+            if icon.0 != webView?.URL?.normalizedHost() {
                 continue
             }
             if icon.1.width > width {

@@ -175,17 +175,8 @@ extension BrowserViewController: WKCompatNavigationDelegate {
         if tab.isPrivate {
             return
         }
-//        var info = [String : AnyObject]()
-//        info["url"] = tab.displayURL
-//        info["title"] = title
-//        info["visitType"] = 1 // VisitType.Link
-//        info["isPrivate"] = tab.isPrivate
 
         History.add(title: title, url: historyUrl)
-
-            //(profile as? BrowserProfile)?.onLocationChange(info)
-
-
         //history.setTopSitesNeedsInvalidation()
     }
 

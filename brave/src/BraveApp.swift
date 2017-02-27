@@ -81,12 +81,12 @@ class BraveApp {
        #endif
         
         // TODO: CoreData Migration...
-        DataController.write {
+    //    DataController.write {
 //            let bookmark = DataController.new("Bookmark") as! Bookmark
 //            bookmark.title = "Brave"
 //            bookmark.url = "https://brave.com/"
 //            bookmark.lastVisited = NSDate()
-        }
+      //  }
     }
 
     // Be aware: the Prefs object has not been created yet
