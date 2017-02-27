@@ -1,10 +1,5 @@
-//
-//  Domain.swift
-//  Client
-//
-//  Created by James Mudgett on 1/29/17.
-//  Copyright © 2017 Brave. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 
 import UIKit
 import CoreData
@@ -16,7 +11,6 @@ class Domain: NSManagedObject {
     @NSManaged var visits: Int32
     @NSManaged var topsite: Bool
     @NSManaged var favicon: FaviconMO?
-    @NSManaged var history: NSSet?
 
     @NSManaged var shield_allOff: NSNumber?
     @NSManaged var shield_adblockAndTp: NSNumber?
@@ -25,30 +19,32 @@ class Domain: NSManagedObject {
     @NSManaged var shield_fpProtection: NSNumber?
     @NSManaged var shield_safeBrowsing: NSNumber?
 
+    @NSManaged var historyItems: NSSet?
+    @NSManaged var bookmarks: NSSet?
 
-    static var entityInfo: NSEntityDescription {
-        return NSEntityDescription.entityForName("Domain", inManagedObjectContext: DataController.moc)!
+    static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entityForName("Domain", inManagedObjectContext: context)!
     }
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
     }
 
-    class func getOrCreateForUrl(url: NSURL) -> Domain? {
-        assert(!NSThread.isMainThread())
+    class func getOrCreateForUrl(url: NSURL, context: NSManagedObjectContext) -> Domain? {
+        guard let domainUrl = url.normalizedHost() else { return nil }
 
-        let domainUrl = url.domainURL()
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = Domain.entityInfo
+        fetchRequest.entity = Domain.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", domainUrl)
         var result: Domain? = nil
         do {
-            let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [Domain]
+            let results = try context.executeFetchRequest(fetchRequest) as? [Domain]
             if let item = results?.first {
                 result = item
             } else {
-                result = Domain(entity: Domain.entityInfo, insertIntoManagedObjectContext: DataController.moc)
-                result?.url = domainUrl.absoluteString
+                print("👽 Creating Domain \(domainUrl)")
+                result = Domain(entity: Domain.entity(context), insertIntoManagedObjectContext: context)
+                result?.url = domainUrl
             }
         } catch {
             let fetchError = error as NSError

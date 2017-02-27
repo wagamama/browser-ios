@@ -55,6 +55,9 @@ protocol SearchViewControllerDelegate: class {
 class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, LoaderListener {
     var searchDelegate: SearchViewControllerDelegate?
 
+    var profile: Profile!
+    var data: Cursor<Site> = Cursor<Site>(status: .Success, msg: "No data set")
+
     private let isPrivate: Bool
     private var suggestClient: SearchSuggestClient?
 
