@@ -1,10 +1,4 @@
-//
-//  Favicon.swift
-//  Client
-//
-//  Created by James Mudgett on 1/29/17.
-//  Copyright © 2017 Brave. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
 import CoreData
@@ -19,19 +13,17 @@ class FaviconMO: NSManagedObject {
     @NSManaged var type: Int16
     @NSManaged var domain: Domain?
 
-    static var entityInfo: NSEntityDescription {
-        return NSEntityDescription.entityForName("Favicon", inManagedObjectContext: DataController.moc)!
+    static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entityForName("Favicon", inManagedObjectContext: context)!
     }
 
-    class func get(forFaviconUrl urlString: String) -> FaviconMO? {
-        assert(!NSThread.isMainThread())
-
+    class func get(forFaviconUrl urlString: String, context: NSManagedObjectContext) -> FaviconMO? {
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = FaviconMO.entityInfo
+        fetchRequest.entity = FaviconMO.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", urlString)
         var result: FaviconMO? = nil
         do {
-            let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [FaviconMO]
+            let results = try context.executeFetchRequest(fetchRequest) as? [FaviconMO]
             if let item = results?.first {
                 result = item
             }
@@ -43,16 +35,27 @@ class FaviconMO: NSManagedObject {
     }
 
     class func add(favicon favicon: Favicon, forSiteUrl siteUrl: NSURL) {
-        DataController.write {
-            let domainUrl = siteUrl.domainURL()
-            var item = FaviconMO.get(forFaviconUrl: favicon.url)
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            var item = FaviconMO.get(forFaviconUrl: favicon.url, context: context)
             if item == nil {
-                item = FaviconMO(entity: FaviconMO.entityInfo, insertIntoManagedObjectContext: DataController.moc)
+                item = FaviconMO(entity: FaviconMO.entity(context), insertIntoManagedObjectContext: context)
                 item!.url = favicon.url
             }
             if item?.domain == nil {
-                item!.domain = Domain.getOrCreateForUrl(domainUrl)
+                item!.domain = Domain.getOrCreateForUrl(siteUrl, context: context)
             }
+
+            // Go up the relationship chain, mark objects as dirty that are waiting for favicons to be set
+            (item!.domain?.bookmarks?.allObjects as? [Bookmark])?.forEach {
+                $0.markDirty += 1
+                print("👽 dirty \($0.url)")
+            }
+
+            (item!.domain?.historyItems?.allObjects as? [History])?.forEach {
+                $0.markDirty += 1
+            }
+
             let w = Int16(favicon.width ?? 0)
             let h = Int16(favicon.height ?? 0)
             let t = Int16(favicon.type.rawValue ?? 0)
@@ -68,6 +71,8 @@ class FaviconMO: NSManagedObject {
             if t != item!.type {
                 item!.type = t
             }
+
+            DataController.saveContext(context)
         }
     }
 

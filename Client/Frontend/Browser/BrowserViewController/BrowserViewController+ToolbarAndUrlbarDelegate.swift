@@ -15,7 +15,7 @@ extension BrowserViewController: URLBarDelegate {
         searchController = SearchViewController(isPrivate: isPrivate)
         searchController!.searchEngines = profile.searchEngines
         searchController!.searchDelegate = self
-        searchController!.profile = self.profile
+        //searchController!.profile = self.profile
 
         searchLoader.addListener(searchController!)
 
@@ -183,7 +183,7 @@ extension BrowserViewController: URLBarDelegate {
                 return
         }
 
-        finishEditingAndSubmit(url, visitType: VisitType.Typed)
+        finishEditingAndSubmit(url)
     }
 
     func urlBarDidEnterSearchMode(urlBar: URLBarView) {
@@ -219,20 +219,18 @@ extension BrowserViewController: BrowserToolbarDelegate {
 
     func browserToolbarDidPressBookmark(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         guard let tab = tabManager.selectedTab,
-            let url = tab.displayURL?.absoluteString else {
+            let url = tab.url else {
                 log.error("Bookmark error: No tab is selected, or no URL in tab.")
                 return
         }
 
-        profile.bookmarks.modelFactory >>== {
-            $0.isBookmarked(url) >>== { isBookmarked in
-                if isBookmarked {
-                    self.removeBookmark(url)
-                } else {
-                    self.addBookmark(url, title: tab.title)
-                }
+       Bookmark.contains(url: url, completionOnMain: { isBookmarked in
+            if isBookmarked {
+                self.removeBookmark(url)
+            } else {
+                self.addBookmark(url, title: tab.title)
             }
-        }
+        })
     }
 
     func browserToolbarDidPressShare(browserToolbar: BrowserToolbarProtocol, button: UIButton) {

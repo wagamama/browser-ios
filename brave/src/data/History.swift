@@ -1,10 +1,5 @@
-//
-//  History.swift
-//  Client
-//
-//  Created by James Mudgett on 1/29/17.
-//  Copyright © 2017 Brave. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 
 import CoreData
 import Shared
@@ -49,33 +44,41 @@ class History: NSManagedObject {
     @NSManaged var domain: Domain?
     @NSManaged var sectionIdentifier: String?
 
+    // To trigger fetchedResultsController to update, easiest method is change this value
+    // For instance, when a favicon is set on a domain, to notify any bookmarks or history items that
+    // are displayed in a table and waiting for a favicon, you can change markDirty, and the favicon will update
+    @NSManaged var markDirty: Int16
+    
     let Today = getDate(dayOffset: 0)
     let Yesterday = getDate(dayOffset: -1)
     let ThisWeek = getDate(dayOffset: -7)
     static let ThisMonth = getDate(dayOffset: -31)
 
-    static var entityInfo: NSEntityDescription {
-        return NSEntityDescription.entityForName("History", inManagedObjectContext: DataController.moc)!
+    static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entityForName("History", inManagedObjectContext: context)!
     }
 
     class func add(title title: String, url: NSURL) {
-        DataController.write {
-            var item = History.getExisting(url)
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            var item = History.getExisting(url, context: context)
             if item == nil {
-                item = History(entity: History.entityInfo, insertIntoManagedObjectContext: DataController.moc)
-                item!.domain = Domain.getOrCreateForUrl(url)
+                item = History(entity: History.entity(context), insertIntoManagedObjectContext: context)
+                item!.domain = Domain.getOrCreateForUrl(url, context: context)
                 item!.url = url.absoluteString
             }
             item?.title = title
             item?.domain?.visits += 1
             item?.visitedOn = NSDate()
             item?.sectionIdentifier = Strings.Today
+
+            DataController.saveContext(context)
         }
     }
 
     class func frc() -> NSFetchedResultsController {
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = History.entityInfo
+        fetchRequest.entity = History.entity(DataController.moc)
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 200
         fetchRequest.sortDescriptors = [NSSortDescriptor(key:"visitedOn", ascending: false)]
@@ -100,16 +103,16 @@ class History: NSManagedObject {
         }
     }
 
-    class func getExisting(url: NSURL) -> History? {
+    class func getExisting(url: NSURL, context: NSManagedObjectContext) -> History? {
         assert(!NSThread.isMainThread())
 
         guard let urlString = url.absoluteString else { return nil }
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = History.entityInfo
+        fetchRequest.entity = History.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", urlString)
         var result: History? = nil
         do {
-            let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [History]
+            let results = try context.executeFetchRequest(fetchRequest) as? [History]
             if let item = results?.first {
                 result = item
             }

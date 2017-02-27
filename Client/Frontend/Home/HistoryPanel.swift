@@ -20,20 +20,6 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     private var kvoContext: UInt8 = 1
     var frc: NSFetchedResultsController? = nil
 
-
-    // This list is used for observing when the domain.favicon is updated.
-    // I called these faviconless-domains for clarity.
-    private var faviconlessDomainToIndexPaths = [String: [NSIndexPath]]()
-    private func addFaviconlessDomain(domain: Domain, forIndexPath: NSIndexPath) {
-        guard let url = domain.url else { return }
-
-        if faviconlessDomainToIndexPaths[url] == nil {
-            faviconlessDomainToIndexPaths[url] = [NSIndexPath]()
-            domain.addObserver(self, forKeyPath: "favicon", options: .New, context: &kvoContext)
-        }
-        faviconlessDomainToIndexPaths[url]!.append(forIndexPath)
-    }
-
     init() {
         super.init(nibName: nil, bundle: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(HistoryPanel.notificationReceived(_:)), name: NotificationFirefoxAccountChanged, object: nil)
@@ -75,20 +61,19 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     }
 
     override func reloadData() {
-        if frc == nil {
+        guard let frc = frc else {
             return
         }
+        DataController.saveContext(DataController.moc)
 
-        DataController.asyncAccess({
-            do {
-                try self.frc?.performFetch()
-            } catch let error as NSError {
-                print(error.description)
-            }
-            }, completionOnMain: {
-                self.tableView.reloadData()
-                self.updateEmptyPanelState()
-        })
+        do {
+            try frc.performFetch()
+        } catch let error as NSError {
+            print(error.description)
+        }
+
+        tableView.reloadData()
+        updateEmptyPanelState()
     }
 
     private func updateEmptyPanelState() {
@@ -132,8 +117,6 @@ class HistoryPanel: SiteTableViewController, HomePanel {
                     cell.imageView!.setIcon(best, withPlaceholder: FaviconFetcher.defaultFavicon)
                 }
             }
-        } else if let domain = site.domain {
-            addFaviconlessDomain(domain, forIndexPath: indexPath)
         }
     }
 
@@ -142,7 +125,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         let site = frc?.objectAtIndexPath(indexPath) as! History
 
         if let u = site.url, let url = NSURL(string: u) {
-            homePanelDelegate?.homePanel(self, didSelectURL: url, visitType: VisitType.Typed)
+            homePanelDelegate?.homePanel(self, didSelectURL: url)
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
@@ -150,7 +133,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     // Minimum of 1 section
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         let count = frc?.sections?.count ?? 0
-        return max(count, 1)
+        return count
     }
 
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -170,27 +153,15 @@ class HistoryPanel: SiteTableViewController, HomePanel {
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if (editingStyle == UITableViewCellEditingStyle.Delete) {
             if let obj = self.frc?.objectAtIndexPath(indexPath) as? History {
-                let id = obj.objectID
-                DataController.write {
-                    let obj = DataController.moc.objectWithID(id)
-                    DataController.moc.deleteObject(obj)
-                }
+                DataController.moc.deleteObject(obj)
+                DataController.saveContext(DataController.moc)
             }
         }
     }
 
-    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        if let domain = object as? Domain where context == &kvoContext && keyPath == "favicon" {
-            domain.removeObserver(self, forKeyPath: "favicon")
-            if let url = domain.url, let indexes = faviconlessDomainToIndexPaths[url] {
-                for index in indexes {
-                    if let cell = tableView.cellForRowAtIndexPath(index) {
-                        configureCell(cell, atIndexPath: index)
-                    }
-                }
-                faviconlessDomainToIndexPaths[url] = nil
-            }
-        }
+    override func getLongPressUrl(forIndexPath indexPath: NSIndexPath) -> NSURL? {
+        guard let obj = frc?.objectAtIndexPath(indexPath) as? History else { return nil }
+        return obj.url != nil ? NSURL(string: obj.url!) : nil
     }
 }
 
@@ -203,44 +174,40 @@ extension HistoryPanel : NSFetchedResultsControllerDelegate {
         tableView.endUpdates()
     }
 
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        switch type {
+        case .Insert:
+            let sectionIndexSet = NSIndexSet(index: sectionIndex)
+            self.tableView.insertSections(sectionIndexSet, withRowAnimation: .Fade)
+        case .Delete:
+            let sectionIndexSet = NSIndexSet(index: sectionIndex)
+            self.tableView.deleteSections(sectionIndexSet, withRowAnimation: .Fade)
+        default: break;
+        }
+    }
+
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch (type) {
         case .Insert:
             if let indexPath = newIndexPath {
-                let obj = anObject as! History
-                if let domain = obj.domain where obj.domain?.favicon == nil {
-                    addFaviconlessDomain(domain, forIndexPath: indexPath)
-                }
                 tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             }
-            break;
         case .Delete:
             if let indexPath = indexPath {
-                if tableView.numberOfRowsInSection(indexPath.section) == 1 && tableView.numberOfSections > 1 {
-                    tableView.deleteSections(NSIndexSet(index: indexPath.section), withRowAnimation: .Automatic)
-                } else {
-                    tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-                }
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             }
-            break;
         case .Update:
             if let indexPath = indexPath, let cell = tableView.cellForRowAtIndexPath(indexPath) {
                 configureCell(cell, atIndexPath: indexPath)
             }
-            break;
         case .Move:
             if let indexPath = indexPath {
-                if tableView.numberOfRowsInSection(indexPath.section) == 1 && tableView.numberOfSections > 1 {
-                    tableView.deleteSections(NSIndexSet(index: indexPath.section), withRowAnimation: .Automatic)
-                } else {
-                    tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-                }
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             }
 
             if let newIndexPath = newIndexPath {
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
             }
-            break;
         }
         updateEmptyPanelState()
     }
