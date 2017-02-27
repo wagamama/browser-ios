@@ -12,7 +12,7 @@ private let log = Logger.browserLogger
 struct TabsButtonUX {
     static let CornerRadius: CGFloat = 1
     static let TitleFont: UIFont = UIConstants.DefaultChromeSmallFontBold
-    static let BorderStrokeWidth: CGFloat = 1
+    static let BorderStrokeWidth: CGFloat = 1.5
     static let BorderColor = UIColor.clearColor()
     static let HighlightButtonColor = UIColor.clearColor()
     static let TitleInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
@@ -20,26 +20,26 @@ struct TabsButtonUX {
     static let Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
-        theme.borderColor = BorderColor
+        theme.borderColor = .whiteColor()
         theme.borderWidth = BorderStrokeWidth
         theme.font = TitleFont
-        theme.backgroundColor = .whiteColor()
-        theme.textColor = .blackColor()
+        theme.backgroundColor = .clearColor()
+        theme.textColor = .whiteColor()
         theme.insets = TitleInsets
-        theme.highlightButtonColor = HighlightButtonColor
-        theme.highlightTextColor = .whiteColor()
+        theme.highlightButtonColor = .whiteColor()
+        theme.highlightTextColor = .blackColor()
         theme.highlightBorderColor = .whiteColor()
         themes[Theme.PrivateMode] = theme
 
         theme = Theme()
-        theme.borderColor = BorderColor
+        theme.borderColor = .blackColor()
         theme.borderWidth = BorderStrokeWidth
         theme.font = TitleFont
-        theme.backgroundColor = .blackColor()
-        theme.textColor = .whiteColor()
+        theme.backgroundColor = .clearColor()
+        theme.textColor = .blackColor()
         theme.insets = TitleInsets
-        theme.highlightButtonColor = HighlightButtonColor
-        theme.highlightTextColor = .blackColor()
+        theme.highlightButtonColor = .blackColor()
+        theme.highlightTextColor = .whiteColor()
         theme.highlightBorderColor = .blackColor()
         themes[Theme.NormalMode] = theme
 
