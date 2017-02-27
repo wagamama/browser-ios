@@ -147,8 +147,10 @@ extension SyncWebView {
         let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
         webView.evaluateJavaScript("callbackList['send-sync-records'](null, \(arg1),\(recordJson))",
                                    completionHandler: { (result, error) in
-                                    print(result)
-                                    print(error)
+//                                    print(result)
+//                                    if error != nil {
+//                                        print(error)
+//                                    }
         })
     }
 
@@ -157,8 +159,10 @@ extension SyncWebView {
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
                                    completionHandler: { (result, error) in
-                                    print(result)
-                                    print(error)
+//                                    print(result)
+//                                    if error != nil {
+//                                        print(error)
+//                                    }
         })
     }
     func fetch() {
@@ -166,8 +170,10 @@ extension SyncWebView {
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
         webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
                                    completionHandler: { (result, error) in
-                                    print(result)
-                                    print(error)
+//                                    print(result)
+//                                    if error != nil {
+//                                        print(error)
+//                                    }
         })
     }
 
@@ -228,7 +234,7 @@ extension SyncWebView  {
 
 extension SyncWebView: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
-        print("😎 \(message.name) \(message.body)")
+        //print("😎 \(message.name) \(message.body)")
         guard let data = message.body as? [String: AnyObject], let messageName = data["message"] as? String else {
             assert(false) ;
             return

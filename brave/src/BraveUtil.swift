@@ -18,7 +18,15 @@ func telemetry(action action: String, props: [String: String]?) {
 }
 
 func debugNoteIfNotMainThread() {
-    assert(NSThread.isMainThread(), "Func not for off-main use. This crashes in debug.")
+    if !NSThread.isMainThread() {
+        print("FYI: not called on main thread.")
+    }
+}
+
+func debugNoteIfMainThread() {
+    if NSThread.isMainThread() {
+        print("FYI: called on main thread.")
+    }
 }
 
 class Debug_FuncProfiler {

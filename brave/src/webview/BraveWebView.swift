@@ -222,7 +222,7 @@ class BraveWebView: UIWebView {
             return
         }
 
-        print("Page change detected by content size change triggered timer: \(URL?.absoluteString ?? "")")
+        // print("Page change detected by content size change triggered timer: \(URL?.absoluteString ?? "")")
 
         NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
         shieldStatUpdate(.reset)
@@ -730,9 +730,7 @@ extension BraveWebView: UIWebViewDelegate {
             // TODO Maybe separate page unload from link clicked.
             NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
             setUrl(url)
-            #if DEBUG
-                print("Page changed by shouldStartLoad: \(URL?.absoluteString ?? "")")
-            #endif
+            //print("Page changed by shouldStartLoad: \(URL?.absoluteString ?? "")")
 
             if let url = request.URL, domain = url.normalizedHost() {
                 internalSetBraveShieldStateForDomain(domain)
@@ -792,7 +790,7 @@ extension BraveWebView: UIWebViewDelegate {
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError) {
-        print("didFailLoadWithError: \(error)")
+        //print("didFailLoadWithError: \(error)")
         guard let errorUrl = error.userInfo[NSURLErrorFailingURLErrorKey] as? NSURL else { return }
         if errorUrl.isSpecialInternalUrl() {
             return

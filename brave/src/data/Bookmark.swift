@@ -1,10 +1,5 @@
-//
-//  Bookmark.swift
-//  Client
-//
-//  Created by James Mudgett on 1/27/17.
-//  Copyright © 2017 Brave. All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 
 import UIKit
 import CoreData
@@ -24,9 +19,13 @@ class Bookmark: NSManagedObject {
     @NSManaged var syncUUID: NSUUID?
 
     @NSManaged var parentFolder: Bookmark?
-    @NSManaged var childFolders: NSSet?
+    @NSManaged var children: Set<Bookmark>?
     @NSManaged var domain: Domain?
 
+    // To trigger fetchedResultsController to update, change this value.
+    // For instance, when a favicon is set on a domain, to notify any bookmarks or history items that
+    // are displayed in a table and waiting for a favicon, you can change markDirty, and the favicon will update
+    @NSManaged var markDirty: Int16
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
@@ -34,37 +33,111 @@ class Bookmark: NSManagedObject {
         lastVisited = created
     }
 
-    static var entityInfo: NSEntityDescription {
-        return NSEntityDescription.entityForName("Bookmark", inManagedObjectContext: DataController.moc)!
+    static func entity(context:NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entityForName("Bookmark", inManagedObjectContext: context)!
     }
 
     class func frc(parentFolder parentFolder: Bookmark?) -> NSFetchedResultsController {
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = Bookmark.entityInfo
+        fetchRequest.entity = Bookmark.entity(DataController.moc)
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 200
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key:"order", ascending: false), NSSortDescriptor(key:"created", ascending: false)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key:"order", ascending: true), NSSortDescriptor(key:"created", ascending: false)]
         if let parentFolder = parentFolder {
             fetchRequest.predicate = NSPredicate(format: "parentFolder == %@", parentFolder)
+        } else {
+            fetchRequest.predicate = NSPredicate(format: "parentFolder == nil")
         }
+
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
-    class func add(url url: String?, title: String?, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false) {
+    class func add(url url: NSURL?, title: String?, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) {
+        if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
+            return
+        }
+        
+        let bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
+        bk.url = url?.absoluteString
+        bk.title = title
+        bk.isFolder = isFolder
 
-        DataController.write {
-            let bk = Bookmark(entity: Bookmark.entityInfo, insertIntoManagedObjectContext: DataController.moc)
-            bk.url = url
-            bk.title = title
-            bk.isFolder = isFolder
+        if let url = url {
+            bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
+        }
+        if let id = parentFolder {
+            bk.parentFolder = DataController.moc.objectWithID(id) as? Bookmark
+        }
 
-            if let url = url, let nsurl = NSURL(string: url) {
-                bk.domain = Domain.getOrCreateForUrl(nsurl)
+        if save {
+            DataController.saveContext(DataController.moc)
+        }
+    }
+
+    class func contains(url url: NSURL, completionOnMain completion: ((Bool)->Void)) {
+        var found = false
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            if let count = get(forUrl: url, countOnly: true, context: context) as? Int {
+                found = count > 0
             }
-            if let id = parentFolder {
-                bk.parentFolder = DataController.moc.objectWithID(id) as? Bookmark
+            postAsyncToMain {
+                completion(found)
             }
         }
     }
-    
+
+    private static func get(forUrl url: NSURL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
+        guard let str = url.absoluteDisplayString() else { return nil }
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Bookmark.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "url == %@", str)
+        do {
+            if countOnly {
+                let count = try context.countForFetchRequest(fetchRequest)
+                return count
+            }
+            let results = try context.executeFetchRequest(fetchRequest)
+            if let bm = results.first {
+                return bm as? Bookmark
+            } else {
+                return nil
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return nil
+    }
+
+
+    static func getFolders(bookmark: Bookmark?) -> [Bookmark] {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Bookmark.entity(DataController.moc)
+        if let parent = bookmark?.parentFolder {
+            fetchRequest.predicate = NSPredicate(format: "isFolder == true and parentFolder == %@", parent)
+        } else {
+            fetchRequest.predicate = NSPredicate(format: "isFolder == true and parentFolder.@count = 0")
+        }
+        do {
+            if let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [Bookmark]()
+    }
+
+    class func remove(forUrl url: NSURL, save: Bool = true) -> Bool {
+        if let bm = get(forUrl: url, context: DataController.moc) as? Bookmark {
+            DataController.moc.deleteObject(bm)
+            if save {
+                DataController.saveContext(DataController.moc)
+            }
+            return true
+        }
+        return false
+    }
 }

@@ -7,11 +7,9 @@ import CoreData
 import Shared
 import XCGLogger
 import Eureka
-
+import Storage
 
 private let log = Logger.browserLogger
-
-let BookmarkStatusChangedNotification = "BookmarkStatusChangedNotification"
 
 // MARK: - UX constants.
 
@@ -85,44 +83,38 @@ class BorderedButton: UIButton {
     }
 }
 
+struct FolderPickerRow : Equatable {
+    var folder: Bookmark?
+}
+func ==(lhs: FolderPickerRow, rhs: FolderPickerRow) -> Bool {
+    return lhs.folder === rhs.folder
+}
 
 class BookmarkEditingViewController: FormViewController {
     var completionBlock:((controller:BookmarkEditingViewController) -> Void)?
-    var sourceTable:UITableView!
-    
-    var folders:[Bookmark]!
+
+    var folders = [Bookmark]()
     
     var bookmarksPanel:BookmarksPanel!
     var bookmark:Bookmark!
-
     var bookmarkIndexPath:NSIndexPath!
-
-    var newParentFolder: Bookmark?
-    var oldParentFolder: Bookmark?
 
     let BOOKMARK_TITLE_ROW_TAG:String = "BOOKMARK_TITLE_ROW_TAG"
     let BOOKMARK_URL_ROW_TAG:String = "BOOKMARK_URL_ROW_TAG"
     let BOOKMARK_FOLDER_ROW_TAG:String = "BOOKMARK_FOLDER_ROW_TAG"
 
-    var originalTitle:String!
-    var originalFolderGUID:String!
-
     var titleRow:TextRow!
     var urlRow:LabelRow!
-    var folderSelectionRow:PickerInlineRow<Bookmark>!
     
-    init(sourceTable table:UITableView!, indexPath:NSIndexPath, currentFolderGUID:String, bookmarksPanel:BookmarksPanel, bookmark:Bookmark!, folders:[Bookmark]) {
+    init(bookmarksPanel: BookmarksPanel, indexPath: NSIndexPath, bookmark: Bookmark) {
         super.init(nibName: nil, bundle: nil)
-        sourceTable = table
-        
-        self.folders = folders
+
         self.bookmark = bookmark
         self.bookmarksPanel = bookmarksPanel
         self.bookmarkIndexPath = indexPath
 
-        
-        self.originalTitle = self.bookmark.title
-        self.originalFolderGUID = currentFolderGUID
+        // get top-level folders
+        folders = Bookmark.getFolders(nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -140,103 +132,60 @@ class BookmarkEditingViewController: FormViewController {
     var isEditingFolder:Bool {
         return bookmark.isFolder
     }
-    
-    var isEditingBookmarkItem:Bool {
-        return !isEditingFolder
-    }
 
-    
-    //may be the same as the original
-    var newTitle:String! {
-        guard let possibleNewTitle = titleRow.value else {
-            return originalTitle
-        }
-        
-        let newTitle:String! = possibleNewTitle.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-        
-        if newTitle.characters.count == 0 {
-            return originalTitle
-        }
-        return newTitle
-    }
-
-    var bookmarkTitleChanged:Bool {
-        return self.newTitle != self.originalTitle
-    }
-
-    var bookmarkFolderChanged:Bool {
-        return newParentFolder != oldParentFolder
-    }
-
-    var bookmarkDataChanged:Bool {
-        if isEditingFolder {
-            return bookmarkTitleChanged
-        }
-        
-        return bookmarkTitleChanged || bookmarkFolderChanged
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let firstSectionName = isEditingBookmarkItem ?  Strings.Bookmark_Info : Strings.Bookmark_Folder
+        let firstSectionName = !isEditingFolder ?  Strings.Bookmark_Info : Strings.Bookmark_Folder
 
         let nameSection = Section(firstSectionName)
             
         nameSection <<< TextRow() { row in
-                row.tag = BOOKMARK_TITLE_ROW_TAG
-                row.title = Strings.Name
-                row.value = bookmark.title
-                self.titleRow = row
-            }
-        
+            row.tag = BOOKMARK_TITLE_ROW_TAG
+            row.title = Strings.Name
+            row.value = bookmark.title
+            self.titleRow = row
+        }.onChange { row in
+            self.bookmark.title = row.value
+            DataController.saveContext(DataController.moc)
+        }
+
         form +++ nameSection
         
-//        if isEditingBookmarkItem {
-//
-//            nameSection <<< LabelRow() { row in
-//                row.tag = BOOKMARK_URL_ROW_TAG
-//                row.title = Strings.URL
-//                row.value = (bookmark as! BookmarkItem).url
-//                self.urlRow = row
-//            }
-//            
-//        
-//            form +++ Section(Strings.Location)
-//            <<< PickerInlineRow<BookmarkFolder>() { (row : PickerInlineRow<BookmarkFolder>) -> Void in
-//                row.tag = BOOKMARK_FOLDER_ROW_TAG
-//                row.title = Strings.Folder
-//                row.displayValueFor = { (rowValue: BookmarkFolder?) in
-//                    return (rowValue?.title) ?? ""
-//                }
-//
-//                // This is a hack to workaround https://github.com/brave/browser-ios/issues/450
-//                // TODO: we should be able to just do foldersArray = self.folders, not sure why multiple MemoryBookmarkFolder called 'Root Folder' appear
-//                var foundOneRootFolder = false
-//                let foldersArray = self.folders.filter({ (folder) -> Bool in
-//                    if let _ = folder as? MemoryBookmarkFolder {
-//                        if foundOneRootFolder {
-//                            return false
-//                        }
-//                        foundOneRootFolder = true
-//                    }
-//                    return true
-//                })
-//                row.options = foldersArray
-//                
-//                var currentFolder:BookmarkFolder!
-//                for i in 0..<foldersArray.count {
-//                    let folder = foldersArray[i]
-//                    if self.currentFolderGUID == folder.guid {
-//                        currentFolder = folder
-//                        break
-//                    }
-//                }
-//                row.value = currentFolder
-//                self.folderSelectionRow = row
-//            }
-//        }
+        if !isEditingFolder {
+            nameSection <<< LabelRow() { row in
+                row.tag = BOOKMARK_URL_ROW_TAG
+                row.title = Strings.URL
+                row.value = bookmark.url
+                self.urlRow = row
+            }.onChange { row in
+                self.bookmark.url = row.value
+                DataController.saveContext(DataController.moc)
+            }
 
+            form +++ Section(Strings.Location)
+            <<< PickerInlineRow<FolderPickerRow>() { (row : PickerInlineRow<FolderPickerRow>) -> Void in
+                row.tag = BOOKMARK_FOLDER_ROW_TAG
+                row.title = Strings.Folder
+                row.displayValueFor = { (rowValue: FolderPickerRow?) in
+                    return (rowValue?.folder?.title) ?? "Root Folder"
+                }
+
+                row.options = [FolderPickerRow()] + folders.map { (item) -> FolderPickerRow in
+                    var fpr = FolderPickerRow()
+                    fpr.folder = item
+                    return fpr
+                }
+
+                var initial = FolderPickerRow()
+                initial.folder = bookmark.parentFolder
+                row.value = initial
+            }.onChange { row in
+                let r = row.value! as FolderPickerRow
+                self.bookmark.parentFolder = r.folder
+                DataController.saveContext(DataController.moc)
+            }
+        }
     }
 }
 
@@ -255,7 +204,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     var addFolderButton:UIBarButtonItem!
     weak var addBookmarksFolderOkAction: UIAlertAction?
   
-    var isEditingInvidivualBookmark:Bool = false
+    var isEditingIndividualBookmark:Bool = false
 
     var currentFolder: Bookmark? = nil
 
@@ -275,11 +224,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     deinit {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
-    }
-
-    override func viewDidAppear(animated: Bool) {
-        print("BookmarksPanel: viewdidappear")
-        reloadData()
     }
 
     override func viewDidLoad() {
@@ -320,19 +264,15 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func reloadData() {
-        if frc == nil {
-            return
+        DataController.saveContext(DataController.moc)
+
+        do {
+            try self.frc?.performFetch()
+        } catch let error as NSError {
+            print(error.description)
         }
 
-        DataController.asyncAccess({
-            do {
-                try self.frc?.performFetch()
-            } catch let error as NSError {
-                print(error.description)
-            }
-            }, completionOnMain: {
-                self.tableView.reloadData()
-        })
+        self.tableView.reloadData()
     }
     
     func disableTableEditingMode() {
@@ -434,35 +374,11 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             NSLog("Delete folder button pressed but no folder object exists (probably at root), ignoring.")
             return
         }
-//        let itemCount = source?.current.count ?? 0
-//        let folderGUID = currentFolder.guid
-        let canDeleteFolder = (frc?.fetchedObjects?.count ?? -1 == 0)
-        let title = canDeleteFolder ? "Delete Folder" : "Oops!"
-        let message = canDeleteFolder ? "Deleting folder \"\(currentFolder.title)\". This action can't be undone. Are you sure?" : "You can't delete a folder that contains items. Please delete all items and try again."
-        let okButtonTitle = canDeleteFolder ? "Delete" : "OK"
-        let okButtonType = canDeleteFolder ? UIAlertActionStyle.Destructive : UIAlertActionStyle.Default
-        
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-//        alert.addAction(UIAlertAction(title: okButtonTitle, style: okButtonType,
-//            handler: { (alertA: UIAlertAction!) in
-//                if canDeleteFolder {
-//                    
-//                    self.profile.bookmarks.modelFactory >>== {
-//                        $0.removeByGUID(folderGUID).uponQueue(dispatch_get_main_queue()) { res in
-//                            if res.isSuccess {
-//                                self.navigationController?.popViewControllerAnimated(true)
-//                                self.currentBookmarksPanel().reloadData()
-//                            }
-//                        }
-//                    }
-//                }
-//        }))
-        if canDeleteFolder {
-            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel,
-                handler: nil))
-        }
-        self.presentViewController(alert, animated: true) {
-        }
+
+        DataController.moc.deleteObject(currentFolder)
+        DataController.saveContext(DataController.moc)
+
+        self.navigationController?.popViewControllerAnimated(true)
     }
 
     func onAddBookmarksFolderButton() {
@@ -510,21 +426,37 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
-//        let item = orderUpdatedBookmarkGUIDs.removeAtIndex(sourceIndexPath.item)
-//        orderUpdatedBookmarkGUIDs.insert(item, atIndex: destinationIndexPath.item)
 
-        //check if the table has been reordered, if so make the changes persistent
- //       if self.tableView.editing && bookmarksOrderChanged {
-//            orderedBookmarkGUIDs = orderUpdatedBookmarkGUIDs
-//            if let sqllitbk = self.profile.bookmarks as? MergedSQLiteBookmarks {
-//                let folderGUID = self.bookmarkFolder?.guid ?? BookmarkRoots.MobileFolderGUID
-//                sqllitbk.reorderBookmarks(folderGUID, bookmarksOrder: self.orderedBookmarkGUIDs).upon { _ in
-//                    postAsyncToMain {
-//                        self.reloadData()
-//                    }
-//                }
-//            }
-  //      }
+        let dest = frc?.objectAtIndexPath(destinationIndexPath) as! Bookmark
+        let src = frc?.objectAtIndexPath(sourceIndexPath) as! Bookmark
+
+        if dest === src {
+            return
+        }
+
+        // Warning, this could be a bottleneck, grabs ALL the bookmarks in the current folder
+        // But realistically, with a batch size of 20, and most reads around 1ms, a bottleneck here is an edge case.
+        // Optionally: grab the parent folder, and the on a bg thread iterate the bms and update their order. Seems like overkill.
+        var bms = self.frc?.fetchedObjects as! [Bookmark]
+        bms.removeAtIndex(bms.indexOf(src)!)
+        if sourceIndexPath.row > destinationIndexPath.row {
+            // insert before
+            bms.insert(src, atIndex: bms.indexOf(dest)!)
+        } else {
+            let end = bms.indexOf(dest)! + 1
+            bms.insert(src, atIndex: end)
+        }
+
+        for i in 0..<bms.count {
+            bms[i].order = Int16(i)
+        }
+
+        // I am stumped, I can't find the notification that animation is complete for moving.
+        // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
+        // Adding a delay to let animation complete avoids this problem
+        postAsyncToMain(0.25) {
+            DataController.saveContext(DataController.moc)
+        }
     }
 
     func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -570,17 +502,17 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         return cell
     }
 
+    override func getLongPressUrl(forIndexPath indexPath: NSIndexPath) -> NSURL? {
+        guard let obj = frc?.objectAtIndexPath(indexPath) as? Bookmark else { return nil }
+        return obj.url != nil ? NSURL(string: obj.url!) : nil
+    }
+
     private func configureCell(cell: UITableViewCell, atIndexPath indexPath: NSIndexPath) {
 
         guard let item = frc?.objectAtIndexPath(indexPath) as? Bookmark else { return }
+        cell.tag = item.objectID.hashValue
 
         func configCell(image image: UIImage? = nil, icon: FaviconMO? = nil, longPressForContextMenu: Bool = false) {
-            //let cell = UITableViewCell(style: .Default, reuseIdentifier: nil)
-
-            //            if self.tableView(tableView, hasFullWidthSeparatorForRowAtIndexPath: indexPath) {
-            //                cell.separatorInset = UIEdgeInsetsZero
-            //            }
-
             if longPressForContextMenu && !tableView.editing {
                 cell.gestureRecognizers?.forEach { cell.removeGestureRecognizer($0) }
                 let lp = UILongPressGestureRecognizer(target: self, action: #selector(longPressOnCell))
@@ -600,20 +532,20 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 UIGraphicsEndImageContext()
             }
 
-            func setIcon(icon: FaviconMO?, withPlaceholder placeholder: UIImage) {
-                if let icon = icon, let url = icon.url{
-                    let imageURL = NSURL(string: url)
-                    cell.imageView?.sd_setImageWithURL(imageURL, placeholderImage: placeholder, completed: {
-                        image, error, cache, url in
-                        restrictImageSize()
-                    })
-                    return
+            if let faviconMO = item.domain?.favicon, let url = faviconMO.url {
+                let favicon = Favicon(url: url, type: IconType(rawValue: Int(faviconMO.type)) ?? IconType.Guess)
+                postAsyncToBackground {
+                    let best = getBestFavicon([favicon])
+                    postAsyncToMain {
+                        let hasImage = cell.imageView?.image != nil
+                        cell.imageView!.setIcon(best, withPlaceholder: FaviconFetcher.defaultFavicon) {
+                            if !hasImage {
+                                // TODO: why will it not draw the image the first time without this?
+                                self.tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+                            }
+                        }
+                    }
                 }
-                cell.imageView?.image = placeholder
-            }
-
-            if let icon = icon {
-                setIcon(icon, withPlaceholder: FaviconFetcher.defaultFavicon)
             } else if let image = image {
                 cell.imageView?.image = image
                 restrictImageSize()
@@ -656,20 +588,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 0
     }
-
-    override func tableView(tableView: UITableView, hasFullWidthSeparatorForRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Show a full-width border for cells above separators, so they don't have a weird step.
-        // Separators themselves already have a full-width border, but let's force the issue
-        // just in case.
-//        let this = self.source?.current[indexPath.row]
-//        if (indexPath.row + 1) < self.source?.current.count {
-//            let below = self.source?.current[indexPath.row + 1]
-//            if this is BookmarkSeparator || below is BookmarkSeparator {
-//                return true
-//            }
-//        }
-        return super.tableView(tableView, hasFullWidthSeparatorForRowAtIndexPath: indexPath)
-    }
     
     func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
         return indexPath
@@ -700,8 +618,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 let nextController = BookmarksPanel()
                 nextController.currentFolder = bookmark
                 nextController.homePanelDelegate = self.homePanelDelegate
-                nextController.profile = self.profile
-
+                
                 //on subfolders, the folderpicker is the same as the root
                 let backButton = UIBarButtonItem(title: "", style: UIBarButtonItemStyle.Plain, target: self.navigationController, action: nil)
                 self.navigationItem.leftBarButtonItem = backButton
@@ -732,112 +649,35 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
     
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
-//        guard let source = self.source else {
-//            return [AnyObject]()
-//        }
+        guard let item = frc?.objectAtIndexPath(indexPath) as? Bookmark else { return nil }
 
         let delete = UITableViewRowAction(style: UITableViewRowActionStyle.Destructive, title: Strings.Delete, handler: { (action, indexPath) in
-//            guard let bookmark = source.current[indexPath.row] else {
-//                return
-//            }
-//
-//            assert(!(bookmark is BookmarkFolder))
-//            //folder deletion is dealt with within a folder.
-//            if bookmark is BookmarkFolder {
-//                // TODO: check whether the folder is empty (excluding separators). If it isn't
-//                // then we must ask the user to confirm. Bug 1232810.
-//                log.debug("Not deleting folder.")
-//                return
-//            }
-//
-//            log.debug("Removing rows \(indexPath).")
-//
-//            // Block to do this -- this is UI code.
-//            guard let factory = source.modelFactory.value.successValue else {
-//                log.error("Couldn't get model factory. This is unexpected.")
-//                self.onModelFailure(DatabaseError(description: "Unable to get factory."))
-//                return
-//            }
-//
-//            if let err = factory.removeByGUID(bookmark.guid).value.failureValue {
-//                log.debug("Failed to remove \(bookmark.guid).")
-//                self.onModelFailure(err)
-//                return
-//            }
-//
-//            guard let reloaded = source.reloadData().value.successValue else {
-//                log.debug("Failed to reload model.")
-//                return
-//            }
-//
-//            self.tableView.beginUpdates()
-//            self.source = reloaded
-//            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Left)
-//            self.tableView.endUpdates()
-//
-//            NSNotificationCenter.defaultCenter().postNotificationName(BookmarkStatusChangedNotification, object: bookmark, userInfo:["added": false])
+
+            DataController.moc.deleteObject(item)
+            DataController.saveContext(DataController.moc)
+
+            // updates the bookmark state
+            getApp().browserViewController.updateURLBarDisplayURL(tab: nil)
         })
-        
-        
+
         let edit = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: Strings.Edit, handler: { (action, indexPath) in
-//            guard let bookmark = source.current[indexPath.row] else {
-//                return
-//            }
-//            
-//            if bookmark is BookmarkFolder {
-//                return
-//            }
-//            
-//            self.showEditBookmarkController(tableView, indexPath: indexPath)
+            self.showEditBookmarkController(tableView, indexPath: indexPath)
         })
 
         return [delete, edit]
     }
     
-    func showEditBookmarkController(tableView: UITableView, indexPath:NSIndexPath) {
-//        guard let source = source else {
-//            return
-//        }
-//
-//        guard let bookmark = source.current[indexPath.row] else {
-//            return
-//        }
-//
-//        let currentFolderGUID = self.bookmarkFolder?.guid ?? BookmarkRoots.MobileFolderGUID
-//
-//        let nextController = BookmarkEditingViewController(sourceTable:self.tableView,indexPath: indexPath, currentFolderGUID:currentFolderGUID, bookmarksPanel: self, bookmark: bookmark, folders: self.folderList)
-//
-//        nextController.completionBlock = {(controller: BookmarkEditingViewController) -> Void in
-//            self.isEditingInvidivualBookmark = false
-//            if controller.bookmarkDataChanged {
-//                postAsyncToBackground {
-//                    self.updateBookmarkData(bookmark, newTitle: controller.newTitle, newFolderGUID: controller.newFolderGUID, atIndexPath: controller.bookmarkIndexPath)
-//                    NSNotificationCenter.defaultCenter().postNotificationName(BookmarkStatusChangedNotification, object: bookmark, userInfo:["added": false])
-//                }
-//            }
-//        }
-//        self.isEditingInvidivualBookmark = true
-//        self.navigationController?.pushViewController(nextController, animated: true)
+    private func showEditBookmarkController(tableView: UITableView, indexPath:NSIndexPath) {
+        guard let item = frc?.objectAtIndexPath(indexPath) as? Bookmark else { return }
+        let nextController = BookmarkEditingViewController(bookmarksPanel: self, indexPath: indexPath, bookmark: item)
+
+        nextController.completionBlock = { controller in
+            self.isEditingIndividualBookmark = false
+        }
+        self.isEditingIndividualBookmark = true
+        self.navigationController?.pushViewController(nextController, animated: true)
     }
 
-    func updateBookmarkData(bookmark:Bookmark, newTitle:String, newFolderGUID: String?, atIndexPath indexPath: NSIndexPath) {
-
-        let refreshBlock:dispatch_block_t = { postAsyncToMain { self.reloadData() }}
-
-//        if let sqllitbk = self.profile.bookmarks as? MergedSQLiteBookmarks {
-//            //we split up the update into class-specific functions so we get more compile time & runtime checks before writing into the DB
-//            if let bookmarkItem = bookmark as? BookmarkItem, guid = newFolderGUID {
-//                //bookmark items ALWAYS pass along the folderGUID even if not changed hence we can force newFolderGUID!
-//                sqllitbk.editBookmarkItem(bookmarkItem, title:newTitle, parentGUID: guid).upon { _ in
-//                    refreshBlock()
-//                }
-//            } else if let bookmarkFolder = bookmark as? BookmarkFolder {
-//                sqllitbk.editBookmarkFolder(bookmarkFolder, title:newTitle).upon { _ in
-//                    refreshBlock()
-//                }
-//            }
-//        }
-    }
 }
 
 private protocol BookmarkFolderTableViewHeaderDelegate {
@@ -955,18 +795,22 @@ extension BookmarksPanel : NSFetchedResultsControllerDelegate {
     }
 
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        tableView.endUpdates()
+       tableView.endUpdates()
     }
 
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch (type) {
-        case .Insert:
-            if let indexPath = newIndexPath {
-                let obj = anObject as! Bookmark
-//                if let domain = obj.domain where obj.domain?.favicon == nil {
-//                    addFaviconlessDomain(domain, forIndexPath: indexPath)
-//                }
-                tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        case .Update:
+            if let indexPath = indexPath, let cell = tableView.cellForRowAtIndexPath(indexPath) {
+                configureCell(cell, atIndexPath: indexPath)
+            }
+       case .Insert:
+            if let path = newIndexPath {
+                print("try insert row \((anObject as! Bookmark).url)")
+                let objectIdHash = tableView.cellForRowAtIndexPath(path)?.tag ?? 0
+                if objectIdHash != anObject.objectID.hashValue {
+                    tableView.insertRowsAtIndexPaths([path], withRowAnimation: .Automatic)
+                }
             }
 
         case .Delete:
@@ -974,19 +818,9 @@ extension BookmarksPanel : NSFetchedResultsControllerDelegate {
                 tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             }
 
-        case .Update:
-            if let indexPath = indexPath, let cell = tableView.cellForRowAtIndexPath(indexPath) {
-                configureCell(cell, atIndexPath: indexPath)
-            }
 
         case .Move:
-            if let indexPath = indexPath {
-                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-            }
-
-            if let newIndexPath = newIndexPath {
-                tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
-            }
+            break
         }
     }
 }

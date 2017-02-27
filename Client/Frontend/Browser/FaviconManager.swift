@@ -84,7 +84,7 @@ class FaviconManager : BrowserHelper {
                             spotlight?.updateImage(img, forURL: url)
                         }
                     }
-                    tab.favicons[currentUrl.baseDomain() ?? ""] = fav
+                    tab.favicons[currentUrl.normalizedHost() ?? ""] = fav
                 })
             }
         }
