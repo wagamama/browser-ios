@@ -10,6 +10,7 @@ class Domain: NSManagedObject {
     @NSManaged var url: String?
     @NSManaged var visits: Int32
     @NSManaged var topsite: Bool
+    @NSManaged var blockedFromTopSites: Bool // don't show ever on top sites
     @NSManaged var favicon: FaviconMO?
 
     @NSManaged var shield_allOff: NSNumber?
@@ -52,4 +53,49 @@ class Domain: NSManagedObject {
         }
         return result
     }
+
+    class func blockFromTopSites(url: NSURL, context: NSManagedObjectContext) {
+        if let domain = getOrCreateForUrl(url, context: context) {
+            domain.blockedFromTopSites = true
+            DataController.saveContext(context)
+        }
+    }
+
+    class func blockedTopSites(context: NSManagedObjectContext) -> [Domain] {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Domain.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "blockedFromTopSites == %@", NSNumber(bool: true))
+        do {
+            if let results = try context.executeFetchRequest(fetchRequest) as? [Domain] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [Domain]()
+    }
+
+    class func topSitesQuery(limit limit: Int, context: NSManagedObjectContext) -> [Domain] {
+        assert(!NSThread.isMainThread())
+
+        let minVisits = 5
+
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.fetchLimit = limit
+        fetchRequest.entity = Domain.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "visits > %i AND blockedFromTopSites != %@", minVisits, NSNumber(bool: true))
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "visits", ascending: false)]
+        do {
+            if let results = try context.executeFetchRequest(fetchRequest) as? [Domain] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [Domain]()
+    }
+
+    
 }

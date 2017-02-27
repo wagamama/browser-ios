@@ -17,6 +17,7 @@
         <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="children" inverseEntity="Bookmark" syncable="YES"/>
     </entity>
     <entity name="Domain" representedClassName=".Domain" syncable="YES">
+        <attribute name="blockedFromTopSites" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="shield_adblockAndTp" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="shield_allOff" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="shield_fpProtection" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
@@ -56,7 +57,7 @@
     </entity>
     <elements>
         <element name="Bookmark" positionX="45" positionY="-433" width="128" height="255"/>
-        <element name="Domain" positionX="234" positionY="-324" width="128" height="225"/>
+        <element name="Domain" positionX="234" positionY="-324" width="128" height="240"/>
         <element name="Favicon" positionX="412" positionY="-399" width="128" height="120"/>
         <element name="History" positionX="441" positionY="-157" width="128" height="150"/>
         <element name="Tab" positionX="45" positionY="-171" width="128" height="135"/>
