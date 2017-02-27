@@ -69,6 +69,7 @@ class SyncWebView: UIViewController {
             userController.addScriptMessageHandler(self, name: "syncToIOS_on")
             userController.addScriptMessageHandler(self, name: "syncToIOS_send")
 
+            // ios-sync must be called before bundle, since it auto-runs
             ["fetch", "ios-sync", "bundle"].forEach() {
                 userController.addUserScript(WKUserScript(source: getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
             }
@@ -86,10 +87,10 @@ class SyncWebView: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.frame = CGRectMake(20, 20, 200, 100)
-        webView = WKWebView(frame: view.frame, configuration: webConfig)
+        webView = WKWebView(frame: view.bounds, configuration: webConfig)
         view.addSubview(webView)
         view.userInteractionEnabled = false
-        view.alpha = 0.5
+        view.alpha = 1.0
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -111,6 +112,7 @@ class SyncWebView: UIViewController {
         }
     }
 
+    // TODO: Move to keychain
     var syncSeed: String {
         get {
             let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
@@ -236,7 +238,7 @@ extension SyncWebView: WKScriptMessageHandler {
 
         switch messageName {
         case "get-init-data":
-            //getInitData()
+//            getInitData()
             break
         case "got-init-data":
             gotInitData()
