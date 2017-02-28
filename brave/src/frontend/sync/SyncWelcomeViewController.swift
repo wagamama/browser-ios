@@ -17,8 +17,8 @@ class SyncWelcomeViewController: UIViewController {
     var bg: UIImageView!
     var titleLabel: UILabel!
     var descriptionLabel: UILabel!
-    var newToSyncButton: SyncButton!
-    var existingUserButton: SyncButton!
+    var newToSyncButton: UIButton!
+    var existingUserButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,9 +27,11 @@ class SyncWelcomeViewController: UIViewController {
         view.backgroundColor = SyncBackgroundColor
         
         bg = UIImageView(image: UIImage(named: "sync-gradient"))
+        bg.contentMode = .ScaleAspectFill
         view.addSubview(bg)
         
         graphic = UIImageView(image: UIImage(named: "sync-art"))
+        graphic.contentMode = .Center
         view.addSubview(graphic)
         
         titleLabel = UILabel()
@@ -43,16 +45,56 @@ class SyncWelcomeViewController: UIViewController {
         descriptionLabel.textColor = UIColor(rgb: 0x696969)
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
+        descriptionLabel.textAlignment = .Center
         descriptionLabel.text = "Sync browser data between your devices securely using Brave Sync, no account creation required. Tap below to get started."
         view.addSubview(descriptionLabel)
         
-        newToSyncButton = SyncButton()
-        newToSyncButton.titleLabel.text = "I am new to sync"
+        newToSyncButton = UIButton()
+        newToSyncButton.setTitle("I am new to sync", forState: .Normal)
+        newToSyncButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
+        newToSyncButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        newToSyncButton.backgroundColor = BraveUX.DefaultBlue
+        newToSyncButton.layer.cornerRadius = 8
         view.addSubview(newToSyncButton)
         
-        existingUserButton = SyncButton()
-        existingUserButton.titleLabel.text = "I have an existing sync code"
+        existingUserButton = UIButton()
+        existingUserButton.setTitle("I have an existing sync code", forState: .Normal)
+        existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightBold)
+        existingUserButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
         view.addSubview(existingUserButton)
+        
+        bg.snp_makeConstraints { (make) in
+            make.top.equalTo(self.view).offset(CGRectGetMaxY(self.navigationController?.navigationBar.frame ?? CGRectZero))
+            make.left.equalTo(self.view)
+            make.right.equalTo(self.view)
+        }
+        
+        graphic.snp_makeConstraints { (make) in
+            make.edges.equalTo(self.bg).inset(UIEdgeInsetsMake(0, 19, 0, 0))
+        }
+        
+        titleLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.bg.snp_bottom).offset(40)
+            make.centerX.equalTo(self.view)
+        }
+        
+        descriptionLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.titleLabel.snp_bottom).offset(7)
+            make.leftMargin.equalTo(30)
+            make.rightMargin.equalTo(-30)
+        }
+        
+        newToSyncButton.snp_makeConstraints { (make) in
+            make.bottom.equalTo(self.view.snp_bottom).offset(-60)
+            make.leftMargin.equalTo(16)
+            make.rightMargin.equalTo(-16)
+            make.height.equalTo(50)
+        }
+        
+        existingUserButton.snp_makeConstraints { (make) in
+            make.top.equalTo(self.newToSyncButton.snp_bottom).offset(14)
+            make.centerX.equalTo(self.view)
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -65,85 +107,4 @@ class SyncWelcomeViewController: UIViewController {
         
     }
     
-}
-
-class SyncButton: UIControl {
-    
-    private let Padding: CGFloat = 11.0
-    
-    var titleLabel: UILabel!
-    var highlightColor: UIColor?
-    var _color: UIColor = BraveUX.DefaultBlue
-    var color: UIColor {
-        get {
-            return _color
-        }
-        set {
-            _color = newValue
-            backgroundColor = _color
-        }
-    }
-    
-    var _textColor: UIColor = UIColor.whiteColor()
-    var textColor: UIColor {
-        get {
-            return _textColor
-        }
-        set {
-            _textColor = newValue
-            titleLabel.textColor = _textColor
-        }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        layer.masksToBounds = true
-        backgroundColor = UIColor.clearColor()
-        
-        titleLabel = UILabel(frame: frame)
-        titleLabel.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-        titleLabel.userInteractionEnabled = false
-        titleLabel.textAlignment = .Center
-        titleLabel.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
-        titleLabel.textColor = textColor
-        titleLabel.backgroundColor = UIColor.clearColor()
-        addSubview(titleLabel)
-        setNeedsDisplay()
-    }
-    
-    required init(coder: NSCoder) {
-        super.init(coder: coder)!
-    }
-    
-    override var highlighted: Bool {
-        didSet {
-            if (highlighted) {
-                UIView.animateWithDuration(0.1, animations: {
-                    self.backgroundColor = self.highlightColor ?? BraveUX.DefaultBlue.colorWithAlphaComponent(0.8)
-                })
-            }
-            else {
-                UIView.animateWithDuration(0.1, animations: {
-                    self.backgroundColor = self.color
-                })
-            }
-        }
-    }
-    
-    override func layoutSubviews() {
-        titleLabel.frame = bounds
-        
-        layer.cornerRadius = 8
-    }
-    
-    override func sizeToFit() {
-        super.sizeToFit()
-        
-        let size: CGSize = titleLabel.sizeThatFits(CGSizeMake(CGFloat.max, CGFloat.max))
-        var frame: CGRect = self.frame
-        frame.size.width = size.width + Padding * 4.0
-        frame.size.height = size.height + Padding * 2.0
-        self.frame = frame
-    }
 }
