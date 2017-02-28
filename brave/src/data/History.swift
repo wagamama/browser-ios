@@ -142,5 +142,29 @@ class History: NSManagedObject {
         return [History]()
     }
     
+    class func deleteAll(completionOnMain: ()->()) {
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            let fetchRequest = NSFetchRequest()
+            fetchRequest.entity = History.entity(context)
+            fetchRequest.includesPropertyValues = false
+            do {
+                let results = try context.executeFetchRequest(fetchRequest)
+                for result in results {
+                    context.deleteObject(result as! NSManagedObject)
+                }
+
+            } catch {
+                let fetchError = error as NSError
+                print(fetchError)
+            }
+
+            DataController.saveContext(context)
+
+            Domain.deleteNonBookmarked {
+                completionOnMain()
+            }
+        }
+    }
 
 }

@@ -175,14 +175,12 @@ class BraveApp {
             //BlankTargetLinkHandler.updatedEnabledState()
         #endif
 
-        getApp().profile?.loadBraveShieldsPerBaseDomain().upon() {
-            postAsyncToMain(0) { // back to main thread
-                guard let shieldState = getApp().tabManager.selectedTab?.braveShieldStateSafeAsync.get() else { return }
-                if let wv = getCurrentWebView(), url = wv.URL, base = url.normalizedHost(), dbState = BraveShieldState.perNormalizedDomain[base] where shieldState.isNotSet() {
-                    // on init, the webview's shield state doesn't match the db
-                    getApp().tabManager.selectedTab?.braveShieldStateSafeAsync.set(dbState)
-                    wv.reloadFromOrigin()
-                }
+        Domain.loadShieldsIntoMemory {
+            guard let shieldState = getApp().tabManager.selectedTab?.braveShieldStateSafeAsync.get() else { return }
+            if let wv = getCurrentWebView(), url = wv.URL, dbState = BraveShieldState.perNormalizedDomain[url.normalizedHost()] where shieldState.isNotSet() {
+                // on init, the webview's shield state doesn't match the db
+                getApp().tabManager.selectedTab?.braveShieldStateSafeAsync.set(dbState)
+                wv.reloadFromOrigin()
             }
         }
     }

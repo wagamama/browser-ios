@@ -27,7 +27,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
 
     private lazy var clearables: [(clearable: Clearable, checked: DefaultCheckedState)] = {
         return [
-            (HistoryClearable(profile: self.profile), true),
+            (HistoryClearable(), true),
             (CacheClearable(), true),
             (CookiesClearable(), true),
             (PasswordsClearable(profile: self.profile), true),

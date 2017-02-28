@@ -150,10 +150,7 @@ extension NSURL {
     }
 
     public func normalizedHostAndPath() -> String? {
-        if let normalizedHost = self.normalizedHost() {
-            return normalizedHost + (self.path ?? "/")
-        }
-        return nil
+        return normalizedHost() + (self.path ?? "/")
     }
 
     public func absoluteDisplayString() -> String? {
@@ -196,16 +193,13 @@ extension NSURL {
      * Any failure? Return this URL.
      */
     public func domainURL() -> NSURL {
-        if let normalized = self.normalizedHost() {
-            // Use NSURLComponents instead of NSURL since the former correctly preserves
-            // brackets for IPv6 hosts, whereas the latter escapes them.
-            let components = NSURLComponents()
-            components.scheme = self.scheme
-            components.host = normalized
-            components.path = "/"
-            return components.URL ?? self
-        }
-        return self
+        // Use NSURLComponents instead of NSURL since the former correctly preserves
+        // brackets for IPv6 hosts, whereas the latter escapes them.
+        let components = NSURLComponents()
+        components.scheme = self.scheme ?? "http://"
+        components.host = normalizedHost()
+        components.path = "/"
+        return components.URL ?? self
     }
 
     public func extractDomainName() -> String {
@@ -218,11 +212,19 @@ extension NSURL {
         return urlString
     }
 
-    public func normalizedHost() -> String? {
+    public func normalizedHost() -> String {
+        var url = self
+        if scheme == nil {
+            if let _url = NSURL(string: "http://" + (path ?? "")) {
+                url = _url
+            } else {
+                return self.description
+            }
+        }
         // Use components.host instead of self.host since the former correctly preserves
         // brackets for IPv6 hosts, whereas the latter strips them.
-        guard let components = NSURLComponents(URL: self, resolvingAgainstBaseURL: false),
-            var host = components.host else { return nil }
+        guard let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false),
+            var host = components.host else { return self.description }
 
         if let range = host.rangeOfString("^(www|mobile|m)\\.", options: .RegularExpressionSearch) {
             host.replaceRange(range, with: "")
