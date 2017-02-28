@@ -198,6 +198,7 @@ extension Strings {
     public static let Sepia = NSLocalizedString("Sepia", comment: "Sepia theme setting in Reading View settings")
     public static let General = NSLocalizedString("General", comment: "General settings section title")
     public static let Sync = NSLocalizedString("Sync", comment: "Sync settings section title")
+    public static let Pair = NSLocalizedString("Pair", comment: "Sync pair device settings section title")
     public static let Close_Private_Tabs = NSLocalizedString("Close Private Tabs", comment: "Setting for closing private tabs")
     public static let When_Leaving_Private_Browsing = NSLocalizedString("When Leaving Private Browsing", comment: "Will be displayed in Settings under 'Close Private Tabs'")
     public static let Saved_Logins = NSLocalizedString("Saved Logins", comment: "Settings item for clearing passwords and login data")

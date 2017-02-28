@@ -386,13 +386,13 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
         }
     }
 
-    var showTopBorder: Bool = true {
+    var showTopBorder: Bool = false {
         didSet {
             topBorder.hidden = !showTopBorder
         }
     }
 
-    var showBottomBorder: Bool = true {
+    var showBottomBorder: Bool = false {
         didSet {
             bottomBorder.hidden = !showBottomBorder
         }
@@ -448,8 +448,8 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        showTopBorder = true
-        showBottomBorder = true
+        showTopBorder = false
+        showBottomBorder = false
         titleLabel.text = nil
         titleAlignment = .Bottom
     }
