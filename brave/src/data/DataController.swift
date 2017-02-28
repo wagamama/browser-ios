@@ -97,6 +97,11 @@ class DataController: NSObject {
     }
 
     static func saveContext(context: NSManagedObjectContext) {
+        if context === DataController.shared.writeMOC {
+            print("Do not use with the write moc, this save is handled internally here.")
+            return
+        }
+
         if context.hasChanges {
             do {
                 try context.save()
@@ -107,17 +112,24 @@ class DataController: NSObject {
                     // By design we only merge changes 'up' the stack from child-to-parent.
                     DataController.shared.workerMOC = nil
                     DataController.shared.workerMOC = DataController.shared.workerContext()
-                }
 
-                // ensure event loop complete, so that child-to-parent moc merge is complete (no cost, and docs are not clear on whether this is required)
-                postAsyncToMain {
-                    DataController.shared.writeMOC?.performBlock({
-                        do {
-                            try DataController.shared.writeMOC!.save()
-                        } catch {
-                            fatalError("Error saving DB to disk: \(error)")
+                    // ensure event loop complete, so that child-to-parent moc merge is complete (no cost, and docs are not clear on whether this is required)
+                    postAsyncToMain(0.1) {
+                        DataController.shared.writeMOC!.performBlock{
+                            if !DataController.shared.writeMOC!.hasChanges {
+                                return
+                            }
+                            do {
+                                try DataController.shared.writeMOC!.save()
+                            } catch {
+                                fatalError("Error saving DB to disk: \(error)")
+                            }
                         }
-                    })
+                    }
+                } else {
+                    postAsyncToMain(0.1) {
+                        DataController.saveContext(DataController.shared.mainThreadMOC!)
+                    }
                 }
             } catch {
                 fatalError("Error saving DB: \(error)")

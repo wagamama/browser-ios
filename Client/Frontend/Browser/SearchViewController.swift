@@ -55,8 +55,8 @@ protocol SearchViewControllerDelegate: class {
 class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, LoaderListener {
     var searchDelegate: SearchViewControllerDelegate?
 
-    var profile: Profile!
-    var data: Cursor<Site> = Cursor<Site>(status: .Success, msg: "No data set")
+    //var profile: Profile!
+    var data = [Site]()
 
     private let isPrivate: Bool
     private var suggestClient: SearchSuggestClient?
@@ -465,7 +465,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         })
     }
 
-    func loader(dataLoaded data: Cursor<Site>) {
+    func loader(dataLoaded data: [Site]) {
         self.data = data
         tableView.reloadData()
     }
@@ -475,11 +475,11 @@ extension SearchViewController {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let section = SearchListSection(rawValue: indexPath.section)!
         if section == SearchListSection.BookmarksAndHistory {
-            if let site = data[indexPath.row] {
+            let site = data[indexPath.row]
                 if let url = NSURL(string: site.url) {
                     searchDelegate?.searchViewController(self, didSelectURL: url)
                 }
-            }
+
         }
     }
 
@@ -515,14 +515,14 @@ extension SearchViewController {
 
         case .BookmarksAndHistory:
             let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-            if let site = data[indexPath.row] {
-                if let cell = cell as? TwoLineTableViewCell {
-                    let isBookmark = site.bookmarked ?? false
-                    cell.setLines(site.title, detailText: site.url)
-                    cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
-                    cell.imageView?.setIcon(site.icon, withPlaceholder: FaviconFetcher.defaultFavicon)
-                }
+            let site = data[indexPath.row]
+            if let cell = cell as? TwoLineTableViewCell {
+                let isBookmark = site.bookmarked ?? false
+                cell.setLines(site.title, detailText: site.url)
+                cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
+                cell.imageView?.setIcon(site.icon, withPlaceholder: FaviconFetcher.defaultFavicon)
             }
+
             return cell
         }
     }

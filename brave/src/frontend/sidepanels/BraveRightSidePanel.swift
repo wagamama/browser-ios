@@ -448,7 +448,7 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
                 }
             }
 
-            getApp().profile?.setBraveShieldForNormalizedDomain(site, state: (siteShieldKey.rawValue, state))
+            BraveShieldState.set(forDomain:site, state: (siteShieldKey, state))
             (getApp().browserViewController as! BraveBrowserViewController).updateBraveShieldButtonState(animated: true)
             BraveApp.getCurrentWebView()?.reload()
 

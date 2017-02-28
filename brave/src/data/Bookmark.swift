@@ -140,4 +140,24 @@ class Bookmark: NSManagedObject {
         }
         return false
     }
+
+    class func frecencyQuery(context: NSManagedObjectContext) -> [Bookmark] {
+        assert(!NSThread.isMainThread())
+
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.fetchLimit = 5
+        fetchRequest.entity = Bookmark.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "lastVisited > %@", History.ThisWeek)
+
+        do {
+            if let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [Bookmark]()
+    }
+
 }

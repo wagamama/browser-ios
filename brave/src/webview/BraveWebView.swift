@@ -364,8 +364,8 @@ class BraveWebView: UIWebView {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: internalProgressChangedNotification, object: internalWebView)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BraveWebView.internalProgressNotification(_:)), name: internalProgressChangedNotification, object: internalWebView)
 
-        if let url = request.URL, domain = url.normalizedHost() {
-            internalSetBraveShieldStateForDomain(domain)
+        if let url = request.URL {
+            internalSetBraveShieldStateForDomain(url.normalizedHost())
         }
         super.loadRequest(request)
     }
@@ -486,8 +486,8 @@ class BraveWebView: UIWebView {
         NSURLCache.sharedURLCache().diskCapacity = 0
         NSURLCache.sharedURLCache().memoryCapacity = 0
 
-        if let url = URL, domain = url.normalizedHost() {
-            internalSetBraveShieldStateForDomain(domain)
+        if let url = URL {
+            internalSetBraveShieldStateForDomain(url.normalizedHost())
             (getApp().browserViewController as! BraveBrowserViewController).updateBraveShieldButtonState(animated: false)
         }
         super.reload()
@@ -732,8 +732,8 @@ extension BraveWebView: UIWebViewDelegate {
             setUrl(url)
             //print("Page changed by shouldStartLoad: \(URL?.absoluteString ?? "")")
 
-            if let url = request.URL, domain = url.normalizedHost() {
-                internalSetBraveShieldStateForDomain(domain)
+            if let url = request.URL {
+                internalSetBraveShieldStateForDomain(url.normalizedHost())
             }
 
             shieldStatUpdate(.reset)
