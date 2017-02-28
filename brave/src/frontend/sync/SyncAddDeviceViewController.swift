@@ -27,6 +27,10 @@ class SyncAddDeviceViewController: UIViewController {
         
         containerView = UIView()
         containerView.backgroundColor = UIColor.whiteColor()
+        containerView.layer.shadowColor = UIColor(rgb: 0xC8C7CC).CGColor
+        containerView.layer.shadowRadius = 0
+        containerView.layer.shadowOpacity = 1.0
+        containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         view.addSubview(containerView)
         
         barcodeView = SyncBarcodeView()
@@ -52,6 +56,7 @@ class SyncAddDeviceViewController: UIViewController {
         descriptionLabel.textColor = UIColor(rgb: 0x696969)
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
+        descriptionLabel.textAlignment = .Center
         descriptionLabel.text = "Using a second device navigate to Brave Settings > Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available."
         view.addSubview(descriptionLabel)
         
@@ -62,6 +67,59 @@ class SyncAddDeviceViewController: UIViewController {
         doneButton.backgroundColor = BraveUX.DefaultBlue
         doneButton.layer.cornerRadius = 8
         view.addSubview(doneButton)
+        
+        edgesForExtendedLayout = .None
+        
+        containerView.snp_makeConstraints { (make) in
+            make.top.equalTo(self.view)
+            make.left.equalTo(self.view)
+            make.right.equalTo(self.view)
+            make.height.equalTo(295)
+        }
+        
+        modeControl.snp_makeConstraints { (make) in
+            make.top.equalTo(self.containerView.snp_top).offset(10)
+            make.left.equalTo(8)
+            make.right.equalTo(-8)
+        }
+        
+        barcodeView.snp_makeConstraints { (make) in
+            make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(44, 0, 0, 0))
+        }
+        
+        codewordsView.snp_makeConstraints { (make) in
+            make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(44, 0, 0, 0))
+        }
+        
+        titleLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.containerView.snp_bottom).offset(40)
+            make.centerX.equalTo(self.view)
+        }
+        
+        descriptionLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.titleLabel.snp_bottom).offset(7)
+            make.leftMargin.equalTo(30)
+            make.rightMargin.equalTo(-30)
+        }
+        
+        doneButton.snp_makeConstraints { (make) in
+            make.bottom.equalTo(self.view.snp_bottom).offset(-60)
+            make.leftMargin.equalTo(16)
+            make.rightMargin.equalTo(-16)
+            make.height.equalTo(50)
+        }
+    }
+    
+    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+        
+        if toInterfaceOrientation == .LandscapeLeft || toInterfaceOrientation == .LandscapeRight {
+            
+        }
+        else {
+            
+        }
+        
+        self.view.setNeedsUpdateConstraints()
     }
     
     override func viewWillAppear(animated: Bool) {
