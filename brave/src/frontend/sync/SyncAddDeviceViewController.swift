@@ -17,7 +17,7 @@ class SyncAddDeviceViewController: UIViewController {
     var modeControl: UISegmentedControl!
     var titleLabel: UILabel!
     var descriptionLabel: UILabel!
-    var doneButton: SyncButton!
+    var doneButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,8 +55,12 @@ class SyncAddDeviceViewController: UIViewController {
         descriptionLabel.text = "Using a second device navigate to Brave Settings > Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available."
         view.addSubview(descriptionLabel)
         
-        doneButton = SyncButton()
-        doneButton.titleLabel.text = "Done"
+        doneButton = UIButton()
+        doneButton.setTitle("Done", forState: .Normal)
+        doneButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
+        doneButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
+        doneButton.backgroundColor = BraveUX.DefaultBlue
+        doneButton.layer.cornerRadius = 8
         view.addSubview(doneButton)
     }
     
