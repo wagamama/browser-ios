@@ -9,7 +9,7 @@ class Domain: NSManagedObject {
     
     @NSManaged var url: String?
     @NSManaged var visits: Int32
-    @NSManaged var topsite: Bool
+    @NSManaged var topsite: Bool // not currently used. Should be used once proper frecency code is in.
     @NSManaged var blockedFromTopSites: Bool // don't show ever on top sites
     @NSManaged var favicon: FaviconMO?
 
