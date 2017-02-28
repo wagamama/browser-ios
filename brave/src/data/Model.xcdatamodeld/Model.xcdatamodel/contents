@@ -4,20 +4,20 @@
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="customTitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="isFolder" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="lastVisited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="lastVisited" optional="YES" attributeType="Date" usesScalarValueType="NO" indexed="YES" syncable="YES"/>
         <attribute name="markDirty" optional="YES" transient="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="syncUUID" optional="YES" attributeType="Transformable" indexed="YES" syncable="YES"/>
         <attribute name="tags" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
         <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Bookmark" inverseName="parentFolder" inverseEntity="Bookmark" syncable="YES"/>
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="bookmarks" inverseEntity="Domain" syncable="YES"/>
         <relationship name="parentFolder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="children" inverseEntity="Bookmark" syncable="YES"/>
     </entity>
     <entity name="Domain" representedClassName=".Domain" syncable="YES">
-        <attribute name="blockedFromTopSites" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="blockedFromTopSites" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
         <attribute name="shield_adblockAndTp" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="shield_allOff" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="shield_fpProtection" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
@@ -25,8 +25,8 @@
         <attribute name="shield_noScript" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="shield_safeBrowsing" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="topsite" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="visits" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
         <relationship name="bookmarks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Bookmark" inverseName="domain" inverseEntity="Bookmark" syncable="YES"/>
         <relationship name="favicon" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Favicon" inverseName="domain" inverseEntity="Favicon" syncable="YES"/>
         <relationship name="historyItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="History" inverseName="domain" inverseEntity="History" syncable="YES"/>
