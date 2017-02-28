@@ -32,7 +32,7 @@ class Domain: NSManagedObject {
     }
 
     class func getOrCreateForUrl(url: NSURL, context: NSManagedObjectContext) -> Domain? {
-        guard let domainUrl = url.normalizedHost() else { return nil }
+        let domainUrl = url.normalizedHost() 
 
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Domain.entity(context)
@@ -97,5 +97,86 @@ class Domain: NSManagedObject {
         return [Domain]()
     }
 
-    
+    class func setBraveShield(forDomain domainString: String, state: (BraveShieldState.Shield, Bool?), context: NSManagedObjectContext) {
+        guard let url = NSURL(string: domainString) else { return }
+        let domain = Domain.getOrCreateForUrl(url, context: context)
+        let shield = state.0
+        switch (shield) {
+            case .AllOff: domain?.shield_allOff = state.1
+            case .AdblockAndTp: domain?.shield_adblockAndTp = state.1
+            case .HTTPSE: domain?.shield_httpse = state.1
+            case .SafeBrowsing: domain?.shield_safeBrowsing = state.1
+            case .FpProtection: domain?.shield_fpProtection = state.1
+            case .NoScript: domain?.shield_noScript = state.1
+        }
+        DataController.saveContext(context)
+    }
+
+    class func loadShieldsIntoMemory(completionOnMain: ()->()) {
+        BraveShieldState.perNormalizedDomain.removeAll()
+
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            let fetchRequest = NSFetchRequest()
+            fetchRequest.entity = Domain.entity(context)
+            do {
+                let results = try context.executeFetchRequest(fetchRequest)
+                for obj in results {
+                    let domain = obj as! Domain
+                    guard let url = domain.url else { continue }
+
+                    print(url)
+                    if let shield = domain.shield_allOff {
+                        BraveShieldState.setInMemoryforDomain(url, setState: (.AllOff, shield.boolValue))
+                    }
+                    if let shield = domain.shield_adblockAndTp {
+                        BraveShieldState.setInMemoryforDomain(url, setState: (.AdblockAndTp, shield.boolValue))
+                    }
+                    if let shield = domain.shield_safeBrowsing {
+                        BraveShieldState.setInMemoryforDomain(url, setState: (.SafeBrowsing, shield.boolValue))
+                    }
+                    if let shield = domain.shield_httpse {
+                        BraveShieldState.setInMemoryforDomain(url, setState: (.HTTPSE, shield.boolValue))
+                    }
+                    if let shield = domain.shield_fpProtection {
+                        BraveShieldState.setInMemoryforDomain(url, setState: (.FpProtection, shield.boolValue))
+                    }
+                    if let shield = domain.shield_noScript {
+                        BraveShieldState.setInMemoryforDomain(url, setState: (.NoScript, shield.boolValue))
+                    }
+                }
+            } catch {
+                let fetchError = error as NSError
+                print(fetchError)
+            }
+
+            postAsyncToMain {
+                completionOnMain()
+            }
+        }
+    }
+
+    class func deleteNonBookmarked(completionOnMain: ()->()) {
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            let fetchRequest = NSFetchRequest()
+            fetchRequest.entity = Domain.entity(context)
+            fetchRequest.predicate = NSPredicate(format: "bookmarks.@count == 0")
+            do {
+                let results = try context.executeFetchRequest(fetchRequest)
+                for obj in results {
+                    // Cascading delete on favicon, it will also get deleted
+                    context.deleteObject(obj as! NSManagedObject)
+                }
+            } catch {
+                let fetchError = error as NSError
+                print(fetchError)
+            }
+
+            DataController.saveContext(context)
+            postAsyncToMain {
+                completionOnMain()
+            }
+        }
+    }
 }
