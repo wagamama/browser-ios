@@ -32,12 +32,12 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
         return UIImage(named: "defaultFavicon")!
     }()
 
-    class func getForURL(url: NSURL, profile: Profile) -> Deferred<Maybe<[Favicon]>> {
+    class func getForURL(url: NSURL) -> Deferred<Maybe<[Favicon]>> {
         let f = FaviconFetcher()
-        return f.loadFavicons(url, profile: profile)
+        return f.loadFavicons(url)
     }
 
-    private func loadFavicons(url: NSURL, profile: Profile, oldIcons: [Favicon] = [Favicon]()) -> Deferred<Maybe<[Favicon]>> {
+    private func loadFavicons(url: NSURL, oldIcons: [Favicon] = [Favicon]()) -> Deferred<Maybe<[Favicon]>> {
         if isIgnoredURL(url) {
             return deferMaybe(FaviconFetcherErrorType(description: "Not fetching ignored URL to find favicons."))
         }
@@ -50,7 +50,7 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
             self.parseHTMLForFavicons(url).bind({ (result: Maybe<[Favicon]>) -> Deferred<[Maybe<Favicon>]> in
                 var deferreds = [Deferred<Maybe<Favicon>>]()
                 if let icons = result.successValue {
-                    deferreds = icons.map { self.getFavicon(url, icon: $0, profile: profile) }
+                    deferreds = icons.map { self.getFavicon(url, icon: $0) }
                 }
                 return all(deferreds)
             }).bind({ (results: [Maybe<Favicon>]) -> Deferred<Maybe<[Favicon]>> in
@@ -170,11 +170,10 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
         })
     }
 
-    func getFavicon(siteUrl: NSURL, icon: Favicon, profile: Profile) -> Deferred<Maybe<Favicon>> {
+    func getFavicon(siteUrl: NSURL, icon: Favicon) -> Deferred<Maybe<Favicon>> {
         let deferred = Deferred<Maybe<Favicon>>()
         let url = icon.url
         let manager = SDWebImageManager.sharedManager()
-        let site = Site(url: siteUrl.absoluteString ?? "", title: "")
 
         var fav = Favicon(url: url, type: icon.type)
         if let url = url.asURL {
@@ -188,7 +187,7 @@ public class FaviconFetcher : NSObject, NSXMLParserDelegate {
                                             if let img = img where !PrivateBrowsing.singleton.isOn {
                                                 fav.width = Int(img.size.width)
                                                 fav.height = Int(img.size.height)
-                                                profile.favicons.addFavicon(fav, forSite: site)
+                                                FaviconMO.add(favicon: fav, forSiteUrl: siteUrl)
                                             } else {
                                                 fav.width = 0
                                                 fav.height = 0

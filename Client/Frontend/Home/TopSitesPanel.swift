@@ -34,7 +34,7 @@ class TopSitesPanel: UIViewController {
     private var collection: TopSitesCollectionView? = nil
     private var braveShieldStatsView: BraveShieldStatsView? = nil
     private lazy var dataSource: TopSitesDataSource = {
-        return TopSitesDataSource(profile: self.profile)
+        return TopSitesDataSource()
     }()
     private lazy var layout: TopSitesLayout = { return TopSitesLayout() }()
 
@@ -198,11 +198,10 @@ class TopSitesPanel: UIViewController {
     }
 
     //MARK: Private Helpers
-    private func updateDataSourceWithSites(result: Maybe<Cursor<Site>>) {
-        if let data = result.successValue {
-            self.dataSource.setHistorySites(data.asArray())
-            self.dataSource.profile = self.profile
+    private func updateDataSourceWithSites(result: [Site], completion: ()->()) {
+        self.dataSource.setHistorySites(result) {
             self.updateEmptyPanelState()
+            completion()
         }
     }
 
@@ -210,34 +209,53 @@ class TopSitesPanel: UIViewController {
         collection?.indexPathsForVisibleItems().forEach(updateRemoveButtonStateForIndexPath)
     }
 
-    private func deleteTileForSuggestedSite(site: SuggestedSite) -> Success {
-        var deletedSuggestedSites = profile.prefs.arrayForKey("topSites.deletedSuggestedSites") as! [String]
-        deletedSuggestedSites.append(site.url)
-        profile.prefs.setObject(deletedSuggestedSites, forKey: "topSites.deletedSuggestedSites")
-        return succeed()
+//    private func deleteTileForSuggestedSite(site: SuggestedSite) -> Success {
+//        var deletedSuggestedSites = profile.prefs.arrayForKey("topSites.deletedSuggestedSites") as! [String]
+//        deletedSuggestedSites.append(site.url)
+//        profile.prefs.setObject(deletedSuggestedSites, forKey: "topSites.deletedSuggestedSites")
+//        return succeed()
+//    }
+
+    private func topSitesQuery() -> Deferred<[Site]> {
+        let result = Deferred<[Site]>()
+
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            var sites = [Site]()
+
+            let domains = Domain.topSitesQuery(limit: 6, context: context)
+            for d in domains {
+                let s = Site(url: d.url ?? "", title: "")
+
+                if let url = d.favicon?.url {
+                    s.icon = Favicon(url: url, type: IconType.Guess)
+                }
+                sites.append(s)
+            }
+            
+            result.fill(sites)
+        }
+        return result
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
         collection?.userInteractionEnabled = false
 
-        if site is SuggestedSite {
-            deleteTileForSuggestedSite(site as! SuggestedSite)
-        }
-
-        succeed().upon() { _ in // move off main thread
-            getApp().profile?.history.removeSiteFromTopSites(site).uponQueue(dispatch_get_main_queue()) { result in
-                guard result.isSuccess else { return }
-
-                // Remove the site from the current data source. Don't requery yet
-                // since a Sync or location change may have changed the data under us.
+        guard let url = NSURL(string: site.url) else { return }
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            Domain.blockFromTopSites(url, context: context)
+            
+            postAsyncToMain {
                 self.dataSource.sites = self.dataSource.sites.filter { $0 !== site }
 
                 // Update the UICollectionView.
                 self.deleteOrUpdateSites(indexPath) >>> {
                     // Finally, requery to pull in the latest sites.
-                    self.profile.history.getTopSitesWithLimit(self.maxFrecencyLimit).uponQueue(dispatch_get_main_queue()) { result in
-                        self.updateDataSourceWithSites(result)
-                        self.collection?.userInteractionEnabled = true
+                    self.topSitesQuery().uponQueue(dispatch_get_main_queue()) { sites in
+                        self.updateDataSourceWithSites(sites) {
+                            self.collection?.userInteractionEnabled = true
+                        }
                     }
                 }
             }
@@ -275,11 +293,14 @@ class TopSitesPanel: UIViewController {
     }
 
     private func reloadTopSitesWithLimit(limit: Int) -> Success {
-        return self.profile.history.getTopSitesWithLimit(limit).bindQueue(dispatch_get_main_queue()) { result in
-            self.updateDataSourceWithSites(result)
-            self.collection?.reloadData()
-            return succeed()
+        let result = Success()
+        topSitesQuery().uponQueue(dispatch_get_main_queue()) { sites in
+            self.updateDataSourceWithSites(sites) {
+                self.collection?.reloadData()
+                result.fill(Maybe(success: ()))
+            }
         }
+        return result
     }
 
     private func deleteOrUpdateSites(indexPath: NSIndexPath) -> Success {
@@ -538,7 +559,6 @@ class TopSitesLayout: UICollectionViewLayout {
 }
 
 private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
-    var profile: Profile
     var editingThumbnails: Bool = false
     var suggestedSites = [SuggestedSite]()
     var sites = [Site]()
@@ -546,14 +566,6 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
 
     weak var collectionView: UICollectionView?
     private let BackgroundFadeInDuration: NSTimeInterval = 0.3
-
-    init(profile: Profile) {
-        self.profile = profile
-        if profile.prefs.arrayForKey("topSites.deletedSuggestedSites") == nil {
-            profile.prefs.setObject([], forKey: "topSites.deletedSuggestedSites")
-        }
-        super.init()
-    }
 
     @objc func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // If there aren't enough data items to fill the grid, look for items in suggested sites.
@@ -593,7 +605,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     private func downloadFaviconsAndUpdateForSite(site: Site) {
         guard let siteURL = site.url.asURL else { return }
 
-        FaviconFetcher.getForURL(siteURL, profile: profile).uponQueue(dispatch_get_main_queue()) { result in
+        FaviconFetcher.getForURL(siteURL).uponQueue(dispatch_get_main_queue()) { result in
             guard let favicons = result.successValue where favicons.count > 0,
                   let url = favicons.first?.url.asURL,
                   let indexOfSite = (self.sites.indexOf { $0 == site }) else {
@@ -613,7 +625,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         }
     }
 
-    private func configureCell(cell: ThumbnailCell, forSite site: Site, isEditing editing: Bool, profile: Profile) {
+    private func configureCell(cell: ThumbnailCell, forSite site: Site, isEditing editing: Bool) {
 
         // We always want to show the domain URL, not the title.
         //
@@ -691,11 +703,8 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         }
     }
 
-    private func setHistorySites(historySites: [Site]) {
-        // Sites are invalidated and we have a new data set, so do a replace.
-        if (sitesInvalidated) {
-            self.sites = []
-        }
+    private func setHistorySites(historySites: [Site], completion: ()->()) {
+        self.sites = []
 
         // We requery every time we do a deletion. If the query contains a top site that's
         // bubbled up that wasn't there previously (e.g., a page just finished loading
@@ -720,34 +729,35 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         }
 
         self.sites += historySites
-
-        // Since future updates to history sites will append to the previous result set,
-        // including suggested sites, we only need to do this once.
-        if sitesInvalidated {
-            sitesInvalidated = false
-            mergeSuggestedSites()
-        }
+        mergeBuiltInSuggestedSites { completion() }
     }
 
-    private func mergeSuggestedSites() {
+    private func mergeBuiltInSuggestedSites(completion: ()->()) {
         suggestedSites = SuggestedSites.asArray()
-        if let deleted = profile.prefs.arrayForKey("topSites.deletedSuggestedSites") as? [String] {
-            for url in deleted {
-                suggestedSites = suggestedSites.filter { extractDomainURL($0.url) != extractDomainURL(url) }
+        var blocked = [Domain]()
+
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            blocked = Domain.blockedTopSites(context)
+            postAsyncToMain {
+                for domain in blocked {
+                    self.suggestedSites = self.suggestedSites.filter { self.extractDomainURL($0.url) != self.extractDomainURL(domain.url!) }
+                }
+
+                self.sites = self.sites.map { site in
+                    let domainURL = self.extractDomainURL(site.url)
+                    if let index = (self.suggestedSites.indexOf { self.extractDomainURL($0.url) == domainURL }) {
+                        let suggestedSite = self.suggestedSites[index]
+                        self.suggestedSites.removeAtIndex(index)
+                        return suggestedSite
+                    }
+                    return site
+                }
+                
+                self.sites += self.suggestedSites as [Site]
+                completion()
             }
         }
-
-        sites = sites.map { site in
-            let domainURL = extractDomainURL(site.url)
-            if let index = (suggestedSites.indexOf { extractDomainURL($0.url) == domainURL }) {
-                let suggestedSite = suggestedSites[index]
-                suggestedSites.removeAtIndex(index)
-                return suggestedSite
-            }
-            return site
-        }
-
-        sites += suggestedSites as [Site]
     }
 
     subscript(index: Int) -> Site? {
@@ -776,7 +786,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         if let site = site as? SuggestedSite {
             configureCell(cell, forSuggestedSite: site)
         } else {
-            configureCell(cell, forSite: site, isEditing: editingThumbnails, profile: profile)
+            configureCell(cell, forSite: site, isEditing: editingThumbnails)
         }
 
         cell.updateLayoutForCollectionViewSize(collectionView.bounds.size, traitCollection: collectionView.traitCollection, forSuggestedSite: false)
