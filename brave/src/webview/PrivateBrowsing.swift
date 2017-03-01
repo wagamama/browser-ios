@@ -185,7 +185,7 @@ class PrivateBrowsing {
             // clears PB in-memory-only shield data, loads from disk
             Domain.loadShieldsIntoMemory {
                 let clear: [Clearable] = [CookiesClearable()]
-    ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(dispatch_get_main_queue()) { _ in
+                ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(dispatch_get_main_queue()) { _ in
                     self.cookiesFileDiskOperation(.DeletePublicBackup)
                     let storage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
                     for cookie in self.nonprivateCookies {
@@ -199,7 +199,7 @@ class PrivateBrowsing {
                     ReentrantGuard.inFunc = false
                 }
             }
-       }
+        }
     }
 
     @objc func cookiesChanged(info: NSNotification) {

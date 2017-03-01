@@ -20,10 +20,13 @@ class SyncPairCameraViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = Strings.Sync
+        title = Strings.Pair
         view.backgroundColor = SyncBackgroundColor
         
         cameraView = SyncCameraView()
+        cameraView.backgroundColor = UIColor.blackColor()
+        cameraView.layer.cornerRadius = 4
+        cameraView.layer.masksToBounds = true
         view.addSubview(cameraView)
         
         titleLabel = UILabel()
@@ -37,6 +40,7 @@ class SyncPairCameraViewController: UIViewController {
         descriptionLabel.textColor = UIColor(rgb: 0x696969)
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
+        descriptionLabel.textAlignment = .Center
         descriptionLabel.text = "Using existing synced device open Brave Settings and navigate to “Devices & Settings”, tap ‘+’ to add a new device and reveal sync code."
         view.addSubview(descriptionLabel)
         
@@ -46,13 +50,46 @@ class SyncPairCameraViewController: UIViewController {
         cameraAccessButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         cameraAccessButton.backgroundColor = BraveUX.DefaultBlue
         cameraAccessButton.layer.cornerRadius = 8
+        cameraAccessButton.addTarget(self, action: #selector(SEL_cameraAccess), forControlEvents: .TouchUpInside)
         view.addSubview(cameraAccessButton)
         
         enterWordsButton = UIButton()
         enterWordsButton.setTitle("Enter code words", forState: .Normal)
-        enterWordsButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightBold)
+        enterWordsButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         enterWordsButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
+        enterWordsButton.addTarget(self, action: #selector(SEL_enterWords), forControlEvents: .TouchUpInside)
         view.addSubview(enterWordsButton)
+        
+        edgesForExtendedLayout = .None
+        
+        cameraView.snp_makeConstraints { (make) in
+            make.top.equalTo(self.view).offset(24)
+            make.size.equalTo(300)
+            make.centerX.equalTo(self.view)
+        }
+        
+        titleLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.cameraView.snp_bottom).offset(40)
+            make.centerX.equalTo(self.view)
+        }
+        
+        descriptionLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.titleLabel.snp_bottom).offset(7)
+            make.leftMargin.equalTo(30)
+            make.rightMargin.equalTo(-30)
+        }
+        
+        cameraAccessButton.snp_makeConstraints { (make) in
+            make.bottom.equalTo(self.view.snp_bottom).offset(-60)
+            make.leftMargin.equalTo(16)
+            make.rightMargin.equalTo(-16)
+            make.height.equalTo(50)
+        }
+        
+        enterWordsButton.snp_makeConstraints { (make) in
+            make.top.equalTo(self.cameraAccessButton.snp_bottom).offset(8)
+            make.centerX.equalTo(self.view)
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -65,5 +102,13 @@ class SyncPairCameraViewController: UIViewController {
         
     }
     
+    func SEL_cameraAccess() {
+        
+    }
+    
+    func SEL_enterWords() {
+        let view = SyncPairWordsViewController()
+        navigationController?.pushViewController(view, animated: true)
+    }
 }
 

@@ -55,16 +55,20 @@ class SyncWelcomeViewController: UIViewController {
         newToSyncButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         newToSyncButton.backgroundColor = BraveUX.DefaultBlue
         newToSyncButton.layer.cornerRadius = 8
+        newToSyncButton.addTarget(self, action: #selector(SEL_newToSync), forControlEvents: .TouchUpInside)
         view.addSubview(newToSyncButton)
         
         existingUserButton = UIButton()
         existingUserButton.setTitle("I have an existing sync code", forState: .Normal)
-        existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightBold)
+        existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         existingUserButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
+        existingUserButton.addTarget(self, action: #selector(SEL_existingUser), forControlEvents: .TouchUpInside)
         view.addSubview(existingUserButton)
         
+        edgesForExtendedLayout = .None
+        
         bg.snp_makeConstraints { (make) in
-            make.top.equalTo(self.view).offset(CGRectGetMaxY(self.navigationController?.navigationBar.frame ?? CGRectZero))
+            make.top.equalTo(self.view)
             make.left.equalTo(self.view)
             make.right.equalTo(self.view)
         }
@@ -92,19 +96,57 @@ class SyncWelcomeViewController: UIViewController {
         }
         
         existingUserButton.snp_makeConstraints { (make) in
-            make.top.equalTo(self.newToSyncButton.snp_bottom).offset(14)
+            make.top.equalTo(self.newToSyncButton.snp_bottom).offset(8)
             make.centerX.equalTo(self.view)
         }
     }
     
+    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+        
+        if toInterfaceOrientation == .LandscapeLeft || toInterfaceOrientation == .LandscapeRight {
+            graphic.snp_remakeConstraints(closure: { (make) in
+                make.top.equalTo(-300)
+                make.centerX.equalTo(self.view)
+            })
+            
+            titleLabel.snp_remakeConstraints(closure: { (make) in
+                make.centerY.equalTo(self.view).offset(-60)
+                make.centerX.equalTo(self.view)
+            })
+        }
+        else {
+            graphic.snp_remakeConstraints(closure: { (make) in
+                make.edges.equalTo(self.bg).inset(UIEdgeInsetsMake(0, 19, 0, 0))
+            })
+            
+            titleLabel.snp_remakeConstraints(closure: { (make) in
+                make.top.equalTo(self.bg.snp_bottom).offset(40)
+                make.centerX.equalTo(self.view)
+            })
+        }
+        
+        self.view.setNeedsUpdateConstraints()
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
         
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
+    }
+    
+    func SEL_newToSync() {
+        let view = SyncAddDeviceViewController()
+        navigationController?.pushViewController(view, animated: true)
+    }
+    
+    func SEL_existingUser() {
+        let view = SyncPairCameraViewController()
+        navigationController?.pushViewController(view, animated: true)
     }
     
 }

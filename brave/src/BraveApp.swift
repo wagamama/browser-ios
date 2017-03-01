@@ -87,6 +87,8 @@ class BraveApp {
 //            bookmark.url = "https://brave.com/"
 //            bookmark.lastVisited = NSDate()
       //  }
+        
+        UINavigationBar.appearance().tintColor = BraveUX.DefaultBlue
     }
 
     // Be aware: the Prefs object has not been created yet
