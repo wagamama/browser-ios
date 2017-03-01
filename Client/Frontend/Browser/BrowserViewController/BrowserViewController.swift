@@ -477,8 +477,18 @@ class BrowserViewController: UIViewController {
     }
 
     private func shouldRestoreTabs() -> Bool {
-        guard let tabsToRestore = TabManager.tabsToRestore() else { return false }
-        let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 || !AboutUtils.isAboutHomeURL($0.sessionData?.urls.first) }
+        let tabsToRestore = TabManager.tabsToRestore()
+        let onlyNoHistoryTabs = !tabsToRestore.every {
+            if let history = $0.urlHistorySnapshot as? [String] {
+                if history.count > 1 {
+                    return false
+                }
+                if let first = history.first {
+                    return first.contains(WebServer.sharedInstance.base)
+                }
+            }
+            return true
+        }
         return !onlyNoHistoryTabs && !DebugSettingsBundleOptions.skipSessionRestore
     }
 
