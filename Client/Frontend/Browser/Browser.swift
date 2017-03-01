@@ -262,7 +262,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
                 prev = curr
                 updatedURLs.append(updatedURL!)
             }
-            let currentPage = sessionData.page
+            let currentPage = sessionData.historyIndex
             self.sessionData = nil
             var jsonDict = [String: AnyObject]()
             jsonDict["history"] = updatedURLs
