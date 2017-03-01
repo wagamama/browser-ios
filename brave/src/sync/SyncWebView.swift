@@ -70,9 +70,27 @@ class SyncWebView: UIViewController {
             userController.addScriptMessageHandler(self, name: "syncToIOS_send")
 
             // ios-sync must be called before bundle, since it auto-runs
-            ["fetch", "ios-sync", "bundle"].forEach() {
+            ["fetch", "ios-sync", "bundle", "niceware"].forEach() {
                 userController.addUserScript(WKUserScript(source: getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
             }
+            
+            // Test example of niceware running
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64(3.0) * Int64(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+                
+                
+                let input = "new Uint8Array([73, 206, 112, 84, 16, 109, 201, 101, 153, 50, 112, 98, 52, 236, 203, 60, 125, 53, 53, 220, 146, 159, 46, 244, 108, 121, 60, 5, 128, 71, 3, 56])"
+                let jsToExecute = "niceware.bytesToPassphrase(\(input));"
+                
+                
+                self.webView.evaluateJavaScript(jsToExecute,
+                    completionHandler: { (result, error) in
+                        
+//                        print(result)
+//                        if error != nil {
+//                            print(error)
+//                        }
+                })
+            });
 
             webCfg.userContentController = userController
             return webCfg
@@ -80,6 +98,7 @@ class SyncWebView: UIViewController {
     }
 
     func getScript(name:String) -> String {
+        // TODO: Add unwrapping warnings
         let filePath = NSBundle.mainBundle().pathForResource(name, ofType:"js")
         return try! String(contentsOfFile: filePath!, encoding: NSUTF8StringEncoding)
     }
@@ -253,7 +272,7 @@ extension SyncWebView: WKScriptMessageHandler {
         case "get-existing-objects":
             getExistingObjects(data)
         case "sync-debug":
-            print("Sync Debug: \(data)")
+            print("---- Sync Debug: \(data)")
         case "sync-ready":
             isSyncFullyInitialized.syncReady = true
         case "fetch-sync-records":
