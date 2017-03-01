@@ -30,38 +30,26 @@ enum SyncActions: Int {
 
 }
 
-class SyncWebView: UIViewController {
-    static let singleton = SyncWebView()
+class Sync: NSObject {
+    static let singleton = Sync()
 
-    var webView: WKWebView!
+    private var webView: WKWebView!
 
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
 
-    let prefNameId = "device-id-js-array"
-    let prefNameSeed = "seed-js-array"
+    private let prefNameId = "device-id-js-array"
+    private let prefNameSeed = "seed-js-array"
     #if DEBUG
-    let isDebug = true
-    let serverUrl = "https://sync-staging.brave.com"
+    private let isDebug = true
+    private let serverUrl = "https://sync-staging.brave.com"
     #else
-    let isDebug = false
-    let serverUrl = "https://sync.brave.com"
+    private let isDebug = false
+    private let serverUrl = "https://sync.brave.com"
     #endif
 
-    let apiVersion = 0
+    private let apiVersion = 0
 
-    private init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    private override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-
-    internal required init?(coder aDecoder: NSCoder) {
-        fatalError("not implemented")
-    }
-
-    var webConfig:WKWebViewConfiguration {
+    private var webConfig:WKWebViewConfiguration {
         get {
             let webCfg = WKWebViewConfiguration()
             let userController = WKUserContentController()
@@ -85,10 +73,10 @@ class SyncWebView: UIViewController {
                 self.webView.evaluateJavaScript(jsToExecute,
                     completionHandler: { (result, error) in
                         
-//                        print(result)
-//                        if error != nil {
-//                            print(error)
-//                        }
+                        print(result)
+                        if error != nil {
+                            print(error)
+                        }
                 })
             });
 
@@ -97,31 +85,17 @@ class SyncWebView: UIViewController {
         }
     }
 
-    func getScript(name:String) -> String {
+    private func getScript(name:String) -> String {
         // TODO: Add unwrapping warnings
         let filePath = NSBundle.mainBundle().pathForResource(name, ofType:"js")
         return try! String(contentsOfFile: filePath!, encoding: NSUTF8StringEncoding)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.frame = CGRectMake(20, 20, 200, 100)
-        webView = WKWebView(frame: view.bounds, configuration: webConfig)
-        view.addSubview(webView)
-        view.userInteractionEnabled = false
-        view.alpha = 1.0
-    }
-
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
-    }
-
-    func webView(webView: WKWebView, didFinish navigation: WKNavigation!) {
+    private func webView(webView: WKWebView, didFinish navigation: WKNavigation!) {
         print(#function)
     }
 
-    var syncDeviceId: String {
+    private var syncDeviceId: String {
         get {
             let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameId)
             return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
@@ -132,7 +106,7 @@ class SyncWebView: UIViewController {
     }
 
     // TODO: Move to keychain
-    var syncSeed: String {
+    private var syncSeed: String {
         get {
             let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
             return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
@@ -142,7 +116,7 @@ class SyncWebView: UIViewController {
         }
     }
 
-    func checkIsSyncReady() -> Bool {
+    private func checkIsSyncReady() -> Bool {
         struct Static {
             static var isReady = false
         }
@@ -161,7 +135,7 @@ class SyncWebView: UIViewController {
  }
 
 // MARK: Native-initiated Message category
-extension SyncWebView {
+extension Sync {
     func sendSyncRecords(recordType: [SyncRecordType], recordJson: String) {
         /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
          @param {string} categoryName, @param {Array.<Object>} records */
@@ -217,7 +191,7 @@ extension SyncWebView {
 }
 
 // MARK: Server To Native Message category
-extension SyncWebView  {
+extension Sync {
 
     func getExistingObjects(data: [String: AnyObject]) {
         guard let typeName = data["arg1"] as? String,
@@ -253,7 +227,7 @@ extension SyncWebView  {
 
 }
 
-extension SyncWebView: WKScriptMessageHandler {
+extension Sync: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
         guard let data = message.body as? [String: AnyObject], let messageName = data["message"] as? String else {

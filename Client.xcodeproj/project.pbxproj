@@ -501,7 +501,7 @@
 		EBACC8551DF9BB3500D5E048 /* SettingsViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */; };
 		EBB345801DAD465C00EE24F0 /* SQLite.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7B9A62DB1C4002B1005C83DC /* SQLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EBD312D01E4967FE0077934D /* SyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD312CF1E4967FE0077934D /* SyncTest.swift */; };
-		EBDB7D471E14231900D744C7 /* SyncWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDB7D461E14231900D744C7 /* SyncWebView.swift */; };
+		EBDB7D471E14231900D744C7 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDB7D461E14231900D744C7 /* Sync.swift */; };
 		EBDB7D501E1432E800D744C7 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D4E1E1432E800D744C7 /* bundle.js */; };
 		EBDB7D551E14331900D744C7 /* fetch.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D531E14331900D744C7 /* fetch.js */; };
 		EBDB7D571E14337800D744C7 /* ios-sync.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D561E14337800D744C7 /* ios-sync.js */; };
@@ -1349,7 +1349,7 @@
 		EBA6F13F1E39410E00F7B3D9 /* upload-to-app-store.applescript */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.applescript; name = "upload-to-app-store.applescript"; path = "brave/build-system/upload-to-app-store.applescript"; sourceTree = "<group>"; };
 		EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewTest.swift; sourceTree = "<group>"; };
 		EBD312CF1E4967FE0077934D /* SyncTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncTest.swift; sourceTree = "<group>"; };
-		EBDB7D461E14231900D744C7 /* SyncWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncWebView.swift; sourceTree = "<group>"; };
+		EBDB7D461E14231900D744C7 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 		EBDB7D4E1E1432E800D744C7 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bundle.js; sourceTree = "<group>"; };
 		EBDB7D531E14331900D744C7 /* fetch.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = fetch.js; sourceTree = "<group>"; };
 		EBDB7D561E14337800D744C7 /* ios-sync.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "ios-sync.js"; sourceTree = "<group>"; };
@@ -2839,7 +2839,7 @@
 				5D2B07EA1E6733B900244C39 /* niceware.js */,
 				EBDB7D511E14331900D744C7 /* polyfill */,
 				EBDB7D4C1E1432E800D744C7 /* bundles */,
-				EBDB7D461E14231900D744C7 /* SyncWebView.swift */,
+				EBDB7D461E14231900D744C7 /* Sync.swift */,
 			);
 			name = sync;
 			path = brave/src/sync;
@@ -4036,7 +4036,7 @@
 				DD024D7E481298ACAB9EF286 /* ErrorPageHelper.swift in Sources */,
 				EB00A3081E1BF4CC00680DB8 /* hashFn.cpp in Sources */,
 				91B903FBE39F640B651928D0 /* FaviconManager.swift in Sources */,
-				EBDB7D471E14231900D744C7 /* SyncWebView.swift in Sources */,
+				EBDB7D471E14231900D744C7 /* Sync.swift in Sources */,
 				B12303762D2ADF302DF8F575 /* FindInPageBar.swift in Sources */,
 				57A89B3DB802440164DBCA3E /* FindInPageHelper.swift in Sources */,
 				BAE512B7D2251A8207EBA7D4 /* LoginsHelper.swift in Sources */,
