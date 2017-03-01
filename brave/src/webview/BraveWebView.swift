@@ -347,10 +347,6 @@ class BraveWebView: UIWebView {
 
     var blankTargetUrl: String?
 
-    func urlBlankTargetTapped(url: String) {
-        blankTargetUrl = url
-    }
-
     let internalProgressStartedNotification = "WebProgressStartedNotification"
     let internalProgressChangedNotification = "WebProgressEstimateChangedNotification"
     let internalProgressFinishedNotification = "WebProgressFinishedNotification" // Not usable

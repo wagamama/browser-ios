@@ -1,6 +1,8 @@
 import Foundation
 
+
 class ElementAtPoint {
+    typealias ElementHitInfo = (url:String?, image:String?, urlTarget:String?)
 
     static var javascript:String = {
         let path = NSBundle.mainBundle().pathForResource("ElementAtPoint", ofType: "js")!
@@ -25,7 +27,7 @@ class ElementAtPoint {
         }
     }
 
-    func getHit(tapLocation: CGPoint) -> (url:String?, image:String?, urlTarget:String?)? {
+    func getHit(tapLocation: CGPoint) -> ElementHitInfo? {
         guard let webView = BraveApp.getCurrentWebView() else { return nil }
         var pt = webView.convertPoint(tapLocation, fromView: nil)
 
