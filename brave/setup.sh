@@ -45,3 +45,6 @@ node -e "require('./node_modules/ad-block/lib/regions.js').forEach((x) =>{ if (x
 ## setup sync
 (cd ../Carthage/Checkouts/sync && brew install yarn; yarn install && yarn run build)
 
+# setup niceware
+(cd ../Carthage/Checkouts/niceware && brew install yarn; yarn install && yarn run build)
+
