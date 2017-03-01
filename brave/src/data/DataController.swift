@@ -20,15 +20,15 @@ class DataController: NSObject {
 
     static var moc: NSManagedObjectContext {
         get {
-            if DataController.shared.mainThreadMOC == nil {
+            guard let moc = DataController.shared.mainThreadMOC else {
                 fatalError("DataController: Access to .moc contained nil value. A db connection has not yet been instantiated.")
             }
 
-            if NSThread.isMainThread() {
-                return DataController.shared.mainThreadMOC!
-            } else {
-                assert(false)
+            if !NSThread.isMainThread() {
+                fatalError("DataController: Access to .moc must be on main thread.")
             }
+            
+            return moc
         }
     }
     
