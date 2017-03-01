@@ -193,7 +193,7 @@ class BraveApp {
     // Firefox logic, this is the simplest solution.
     class func shouldRestoreTabs() -> Bool {
         let ok = BraveApp.isSafeToRestoreTabs
-        BraveApp.isSafeToRestoreTabs = true
+        BraveApp.isSafeToRestoreTabs = false
         return ok
     }
 
