@@ -35,21 +35,11 @@ extension TabManager {
 
         let context = DataController.shared.workerContext()
         context.performBlock {
-            var savedTabs = [String: TabMO]()
-            TabMO.getAll(context).forEach { savedTabs[$0.url ?? ""] = $0 }
+            TabMO.getAll(context).forEach { context.deleteObject($0) }
             for t in _tabs {
-                var mo = savedTabs[t.url]
-                if mo == nil {
-                    mo = TabMO.add(t, context: context)
-                } else {
-                    savedTabs[t.url] = nil
-                }
+                TabMO.add(t, context: context)
             }
-
-            savedTabs.values.forEach {
-                context.deleteObject($0)
-            }
-
+            
             DataController.saveContext(context)
         }
     }
@@ -80,10 +70,6 @@ extension TabManager {
 
         if let tab = tabToSelect {
             selectTab(tab)
-        }
-
-        if selectedTab == nil {
-            addTabAndSelect()
         }
     }
 }
