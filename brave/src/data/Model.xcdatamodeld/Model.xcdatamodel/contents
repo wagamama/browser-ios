@@ -47,19 +47,20 @@
         <attribute name="visitedOn" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="domain" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Domain" inverseName="historyItems" inverseEntity="Domain" syncable="YES"/>
     </entity>
-    <entity name="Tab" representedClassName=".Tab" syncable="YES">
-        <attribute name="closedOn" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="historySnapshot" optional="YES" attributeType="String" syncable="YES"/>
+    <entity name="TabMO" representedClassName=".TabMO" syncable="YES">
+        <attribute name="isSelected" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="privacy" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="screenshot" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="urlHistoryCurrentIndex" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="urlHistorySnapshot" optional="YES" attributeType="Transformable" syncable="YES"/>
     </entity>
     <elements>
         <element name="Bookmark" positionX="45" positionY="-433" width="128" height="255"/>
         <element name="Domain" positionX="234" positionY="-324" width="128" height="240"/>
         <element name="Favicon" positionX="412" positionY="-399" width="128" height="120"/>
         <element name="History" positionX="441" positionY="-157" width="128" height="150"/>
-        <element name="Tab" positionX="45" positionY="-171" width="128" height="135"/>
+        <element name="TabMO" positionX="45" positionY="-171" width="128" height="150"/>
     </elements>
 </model>

@@ -428,16 +428,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
 
-            if DebugSettingsBundleOptions.attachTabStateToDebugEmail {
-                if let tabStateDebugData = TabManager.tabRestorationDebugInfo().dataUsingEncoding(NSUTF8StringEncoding) {
-                    mailComposeViewController.addAttachmentData(tabStateDebugData, mimeType: "text/plain", fileName: "tabState.txt")
-                }
-
-                if let tabStateData = TabManager.tabArchiveData() {
-                    mailComposeViewController.addAttachmentData(tabStateData, mimeType: "application/octet-stream", fileName: "tabsState.archive")
-                }
-            }
-
             self.window?.rootViewController?.presentViewController(mailComposeViewController, animated: true, completion: nil)
         }
     }
