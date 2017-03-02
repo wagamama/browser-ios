@@ -115,7 +115,7 @@ class SyncAddDeviceViewController: UIViewController {
     
     override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         
-        if toInterfaceOrientation == .LandscapeLeft || toInterfaceOrientation == .LandscapeRight {
+        if toInterfaceOrientation.isLandscape {
             
         }
         else {

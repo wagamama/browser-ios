@@ -103,7 +103,7 @@ class SyncWelcomeViewController: UIViewController {
     
     override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         
-        if toInterfaceOrientation == .LandscapeLeft || toInterfaceOrientation == .LandscapeRight {
+        if toInterfaceOrientation.isLandscape {
             graphic.snp_remakeConstraints(closure: { (make) in
                 make.top.equalTo(-300)
                 make.centerX.equalTo(self.view)
@@ -126,17 +126,6 @@ class SyncWelcomeViewController: UIViewController {
         }
         
         self.view.setNeedsUpdateConstraints()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        
-    }
-    
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        
     }
     
     func SEL_newToSync() {
