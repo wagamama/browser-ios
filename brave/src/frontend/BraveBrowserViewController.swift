@@ -45,6 +45,10 @@ class BraveBrowserViewController : BrowserViewController {
         setupConstraints()
         if BraveApp.shouldRestoreTabs() {
             tabManager.restoreTabs()
+
+            if tabManager.tabCount < 1 {
+                tabManager.addTabAndSelect()
+            }
         } else {
             tabManager.addTabAndSelect()
         }
