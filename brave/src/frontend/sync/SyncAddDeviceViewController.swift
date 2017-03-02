@@ -33,7 +33,7 @@ class SyncAddDeviceViewController: UIViewController {
         containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         view.addSubview(containerView)
         
-        barcodeView = SyncBarcodeView()
+        barcodeView = SyncBarcodeView(data: "Hello world program created by someone")
         containerView.addSubview(barcodeView)
         
         codewordsView = SyncCodewordsView()
@@ -84,7 +84,9 @@ class SyncAddDeviceViewController: UIViewController {
         }
         
         barcodeView.snp_makeConstraints { (make) in
-            make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(44, 0, 0, 0))
+            make.top.equalTo(65)
+            make.centerX.equalTo(self.containerView)
+            make.size.equalTo(BarcodeSize)
         }
         
         codewordsView.snp_makeConstraints { (make) in
