@@ -166,8 +166,31 @@ class SyncDevicesSetting: Setting {
     }
     
     override func onClick(navigationController: UINavigationController?) {
-        let viewController = SyncWelcomeViewController()
-        navigationController?.pushViewController(viewController, animated: true)
+//        let viewController = SyncWelcomeViewController()
+//        navigationController?.pushViewController(viewController, animated: true)
+        let settingsTableViewController = SyncSettingsViewController(style: .Grouped)
+        settingsTableViewController.profile = getApp().profile
+        navigationController?.pushViewController(settingsTableViewController, animated: true)
+    }
+}
+
+class RemoveDeviceSetting: Setting {
+    let profile: Profile
+    
+    override var accessoryType: UITableViewCellAccessoryType { return .None }
+    
+    override var accessibilityIdentifier: String? { return "RemoveDeviceSetting" }
+    
+    override var textAlignment: NSTextAlignment { return .Center }
+    
+    init(settings: SettingsTableViewController) {
+        self.profile = settings.profile
+        let clearTitle = Strings.SyncRemoveThisDevice
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIColor.redColor(), NSFontAttributeName: UIFont.systemFontOfSize(17, weight: UIFontWeightRegular)]))
+    }
+    
+    override func onClick(navigationController: UINavigationController?) {
+        // TODO: Remove device from Sync.
     }
 }
 
