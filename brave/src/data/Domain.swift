@@ -31,21 +31,26 @@ class Domain: NSManagedObject {
         super.awakeFromInsert()
     }
 
-    class func getOrCreateForUrl(url: NSURL, context: NSManagedObjectContext) -> Domain? {
-        let domainUrl = url.normalizedHost() 
+    // Always use this function to save or lookup domains in the table
+    class func domainAndScheme(fromUrl url: NSURL) -> String {
+        let domainUrl = (url.scheme ?? "http") + "://" + url.normalizedHost()
+        return domainUrl
+    }
 
+    class func getOrCreateForUrl(url: NSURL, context: NSManagedObjectContext) -> Domain? {
+        let domainString = Domain.domainAndScheme(fromUrl: url)
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Domain.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "url == %@", domainUrl)
+        fetchRequest.predicate = NSPredicate(format: "url == %@", domainString)
         var result: Domain? = nil
         do {
             let results = try context.executeFetchRequest(fetchRequest) as? [Domain]
             if let item = results?.first {
                 result = item
             } else {
-                print("👽 Creating Domain \(domainUrl)")
+                print("👽 Creating Domain \(domainString)")
                 result = Domain(entity: Domain.entity(context), insertIntoManagedObjectContext: context)
-                result?.url = domainUrl
+                result?.url = domainString
             }
         } catch {
             let fetchError = error as NSError
