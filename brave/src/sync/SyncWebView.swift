@@ -1,5 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 import UIKit
 import WebKit
 
@@ -9,7 +7,7 @@ import WebKit
  HISTORY_SITES: '1',
  PREFERENCES: '2'
  }
-
+ 
  module.exports.actions = {
  CREATE: 0,
  UPDATE: 1,
@@ -29,73 +27,101 @@ enum SyncActions: Int {
     case create = 0
     case update = 1
     case delete = 2
-
+    
 }
 
-class Sync: NSObject {
-    static let singleton = Sync()
-
-    private var webView: WKWebView!
-
+class SyncWebView: UIViewController {
+    static let singleton = SyncWebView()
+    
+    var webView: WKWebView!
+    
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
-
-    private let prefNameId = "device-id-js-array"
-    private let prefNameSeed = "seed-js-array"
+    
+    let prefNameId = "device-id-js-array"
+    let prefNameSeed = "seed-js-array"
     #if DEBUG
-    private let isDebug = true
-    private let serverUrl = "https://sync-staging.brave.com"
+    let isDebug = true
+    let serverUrl = "https://sync-staging.brave.com"
     #else
-    private let isDebug = false
-    private let serverUrl = "https://sync.brave.com"
+    let isDebug = false
+    let serverUrl = "https://sync.brave.com"
     #endif
-
-    private let apiVersion = 0
-
-    private var webConfig:WKWebViewConfiguration {
-        let webCfg = WKWebViewConfiguration()
-        let userController = WKUserContentController()
-
-        userController.addScriptMessageHandler(self, name: "syncToIOS_on")
-        userController.addScriptMessageHandler(self, name: "syncToIOS_send")
-
-        // ios-sync must be called before bundle, since it auto-runs
-        ["fetch", "ios-sync", "bundle", "niceware"].forEach() {
-            userController.addUserScript(WKUserScript(source: getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
-        }
-        
-        // Test example of niceware running
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64(3.0) * Int64(NSEC_PER_SEC))), dispatch_get_main_queue(), {
-            
-            
-            let input = "new Uint8Array([73, 206, 112, 84, 16, 109, 201, 101, 153, 50, 112, 98, 52, 236, 203, 60, 125, 53, 53, 220, 146, 159, 46, 244, 108, 121, 60, 5, 128, 71, 3, 56])"
-            let jsToExecute = "niceware.bytesToPassphrase(\(input));"
-            
-            
-            self.webView.evaluateJavaScript(jsToExecute,
-                completionHandler: { (result, error) in
-                    
-                    print(result)
-                    if error != nil {
-                        print(error)
-                    }
-            })
-        });
-
-        webCfg.userContentController = userController
-        return webCfg
+    
+    let apiVersion = 0
+    
+    private init() {
+        super.init(nibName: nil, bundle: nil)
     }
-
-    private func getScript(name:String) -> String {
+    
+    private override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
+    internal required init?(coder aDecoder: NSCoder) {
+        fatalError("not implemented")
+    }
+    
+    var webConfig:WKWebViewConfiguration {
+        get {
+            let webCfg = WKWebViewConfiguration()
+            let userController = WKUserContentController()
+            
+            userController.addScriptMessageHandler(self, name: "syncToIOS_on")
+            userController.addScriptMessageHandler(self, name: "syncToIOS_send")
+            
+            // ios-sync must be called before bundle, since it auto-runs
+            ["fetch", "ios-sync", "bundle", "niceware"].forEach() {
+                userController.addUserScript(WKUserScript(source: getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
+            }
+            
+            // Test example of niceware running
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64(3.0) * Int64(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+                
+                
+                let input = "new Uint8Array([73, 206, 112, 84, 16, 109, 201, 101, 153, 50, 112, 98, 52, 236, 203, 60, 125, 53, 53, 220, 146, 159, 46, 244, 108, 121, 60, 5, 128, 71, 3, 56])"
+                let jsToExecute = "niceware.bytesToPassphrase(\(input));"
+                
+                
+                self.webView.evaluateJavaScript(jsToExecute,
+                    completionHandler: { (result, error) in
+                        
+                        //                        print(result)
+                        //                        if error != nil {
+                        //                            print(error)
+                        //                        }
+                })
+            });
+            
+            webCfg.userContentController = userController
+            return webCfg
+        }
+    }
+    
+    func getScript(name:String) -> String {
         // TODO: Add unwrapping warnings
         let filePath = NSBundle.mainBundle().pathForResource(name, ofType:"js")
         return try! String(contentsOfFile: filePath!, encoding: NSUTF8StringEncoding)
     }
-
-    private func webView(webView: WKWebView, didFinish navigation: WKNavigation!) {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.frame = CGRectMake(20, 20, 200, 100)
+        webView = WKWebView(frame: view.bounds, configuration: webConfig)
+        view.addSubview(webView)
+        view.userInteractionEnabled = false
+        view.alpha = 1.0
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+    }
+    
+    func webView(webView: WKWebView, didFinish navigation: WKNavigation!) {
         print(#function)
     }
-
-    private var syncDeviceId: String {
+    
+    var syncDeviceId: String {
         get {
             let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameId)
             return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
@@ -104,9 +130,9 @@ class Sync: NSObject {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameId)
         }
     }
-
+    
     // TODO: Move to keychain
-    private var syncSeed: String {
+    var syncSeed: String {
         get {
             let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
             return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
@@ -115,15 +141,15 @@ class Sync: NSObject {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
         }
     }
-
-    private func checkIsSyncReady() -> Bool {
+    
+    func checkIsSyncReady() -> Bool {
         struct Static {
             static var isReady = false
         }
         if Static.isReady {
             return true
         }
-
+        
         let mirror = Mirror(reflecting: isSyncFullyInitialized)
         let ready = mirror.children.reduce(true) { $0 && $1.1 as! Bool }
         if ready {
@@ -132,32 +158,32 @@ class Sync: NSObject {
         }
         return ready
     }
- }
+}
 
 // MARK: Native-initiated Message category
-extension Sync {
+extension SyncWebView {
     func sendSyncRecords(recordType: [SyncRecordType], recordJson: String) {
         /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
          @param {string} categoryName, @param {Array.<Object>} records */
         let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
         webView.evaluateJavaScript("callbackList['send-sync-records'](null, \(arg1),\(recordJson))",
                                    completionHandler: { (result, error) in
-//                                    print(result)
-//                                    if error != nil {
-//                                        print(error)
-//                                    }
+                                    //                                    print(result)
+                                    //                                    if error != nil {
+                                    //                                        print(error)
+                                    //                                    }
         })
     }
-
+    
     func gotInitData() {
         let args = "(null, \(syncSeed), \(syncDeviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
                                    completionHandler: { (result, error) in
-//                                    print(result)
-//                                    if error != nil {
-//                                        print(error)
-//                                    }
+                                    //                                    print(result)
+                                    //                                    if error != nil {
+                                    //                                        print(error)
+                                    //                                    }
         })
     }
     func fetch() {
@@ -165,34 +191,34 @@ extension Sync {
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
         webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
                                    completionHandler: { (result, error) in
-//                                    print(result)
-//                                    if error != nil {
-//                                        print(error)
-//                                    }
+                                    //                                    print(result)
+                                    //                                    if error != nil {
+                                    //                                        print(error)
+                                    //                                    }
         })
     }
-
+    
     func resolveSyncRecords(data: [String: AnyObject]) {
         print("not implemented: resolveSyncRecords() \(data)")
     }
-
+    
     func deleteSyncUser(data: [String: AnyObject]) {
         print("not implemented: deleteSyncUser() \(data)")
     }
-
+    
     func deleteSyncCategory(data: [String: AnyObject]) {
         print("not implemented: deleteSyncCategory() \(data)")
     }
-
+    
     func deleteSyncSiteSettings(data: [String: AnyObject]) {
         print("not implemented: delete sync site settings \(data)")
     }
-
+    
 }
 
 // MARK: Server To Native Message category
-extension Sync {
-
+extension SyncWebView  {
+    
     func getExistingObjects(data: [String: AnyObject]) {
         guard let typeName = data["arg1"] as? String,
             let objects = data["arg2"] as? [[String: AnyObject]] else { return }
@@ -203,7 +229,7 @@ extension Sync {
             }
         }
     }
-
+    
     func saveInitData(data: [String: AnyObject]) {
         if let seedDict = data["arg1"] as? [String: Int] {
             var seedArray = [Int](count: 32, repeatedValue: 0)
@@ -213,7 +239,7 @@ extension Sync {
                 }
             }
             syncSeed = "\(seedArray)"
-
+            
             if let idDict = data["arg2"] as? [String: Int] {
                 if let id = idDict["0"] {
                     syncDeviceId = "[\(id)]"
@@ -224,20 +250,20 @@ extension Sync {
             print("Seed expected.")
         }
     }
-
+    
 }
 
-extension Sync: WKScriptMessageHandler {
+extension SyncWebView: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
         guard let data = message.body as? [String: AnyObject], let messageName = data["message"] as? String else {
             assert(false) ;
             return
         }
-
+        
         switch messageName {
         case "get-init-data":
-//            getInitData()
+            //            getInitData()
             break
         case "got-init-data":
             gotInitData()
@@ -264,8 +290,7 @@ extension Sync: WKScriptMessageHandler {
         default:
             print("\(messageName) not handled yet")
         }
-
+        
         checkIsSyncReady()
     }
 }
-
