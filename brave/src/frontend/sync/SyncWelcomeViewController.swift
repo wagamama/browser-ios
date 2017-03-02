@@ -59,7 +59,7 @@ class SyncWelcomeViewController: UIViewController {
         view.addSubview(newToSyncButton)
         
         existingUserButton = UIButton()
-        existingUserButton.setTitle("I have an existing sync code", forState: .Normal)
+        existingUserButton.setTitle("Scan or enter code", forState: .Normal)
         existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         existingUserButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
         existingUserButton.addTarget(self, action: #selector(SEL_existingUser), forControlEvents: .TouchUpInside)

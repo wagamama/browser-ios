@@ -29,7 +29,10 @@ class SyncPairWordsViewController: UIViewController {
         containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         view.addSubview(containerView)
         
-        codewordsView = SyncCodewordsView()
+        codewordsView = SyncCodewordsView(data: [])
+        codewordsView.doneKeyCallback = {
+            self.checkCodes()
+        }
         containerView.addSubview(codewordsView)
         
         helpLabel = UILabel()
@@ -62,6 +65,8 @@ class SyncPairWordsViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
+        // Focus on first input field.
+        codewordsView.fields[0].becomeFirstResponder()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -70,6 +75,15 @@ class SyncPairWordsViewController: UIViewController {
     }
     
     func SEL_done() {
-        
+        checkCodes()
+    }
+    
+    func checkCodes() {
+        debugPrint("check codes")
+        var codes: [String] = []
+        for field in self.codewordsView.fields {
+            codes.append(field.text ?? "")
+        }
+        // TODO: check codes.
     }
 }
