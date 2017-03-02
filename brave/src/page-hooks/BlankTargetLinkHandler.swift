@@ -33,6 +33,7 @@ class BlankTargetLinkHandler {
             }
 
             if touch.phase != .Began && tapLocation == CGPointZero {
+                webView.blankTargetUrl = nil
                 return
             }
 
@@ -46,9 +47,13 @@ class BlankTargetLinkHandler {
                     tapLocation = CGPointZero
                 }
 
-            case .Moved, .Stationary, .Ended, .Cancelled:
+            case .Moved:
                 tapLocation = CGPointZero
                 webView.blankTargetUrl = nil
+            case .Ended, .Cancelled:
+                tapLocation = CGPointZero
+            case .Stationary:
+                break
             }
         }
     }
