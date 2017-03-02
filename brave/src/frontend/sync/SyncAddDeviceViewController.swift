@@ -36,7 +36,8 @@ class SyncAddDeviceViewController: UIViewController {
         barcodeView = SyncBarcodeView(data: "Hello world program created by someone")
         containerView.addSubview(barcodeView)
         
-        codewordsView = SyncCodewordsView()
+        codewordsView = SyncCodewordsView(data: ["hi", "how", "are", "you", "doing", "i", "hope", "very", "well", "we", "are", "happy", "to", "sync", "with", "you"])
+        codewordsView.hidden = true
         containerView.addSubview(codewordsView)
         
         modeControl = UISegmentedControl(items: ["QR Code", "Code Words"])
@@ -90,7 +91,7 @@ class SyncAddDeviceViewController: UIViewController {
         }
         
         codewordsView.snp_makeConstraints { (make) in
-            make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(44, 0, 0, 0))
+            make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(64, 0, 0, 0))
         }
         
         titleLabel.snp_makeConstraints { (make) in
