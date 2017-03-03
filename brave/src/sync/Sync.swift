@@ -66,6 +66,12 @@ class Sync: NSObject {
         webCfg.userContentController = userController
         return webCfg
     }
+    
+    override init() {
+        super.init()
+        webView = WKWebView(frame: CGRectZero, configuration: webConfig)
+        self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+    }
 
     class func getScript(name:String) -> String {
         // TODO: Add unwrapping warnings
