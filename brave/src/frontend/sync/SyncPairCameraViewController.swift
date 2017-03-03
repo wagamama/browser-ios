@@ -34,7 +34,9 @@ class SyncPairCameraViewController: UIViewController {
         }
         cameraView.authorizedCallback = { authorized in
             if authorized {
-                self.cameraAccessButton.hidden = true
+                postAsyncToMain(0) {
+                    self.cameraAccessButton.hidden = true
+                }
             }
             else {
                 // TODO: Show alert.
