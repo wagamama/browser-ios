@@ -32,10 +32,10 @@ class SyncTest: XCTestCase {
                 "creationTime: 0 }," +
                 "isFolder: false," +
                 "parentFolderObjectId: undefined } }]"
-        SyncWebView.singleton.sendSyncRecords([.bookmark], recordJson: bm)
+        Sync.singleton.sendSyncRecords([.bookmark], recordJson: bm)
 
         sleep(5)
-        SyncWebView.singleton.fetch()
+        Sync.singleton.fetch()
 
         // Wait for something that doesn't arrive for now, replace this
         expectationForNotification("never arriving 🤡", object: nil, handler:nil)
