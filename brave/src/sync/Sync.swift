@@ -39,6 +39,7 @@ class Sync: NSObject {
 
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
 
+    // TODO: Move to a better place
     private let prefNameId = "device-id-js-array"
     private let prefNameSeed = "seed-js-array"
     #if DEBUG
@@ -92,6 +93,20 @@ class Sync: NSObject {
         set(value) {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameId)
         }
+    }
+    
+    /// Seed as 16 unique words
+    var seedAsPassphrase: Array<String> {
+        return [""]
+    }
+    
+    /// Seed byte array, 2 indeces for each word
+    var seedAsBytes: String {
+        return ""
+    }
+    
+    func joinSyncGroup(keywords: String) {
+        
     }
 
     // TODO: Move to keychain
