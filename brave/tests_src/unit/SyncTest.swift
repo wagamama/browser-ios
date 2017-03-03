@@ -23,17 +23,18 @@ class SyncTest: XCTestCase {
     
     func testSync() {
         expectationForNotification(NotificationSyncReady, object: nil, handler:nil)
-        var isOk = true
-        waitForExpectationsWithTimeout(20) { (error:NSError?) -> Void in
-            if let _ = error {
-                isOk = false
-                XCTAssert(false, "load data failed")
-            }
+        
+        let sync = Sync()
+        waitForExpectationsWithTimeout(10) { error in
+            XCTAssertNil(error, "Error timeout waiting sync ready")
         }
-
-        if !isOk {
-            return
+        
+        if !sync.checkIsSyncReady() {
+            XCTAssert(false, "Sync not fully initialized")
+            return;
         }
+        
+        // TODO: Implement below
 
         var bm = "[{ action: \(SyncActions.delete.rawValue),"
         bm += "deviceId: [ 0 ]," +
@@ -47,16 +48,15 @@ class SyncTest: XCTestCase {
                 "creationTime: 0 }," +
                 "isFolder: false," +
                 "parentFolderObjectId: undefined } }]"
-        Sync.singleton.sendSyncRecords([.bookmark], recordJson: bm)
+        sync.sendSyncRecords([.bookmark], recordJson: bm)
 
         sleep(5)
-        Sync.singleton.fetch()
+        sync.fetch()
 
         // Wait for something that doesn't arrive for now, replace this
         expectationForNotification("never arriving 🤡", object: nil, handler:nil)
         waitForExpectationsWithTimeout(20) { (error:NSError?) -> Void in
             if let _ = error {
-                isOk = false
                 XCTAssert(false, "error")
             }
         }

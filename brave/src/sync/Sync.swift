@@ -120,7 +120,7 @@ class Sync: NSObject {
         }
     }
 
-    private func checkIsSyncReady() -> Bool {
+    func checkIsSyncReady() -> Bool {
         struct Static {
             static var isReady = false
         }
@@ -131,8 +131,8 @@ class Sync: NSObject {
         let mirror = Mirror(reflecting: isSyncFullyInitialized)
         let ready = mirror.children.reduce(true) { $0 && $1.1 as! Bool }
         if ready {
-            NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
             Static.isReady = true
+            NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
         }
         return ready
     }
