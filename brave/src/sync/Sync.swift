@@ -60,7 +60,7 @@ class Sync: NSObject {
 
         // ios-sync must be called before bundle, since it auto-runs
         ["fetch", "ios-sync", "bundle", "niceware"].forEach() {
-            userController.addUserScript(WKUserScript(source: getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
+            userController.addUserScript(WKUserScript(source: Sync.getScript($0), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
         }
         
         // Test example of niceware running
@@ -85,7 +85,7 @@ class Sync: NSObject {
         return webCfg
     }
 
-    private func getScript(name:String) -> String {
+    class func getScript(name:String) -> String {
         // TODO: Add unwrapping warnings
         let filePath = NSBundle.mainBundle().pathForResource(name, ofType:"js")
         return try! String(contentsOfFile: filePath!, encoding: NSUTF8StringEncoding)
