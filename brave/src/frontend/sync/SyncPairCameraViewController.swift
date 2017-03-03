@@ -21,6 +21,25 @@ class SyncPairCameraViewController: UIViewController {
         cameraView.backgroundColor = UIColor.blackColor()
         cameraView.layer.cornerRadius = 4
         cameraView.layer.masksToBounds = true
+        cameraView.scanCallback = { data in
+            debugPrint("Check data \(data)")
+            // TODO: Check data against sync api
+            
+            if true {
+                self.cameraView.cameraOverlaySucess()
+            }
+            else {
+                self.cameraView.cameraOverlayError()
+            }
+        }
+        cameraView.authorizedCallback = { authorized in
+            if authorized {
+                self.cameraAccessButton.hidden = true
+            }
+            else {
+                // TODO: Show alert.
+            }
+        }
         view.addSubview(cameraView)
         
         titleLabel = UILabel()
@@ -87,7 +106,8 @@ class SyncPairCameraViewController: UIViewController {
     }
     
     func SEL_cameraAccess() {
-        
+        // TODO: check if already has access before requiring button tap.
+        cameraView.startCapture()
     }
     
     func SEL_enterWords() {
