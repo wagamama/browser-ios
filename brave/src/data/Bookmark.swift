@@ -70,7 +70,7 @@ class Bookmark: NSManagedObject {
         }
 
         if save {
-            DataController.saveContext(DataController.moc)
+            DataController.saveContext()
         }
     }
 
@@ -134,7 +134,7 @@ class Bookmark: NSManagedObject {
         if let bm = get(forUrl: url, context: DataController.moc) as? Bookmark {
             DataController.moc.deleteObject(bm)
             if save {
-                DataController.saveContext(DataController.moc)
+                DataController.saveContext()
             }
             return true
         }

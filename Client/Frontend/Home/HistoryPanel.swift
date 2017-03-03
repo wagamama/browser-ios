@@ -64,7 +64,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         guard let frc = frc else {
             return
         }
-        DataController.saveContext(DataController.moc)
+        DataController.saveContext()
 
         do {
             try frc.performFetch()
@@ -154,7 +154,7 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         if (editingStyle == UITableViewCellEditingStyle.Delete) {
             if let obj = self.frc?.objectAtIndexPath(indexPath) as? History {
                 DataController.moc.deleteObject(obj)
-                DataController.saveContext(DataController.moc)
+                DataController.saveContext()
             }
         }
     }

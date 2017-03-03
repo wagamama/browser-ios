@@ -94,7 +94,7 @@ class DataController: NSObject {
         return mainThreadMOC!
     }
 
-    static func saveContext(context: NSManagedObjectContext) {
+    static func saveContext(context: NSManagedObjectContext = DataController.moc) {
         if context === DataController.shared.writeMOC {
             print("Do not use with the write moc, this save is handled internally here.")
             return
