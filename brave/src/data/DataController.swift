@@ -9,8 +9,6 @@ import CoreData
 //
 // Notice no merge notifications are needed using this method.
 
-let CoreDataWriteQueue: dispatch_queue_t = dispatch_queue_create("BraveDataWriteQueue", DISPATCH_QUEUE_SERIAL)
-
 class DataController: NSObject {
     static let shared = DataController()
 
