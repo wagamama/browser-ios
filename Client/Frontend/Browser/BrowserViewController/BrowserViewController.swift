@@ -418,28 +418,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func dequeueQueuedTabs() {
-        assert(!NSThread.currentThread().isMainThread, "This must be called in the background.")
-        self.profile.queue.getQueuedTabs() >>== { cursor in
-
-            // This assumes that the DB returns rows in some kind of sane order.
-            // It does in practice, so WFM.
-            log.debug("Queue. Count: \(cursor.count).")
-            if cursor.count <= 0 {
-                return
-            }
-
-            let urls = cursor.flatMap { $0?.url.asURL }
-            if !urls.isEmpty {
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.tabManager.addTabsForURLs(urls, zombie: false)
-                }
-            }
-
-            // Clear *after* making an attempt to open. We're making a bet that
-            // it's better to run the risk of perhaps opening twice on a crash,
-            // rather than losing data.
-            self.profile.queue.clearQueuedTabs()
-        }
+        // Brave doesn't have queued tabs
     }
 
     override func viewWillAppear(animated: Bool) {
