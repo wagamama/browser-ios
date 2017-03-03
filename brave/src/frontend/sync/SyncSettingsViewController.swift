@@ -62,6 +62,7 @@ class SyncSettingsViewController: AppSettingsTableViewController {
     }
     
     func SEL_addDevice() {
-        
+        let view = SyncAddDeviceViewController()
+        navigationController?.pushViewController(view, animated: true)
     }
 }

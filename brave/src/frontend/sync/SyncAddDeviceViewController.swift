@@ -27,7 +27,7 @@ class SyncAddDeviceViewController: UIViewController {
         containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         view.addSubview(containerView)
         
-        let code = "The small brown fox jumped over the blue moon then feel in a bail of hops"
+        let code = "The small brown fox jumped over the blue moon then fell into a pitcher of hops"
         
         barcodeView = SyncBarcodeView(data: code)
         containerView.addSubview(barcodeView)
