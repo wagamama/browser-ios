@@ -9,8 +9,6 @@ import CoreData
 //
 // Notice no merge notifications are needed using this method.
 
-let CoreDataWriteQueue: dispatch_queue_t = dispatch_queue_create("BraveDataWriteQueue", DISPATCH_QUEUE_SERIAL)
-
 class DataController: NSObject {
     static let shared = DataController()
 
@@ -96,7 +94,7 @@ class DataController: NSObject {
         return mainThreadMOC!
     }
 
-    static func saveContext(context: NSManagedObjectContext) {
+    static func saveContext(context: NSManagedObjectContext = DataController.moc) {
         if context === DataController.shared.writeMOC {
             print("Do not use with the write moc, this save is handled internally here.")
             return

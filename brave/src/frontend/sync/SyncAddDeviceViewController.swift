@@ -27,10 +27,12 @@ class SyncAddDeviceViewController: UIViewController {
         containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         view.addSubview(containerView)
         
-        barcodeView = SyncBarcodeView(data: "Hello world program created by someone")
+        let code = "The small brown fox jumped over the blue moon then fell into a pitcher of hops"
+        
+        barcodeView = SyncBarcodeView(data: code)
         containerView.addSubview(barcodeView)
         
-        codewordsView = SyncCodewordsView(data: ["hi", "how", "are", "you", "doing", "i", "hope", "very", "well", "we", "are", "happy", "to", "sync", "with", "you"])
+        codewordsView = SyncCodewordsView(data: code.componentsSeparatedByString(" "))
         codewordsView.hidden = true
         containerView.addSubview(codewordsView)
         

@@ -147,7 +147,7 @@ class BookmarkEditingViewController: FormViewController {
             self.titleRow = row
         }.onChange { row in
             self.bookmark.title = row.value
-            DataController.saveContext(DataController.moc)
+            DataController.saveContext()
         }
 
         form +++ nameSection
@@ -160,7 +160,7 @@ class BookmarkEditingViewController: FormViewController {
                 self.urlRow = row
             }.onChange { row in
                 self.bookmark.url = row.value
-                DataController.saveContext(DataController.moc)
+                DataController.saveContext()
             }
 
             form +++ Section(Strings.Location)
@@ -183,7 +183,7 @@ class BookmarkEditingViewController: FormViewController {
             }.onChange { row in
                 let r = row.value! as FolderPickerRow
                 self.bookmark.parentFolder = r.folder
-                DataController.saveContext(DataController.moc)
+                DataController.saveContext()
             }
         }
     }
@@ -264,7 +264,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     override func reloadData() {
-        DataController.saveContext(DataController.moc)
+        DataController.saveContext()
 
         do {
             try self.frc?.performFetch()
@@ -376,7 +376,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         }
 
         DataController.moc.deleteObject(currentFolder)
-        DataController.saveContext(DataController.moc)
+        DataController.saveContext()
 
         self.navigationController?.popViewControllerAnimated(true)
     }
@@ -455,7 +455,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         // If I save while the animation is happening, the rows look screwed up (draw on top of each other).
         // Adding a delay to let animation complete avoids this problem
         postAsyncToMain(0.25) {
-            DataController.saveContext(DataController.moc)
+            DataController.saveContext()
         }
     }
 
@@ -654,7 +654,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         let delete = UITableViewRowAction(style: UITableViewRowActionStyle.Destructive, title: Strings.Delete, handler: { (action, indexPath) in
 
             DataController.moc.deleteObject(item)
-            DataController.saveContext(DataController.moc)
+            DataController.saveContext()
 
             // updates the bookmark state
             getApp().browserViewController.updateURLBarDisplayURL(tab: nil)
