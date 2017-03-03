@@ -52,7 +52,7 @@ class DataController: NSObject {
         if let docURL = urls.last {
             let storeURL = docURL.URLByAppendingPathComponent("Brave.sqlite")
             do {
-                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
+                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: [NSPersistentStoreFileProtectionKey : NSFileProtectionComplete])
             }
             catch {
                 fatalError("Error migrating store: \(error)")
@@ -113,7 +113,7 @@ class DataController: NSObject {
 
                     // ensure event loop complete, so that child-to-parent moc merge is complete (no cost, and docs are not clear on whether this is required)
                     postAsyncToMain(0.1) {
-                        DataController.shared.writeMOC!.performBlock{
+                        DataController.shared.writeMOC!.performBlock {
                             if !DataController.shared.writeMOC!.hasChanges {
                                 return
                             }
