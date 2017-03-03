@@ -44,7 +44,7 @@ class SyncWelcomeViewController: UIViewController {
         view.addSubview(descriptionLabel)
         
         newToSyncButton = UIButton()
-        newToSyncButton.setTitle("I am new to sync", forState: .Normal)
+        newToSyncButton.setTitle("Get a new sync code", forState: .Normal)
         newToSyncButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         newToSyncButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         newToSyncButton.backgroundColor = BraveUX.DefaultBlue
