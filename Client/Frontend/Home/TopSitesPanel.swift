@@ -59,8 +59,6 @@ class TopSitesPanel: UIViewController {
         }
     }
 
-    let profile: Profile
-
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
 
@@ -73,13 +71,12 @@ class TopSitesPanel: UIViewController {
         return UIInterfaceOrientationMask.AllButUpsideDown
     }
 
-    init(profile: Profile) {
-        self.profile = profile
+    init() {
         super.init(nibName: nil, bundle: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationFirefoxAccountChanged, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationProfileDidFinishSyncing, object: nil)
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationFirefoxAccountChanged, object: nil)
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationProfileDidFinishSyncing, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationPrivateDataClearedHistory, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationDynamicFontChanged, object: nil)
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationDynamicFontChanged, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationPrivacyModeChanged, object: nil)
     }
 
@@ -126,20 +123,15 @@ class TopSitesPanel: UIViewController {
         braveShieldStatsView.autoresizingMask = [.FlexibleWidth]
 
         self.dataSource.collectionView = self.collection
-        succeed().upon { _ in // move sync call off-main
-            self.profile.history.setTopSitesCacheSize(Int32(self.maxFrecencyLimit))
-            postAsyncToMain(0) { // back to main
-                self.refreshTopSites(self.maxFrecencyLimit)
-                self.updateEmptyPanelState()
-            }
-        }
+        self.refreshTopSites(self.maxFrecencyLimit)
+        self.updateEmptyPanelState()
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationProfileDidFinishSyncing, object: nil)
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationProfileDidFinishSyncing, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivateDataClearedHistory, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
+//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivacyModeChanged, object: nil)
     }
 
@@ -272,24 +264,12 @@ class TopSitesPanel: UIViewController {
     }
 
     private func refreshTopSites(frecencyLimit: Int) {
-        dispatch_async(dispatch_get_main_queue()) {
             // Don't allow Sync or other notifications to change the data source if we're deleting a thumbnail.
             if !(self.collection?.userInteractionEnabled ?? true) {
                 return
             }
 
-            // Reload right away with whatever is in the cache, then check to see if the cache is invalid.
-            // If it's invalid, invalidate the cache and requery. This allows us to always show results
-            // immediately while also loading up-to-date results asynchronously if needed.
-            self.reloadTopSitesWithLimit(frecencyLimit) >>> {
-                self.profile.history.updateTopSitesCacheIfInvalidated() >>== { dirty in
-                    if dirty {
-                        self.dataSource.sitesInvalidated = true
-                        self.reloadTopSitesWithLimit(frecencyLimit)
-                    }
-                }
-            }
-        }
+            self.reloadTopSitesWithLimit(frecencyLimit)
     }
 
     private func reloadTopSitesWithLimit(limit: Int) -> Success {

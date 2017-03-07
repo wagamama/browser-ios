@@ -18,8 +18,8 @@ struct HomePanelDescriptor {
 class HomePanels {
     let enabledPanels = [
         HomePanelDescriptor(
-            makeViewController: { profile in
-                TopSitesPanel(profile: profile)
+            makeViewController: { _ in
+                TopSitesPanel()
             },
             imageName: "TopSites",
             accessibilityLabel: Strings.Top_sites,
