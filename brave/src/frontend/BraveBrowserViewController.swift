@@ -43,14 +43,19 @@ class BraveBrowserViewController : BrowserViewController {
         
         // TODO: Should never call setupConstraints multiple times, this can cause huge headaches. Constraints should mostly be static with adjustments made to those constraints.
         setupConstraints()
-        if BraveApp.shouldRestoreTabs() {
-            tabManager.restoreTabs()
 
-            if tabManager.tabCount < 1 {
+        struct RunOnceAtStartup { static var hasRun = false }
+        if !RunOnceAtStartup.hasRun {
+            RunOnceAtStartup.hasRun = true
+            if BraveApp.shouldRestoreTabs() {
+                tabManager.restoreTabs()
+
+                if tabManager.tabCount < 1 {
+                    tabManager.addTabAndSelect()
+                }
+            } else {
                 tabManager.addTabAndSelect()
             }
-        } else {
-            tabManager.addTabAndSelect()
         }
 
         updateTabCountUsingTabManager(tabManager, animated: false)
