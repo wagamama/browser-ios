@@ -68,6 +68,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Websites you visit may request your location.</string>
+	<key>NSCameraUsageDescription</key>
+        <string>Scan barcode for Brave sync.</string>	
 	<key>NSUserActivityTypes</key>
 	<array>
     <string>$(CUSTOM_BUNDLE_ID).browsing</string>
