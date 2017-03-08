@@ -70,7 +70,7 @@ class SiteTableViewHeader : UITableViewHeaderFooterView {
  * Provides base shared functionality for site rows and headers.
  */
 class SiteTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    private let DefaultCellIdentifier = "DefaultCellIdentifier"
+    private let DefaultCellIdentifier = "Cell"
     private let CellIdentifier = "CellIdentifier"
     private let HeaderIdentifier = "HeaderIdentifier"
     var iconForSiteId = [Int : Favicon]()

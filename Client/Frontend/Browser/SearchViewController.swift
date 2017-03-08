@@ -522,6 +522,7 @@ extension SearchViewController {
                 return super.tableView(tableView, viewForHeaderInSection: section)
             }
         }
+        return super.tableView(tableView, viewForHeaderInSection: section)
     }
 }
 
@@ -546,10 +547,9 @@ extension SearchViewController {
 
             return cell
         case .FindInPage:
-            let cell = tableView.dequeueReusableCellWithIdentifier(DefaultCellIdentifier, forIndexPath: indexPath)
-            cell.titleLabel?.text = "Find \"\(searchQuery)\""
-            cell.imageView?.image = UIImage(name: "quickSearch")
-            cell.setLines
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+            cell.textLabel?.text = "Find \"\(searchQuery)\""
+//            cell.imageView?.image = UIImage(name: "quickSearch")
             return cell
         }
     }
