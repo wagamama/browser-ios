@@ -185,7 +185,8 @@ class PasswordManagerButtonSetting: PicklistSettingMainItem<String> {
     private static let _options =  [
         Choice<String> { PasswordManagerButtonAction.ShowPicker },
         Choice<String> { PasswordManagerButtonAction.OnePassword },
-        Choice<String> { PasswordManagerButtonAction.LastPass }
+        Choice<String> { PasswordManagerButtonAction.LastPass },
+        Choice<String> { PasswordManagerButtonAction.Bitwarden }
     ]
 
     static func setupOnAppStart() {
@@ -195,6 +196,8 @@ class PasswordManagerButtonSetting: PicklistSettingMainItem<String> {
             currentSetting = PasswordManagerButtonAction.OnePassword
         case PasswordManagerButtonAction.LastPass.prefId:
             currentSetting = PasswordManagerButtonAction.LastPass
+        case PasswordManagerButtonAction.Bitwarden.prefId:
+            currentSetting = PasswordManagerButtonAction.Bitwarden
         default:
             currentSetting = PasswordManagerButtonAction.ShowPicker
         }

@@ -1176,7 +1176,7 @@ extension BrowserViewController: KeyboardHelperDelegate {
                 if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
                     self.urlBar.pwdMgrButton.hidden = !shouldShow
 
-                    let iconName = PasswordManagerButtonSetting.currentSetting ?? PasswordManagerButtonAction.OnePassword == PasswordManagerButtonAction.LastPass ? "passhelper_lastpass" : "passhelper_1pwd"
+                    let iconName = PasswordManagerButtonSetting.currentSetting ?? PasswordManagerButtonAction.OnePassword == PasswordManagerButtonAction.LastPass ? "passhelper_lastpass" : PasswordManagerButtonAction.OnePassword == PasswordManagerButtonAction.Bitwarden ? "passhelper_bitwarden" : "passhelper_1pwd"
                     self.urlBar.pwdMgrButton.setImage(UIImage(named: iconName)?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
 
                     self.urlBar.setNeedsUpdateConstraints()

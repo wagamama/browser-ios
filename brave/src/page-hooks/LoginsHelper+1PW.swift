@@ -14,6 +14,7 @@ struct PasswordManagerButtonAction {
     static let ShowPicker:ThirdPartyPasswordManagerType = (displayName: "Show picker", cellLabel: "", prefId: 0)
     static let OnePassword:ThirdPartyPasswordManagerType = (displayName: "1Password", cellLabel: "1Password", prefId: 1)
     static let LastPass:ThirdPartyPasswordManagerType = (displayName: "LastPass", cellLabel: "LastPass", prefId: 2)
+    static let Bitwarden:ThirdPartyPasswordManagerType = (displayName: "bitwarden", cellLabel: "bitwarden", prefId: 3)
 }
 
 extension LoginsHelper {
@@ -111,7 +112,8 @@ extension LoginsHelper {
         }
 
         let lastPassSelected = PasswordManagerButtonSetting.currentSetting?.prefId ?? 0 == PasswordManagerButtonAction.LastPass.prefId
-        let image = lastPassSelected ? UIImage(named: "passhelper_lastpass") : UIImage(named: "passhelper_1pwd")
+        let bitwardenSelected = PasswordManagerButtonSetting.currentSetting?.prefId ?? 0 == PasswordManagerButtonAction.Bitwarden.prefId
+        let image = lastPassSelected ? UIImage(named: "passhelper_lastpass") : bitwardenSelected ? UIImage(named: "passhelper_bitwarden") : UIImage(named: "passhelper_1pwd")
 
         let managerButton = UIButton(frame: CGRectMake(0, 0, 44, 44))
         managerButton.tag = tagForManagerButton
@@ -127,7 +129,7 @@ extension LoginsHelper {
         managerButton.frame = managerButtonFrame
     }
 
-    // recurse through items until the 1pw/lastpass share item is found
+    // recurse through items until the 1pw/lastpass/bitwarden share item is found
     private func selectShareItem(view: UIView, shareItemName: String) -> Bool {
         if shareItemName.characters.count == 0 {
             return false
@@ -189,6 +191,9 @@ extension LoginsHelper {
             }
             else if action.contains("lastpass") {
                 PasswordManagerButtonSetting.currentSetting = PasswordManagerButtonAction.LastPass
+            }
+            else if action.contains("bitwarden") {
+                PasswordManagerButtonSetting.currentSetting = PasswordManagerButtonAction.Bitwarden
             }
 
             if let setting = PasswordManagerButtonSetting.currentSetting {
