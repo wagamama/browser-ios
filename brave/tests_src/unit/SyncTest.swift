@@ -7,20 +7,6 @@ import Shared
 
 class SyncTest: XCTestCase {
     
-    func testByteToPassphrase() {
-        let niceware = Niceware()
-        
-        let expect = self.expectationWithDescription("byteToPassphrase attempt")
-        niceware.passphrase(fromBytes: [""]) { (result, error) in
-            XCTAssertNil(error, "byteToPassphrase contained error")
-            expect.fulfill()
-        }
-        
-        self.waitForExpectationsWithTimeout(4) { error in
-            XCTAssertNil(error, "Niceware error with `passphrase`")
-        }
-    }
-    
     func testSync() {
         expectationForNotification(NotificationSyncReady, object: nil, handler:nil)
         
