@@ -264,6 +264,7 @@ extension Strings {
 
     public static let Search_Settings = NSLocalizedString("Search Settings", comment: "")
     public static let Search = NSLocalizedString("Search", comment: "")
+    public static let SearchInPage = NSLocalizedString("Search in page", comment: "")
 }
 
 extension Strings {
