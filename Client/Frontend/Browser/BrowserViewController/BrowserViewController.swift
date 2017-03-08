@@ -995,6 +995,12 @@ extension BrowserViewController: SearchViewControllerDelegate {
 
         self.presentViewController(navController, animated: true, completion: nil)
     }
+    
+    func searchViewController(searchViewController: SearchViewController, shouldFindInPage query: String) {
+        cancelSearch()
+        updateFindInPageVisibility(visible: true)
+        findInPageBar?.text = query
+    }
 }
 
 extension BrowserViewController: ReaderModeDelegate {

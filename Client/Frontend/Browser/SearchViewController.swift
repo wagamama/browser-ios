@@ -50,6 +50,7 @@ private struct SearchViewControllerUX {
 
 protocol SearchViewControllerDelegate: class {
     func searchViewController(searchViewController: SearchViewController, didSelectURL url: NSURL)
+    func searchViewController(searchViewController: SearchViewController, shouldFindInPage query: String)
     func presentSearchSettingsController()
 }
 
@@ -482,6 +483,9 @@ extension SearchViewController {
                 }
 
         }
+        else if section == SearchListSection.FindInPage {
+            searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
+        }
     }
 
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -548,8 +552,8 @@ extension SearchViewController {
             return cell
         case .FindInPage:
             let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
-            cell.textLabel?.text = "Find \"\(searchQuery)\""
-//            cell.imageView?.image = UIImage(name: "quickSearch")
+            cell.textLabel?.text = String(format: Strings.FindInPage, searchQuery)
+            cell.imageView?.image = UIImage(named: "quickSearch")
             return cell
         }
     }
