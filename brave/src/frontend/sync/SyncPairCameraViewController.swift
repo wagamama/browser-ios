@@ -47,7 +47,7 @@ class SyncPairCameraViewController: UIViewController {
         titleLabel = UILabel()
         titleLabel.font = UIFont.systemFontOfSize(20, weight: UIFontWeightSemibold)
         titleLabel.textColor = UIColor.blackColor()
-        titleLabel.text = "Sync to device"
+        titleLabel.text = Strings.SyncToDevice
         view.addSubview(titleLabel)
         
         descriptionLabel = UILabel()
@@ -56,11 +56,11 @@ class SyncPairCameraViewController: UIViewController {
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
         descriptionLabel.textAlignment = .Center
-        descriptionLabel.text = "Using existing synced device open Brave Settings and navigate to “Devices & Settings”, tap ‘+’ to add a new device and reveal sync code."
+        descriptionLabel.text = Strings.SyncToDeviceDescription
         view.addSubview(descriptionLabel)
         
         cameraAccessButton = UIButton()
-        cameraAccessButton.setTitle("Grant camera access", forState: .Normal)
+        cameraAccessButton.setTitle(Strings.GrantCameraAccess, forState: .Normal)
         cameraAccessButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         cameraAccessButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         cameraAccessButton.backgroundColor = BraveUX.DefaultBlue
@@ -69,7 +69,7 @@ class SyncPairCameraViewController: UIViewController {
         view.addSubview(cameraAccessButton)
         
         enterWordsButton = UIButton()
-        enterWordsButton.setTitle("Enter code words", forState: .Normal)
+        enterWordsButton.setTitle(Strings.EnterCodeWords, forState: .Normal)
         enterWordsButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         enterWordsButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_enterWords), forControlEvents: .TouchUpInside)

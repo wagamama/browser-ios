@@ -36,7 +36,7 @@ class SyncAddDeviceViewController: UIViewController {
         codewordsView.hidden = true
         containerView.addSubview(codewordsView)
         
-        modeControl = UISegmentedControl(items: ["QR Code", "Code Words"])
+        modeControl = UISegmentedControl(items: [Strings.QRCode, Strings.CodeWords])
         modeControl.tintColor = BraveUX.DefaultBlue
         modeControl.selectedSegmentIndex = 0
         modeControl.addTarget(self, action: #selector(SEL_changeMode), forControlEvents: .ValueChanged)
@@ -45,7 +45,7 @@ class SyncAddDeviceViewController: UIViewController {
         titleLabel = UILabel()
         titleLabel.font = UIFont.systemFontOfSize(20, weight: UIFontWeightSemibold)
         titleLabel.textColor = UIColor.blackColor()
-        titleLabel.text = "Add Device"
+        titleLabel.text = Strings.SyncAddDevice
         view.addSubview(titleLabel)
         
         descriptionLabel = UILabel()
@@ -54,11 +54,11 @@ class SyncAddDeviceViewController: UIViewController {
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
         descriptionLabel.textAlignment = .Center
-        descriptionLabel.text = "Using a second device navigate to Brave Settings > Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available."
+        descriptionLabel.text = Strings.SyncAddDeviceDescription
         view.addSubview(descriptionLabel)
         
         doneButton = UIButton()
-        doneButton.setTitle("Done", forState: .Normal)
+        doneButton.setTitle(Strings.Done, forState: .Normal)
         doneButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         doneButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         doneButton.backgroundColor = BraveUX.DefaultBlue

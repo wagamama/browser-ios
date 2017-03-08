@@ -31,7 +31,7 @@ class SyncWelcomeViewController: UIViewController {
         titleLabel = UILabel()
         titleLabel.font = UIFont.systemFontOfSize(20, weight: UIFontWeightSemibold)
         titleLabel.textColor = UIColor.blackColor()
-        titleLabel.text = "Brave Sync"
+        titleLabel.text = Strings.BraveSync
         view.addSubview(titleLabel)
         
         descriptionLabel = UILabel()
@@ -40,11 +40,11 @@ class SyncWelcomeViewController: UIViewController {
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
         descriptionLabel.textAlignment = .Center
-        descriptionLabel.text = "Sync browser data between your devices securely using Brave Sync, no account creation required. Tap below to get started."
+        descriptionLabel.text = Strings.BraveSyncWelcome
         view.addSubview(descriptionLabel)
         
         newToSyncButton = UIButton()
-        newToSyncButton.setTitle("Get a new sync code", forState: .Normal)
+        newToSyncButton.setTitle(Strings.NewSyncCode, forState: .Normal)
         newToSyncButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         newToSyncButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         newToSyncButton.backgroundColor = BraveUX.DefaultBlue
@@ -53,7 +53,7 @@ class SyncWelcomeViewController: UIViewController {
         view.addSubview(newToSyncButton)
         
         existingUserButton = UIButton()
-        existingUserButton.setTitle("Scan or enter code", forState: .Normal)
+        existingUserButton.setTitle(Strings.ScanSyncCode, forState: .Normal)
         existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         existingUserButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
         existingUserButton.addTarget(self, action: #selector(SEL_existingUser), forControlEvents: .TouchUpInside)
