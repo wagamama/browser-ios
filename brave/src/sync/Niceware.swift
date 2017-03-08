@@ -29,9 +29,7 @@ class Niceware: NSObject {
         return webCfg
     }
     
-    // TODO: Massage data a bit more for completion block
-    func passphrase(fromBytes bytes: Array<String>, completion: ((AnyObject?, NSError?) -> Void)?) {
-        
+    private func executeBlockOnReady(block: () -> ()) {
         if !self.isNicewareReady && readyDelayAttempts < 2 {
             // If delay attempts exceeds limit, and still not ready, evaluateJS will just throw errors in the completion block
             readyDelayAttempts += 1
@@ -39,27 +37,44 @@ class Niceware: NSObject {
             // Perform delayed attempt
             // TODO: Update with Swift 3 syntax
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.5) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-                self.passphrase(fromBytes: bytes, completion: completion)
+                self.executeBlockOnReady(block)
             })
             
             return;
         }
         
-        
-        let input = "new Uint8Array([73, 206, 112, 84, 16, 109, 201, 101, 153, 50, 112, 98, 52, 236, 203, 60, 125, 53, 53, 220, 146, 159, 46, 244, 108, 121, 60, 5, 128, 71, 3, 56])"
-        let jsToExecute = "niceware.bytesToPassphrase(\(input));"
-        
-        self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
-            (result, error) in
-                
-            print(result)
-            if error != nil {
+        block()
+    }
+    
+    func passphrase(numberOfBytes byteCount: UInt, completion: ((AnyObject?, NSError?) -> Void)?) {
+        // TODO: Add byteCount validation (e.g. must be even)
+        executeBlockOnReady {
+            self.nicewareWebView.evaluateJavaScript("niceware.passphraseToBytes(niceware.generatePassphrase(\(byteCount)))") { (one, error) in
+                print(one)
                 print(error)
             }
+        }
+    }
+    
+    // TODO: Massage data a bit more for completion block
+    func passphrase(fromBytes bytes: Array<String>, completion: ((AnyObject?, NSError?) -> Void)?) {
+        
+        executeBlockOnReady {
             
-            completion?(result, error)
-        })
+            let input = "new Uint8Array([73, 206, 112, 84, 16, 109, 201, 101, 153, 50, 112, 98, 52, 236, 203, 60, 125, 53, 53, 220, 146, 159, 46, 244, 108, 121, 60, 5, 128, 71, 3, 56])"
+            let jsToExecute = "niceware.bytesToPassphrase(\(input));"
             
+            self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
+                (result, error) in
+                    
+                print(result)
+                if error != nil {
+                    print(error)
+                }
+                
+                completion?(result, error)
+            })
+        }
     }
     
     func bytes(fromPassphrase: Array<String>) -> Array<String> {
