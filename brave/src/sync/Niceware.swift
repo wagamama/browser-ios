@@ -56,12 +56,14 @@ class Niceware: NSObject {
         }
     }
     
+    /// This requires native hex strings
     // TODO: Massage data a bit more for completion block
     func passphrase(fromBytes bytes: Array<String>, completion: ((AnyObject?, NSError?) -> Void)?) {
         
         executeBlockOnReady {
             
-            let input = "new Uint8Array([73, 206, 112, 84, 16, 109, 201, 101, 153, 50, 112, 98, 52, 236, 203, 60, 125, 53, 53, 220, 146, 159, 46, 244, 108, 121, 60, 5, 128, 71, 3, 56])"
+            let intBytes = bytes.map({ Int($0, radix: 16) ?? 0 })
+            let input = "new Uint8Array(\(intBytes))"
             let jsToExecute = "niceware.bytesToPassphrase(\(input));"
             
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
