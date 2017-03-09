@@ -32,7 +32,7 @@ class SyncPairWordsViewController: UIViewController {
         helpLabel = UILabel()
         helpLabel.font = UIFont.systemFontOfSize(15, weight: UIFontWeightRegular)
         helpLabel.textColor = UIColor(rgb: 0x696969)
-        helpLabel.text = "Enter code words below."
+        helpLabel.text = Strings.EnterCodeWordsBelow
         view.addSubview(helpLabel)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: #selector(SEL_done))

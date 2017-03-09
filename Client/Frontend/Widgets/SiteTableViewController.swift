@@ -70,6 +70,7 @@ class SiteTableViewHeader : UITableViewHeaderFooterView {
  * Provides base shared functionality for site rows and headers.
  */
 class SiteTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    private let DefaultCellIdentifier = "Cell"
     private let CellIdentifier = "CellIdentifier"
     private let HeaderIdentifier = "HeaderIdentifier"
     var iconForSiteId = [Int : Favicon]()
@@ -87,6 +88,7 @@ class SiteTableViewController: UIViewController, UITableViewDelegate, UITableVie
 
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: DefaultCellIdentifier)
         tableView.registerClass(HistoryTableViewCell.self, forCellReuseIdentifier: CellIdentifier)
         tableView.registerClass(SiteTableViewHeader.self, forHeaderFooterViewReuseIdentifier: HeaderIdentifier)
         tableView.layoutMargins = UIEdgeInsetsZero

@@ -15,7 +15,7 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         footerView.textColor = UIColor(rgb: 0x696969)
         
         if section == 0 {
-            footerView.text = "Changing settings will only affect data that this device shares with others."
+            footerView.text = Strings.SyncDeviceSettingsFooter
         }
         
         return footerView
@@ -32,7 +32,7 @@ class SyncSettingsViewController: AppSettingsTableViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        title = "Devices"
+        title = Strings.Devices
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(SEL_addDevice))
     }
     

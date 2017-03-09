@@ -13,7 +13,8 @@ private let PromptNo = Strings.No
 private enum SearchListSection: Int {
     case SearchSuggestions
     case BookmarksAndHistory
-    static let Count = 2
+    case FindInPage
+    static let Count = 3
 }
 
 private struct SearchViewControllerUX {
@@ -49,6 +50,7 @@ private struct SearchViewControllerUX {
 
 protocol SearchViewControllerDelegate: class {
     func searchViewController(searchViewController: SearchViewController, didSelectURL url: NSURL)
+    func searchViewController(searchViewController: SearchViewController, shouldFindInPage query: String)
     func presentSearchSettingsController()
 }
 
@@ -481,6 +483,9 @@ extension SearchViewController {
                 }
 
         }
+        else if section == SearchListSection.FindInPage {
+            searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
+        }
     }
 
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -500,7 +505,28 @@ extension SearchViewController {
     }
 
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        switch SearchListSection(rawValue: section)! {
+        case .SearchSuggestions:
+            return 0
+        case .BookmarksAndHistory:
+            return 0
+        case .FindInPage:
+            return 22
+        }
+    }
+    
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if let currentSection = SearchListSection(rawValue: section) {
+            switch currentSection {
+            case .FindInPage:
+                let header = super.tableView(tableView, viewForHeaderInSection: section) as! SiteTableViewHeader
+                header.titleLabel.text = Strings.SearchInPage
+                return header
+            default:
+                return super.tableView(tableView, viewForHeaderInSection: section)
+            }
+        }
+        return super.tableView(tableView, viewForHeaderInSection: section)
     }
 }
 
@@ -524,6 +550,11 @@ extension SearchViewController {
             }
 
             return cell
+        case .FindInPage:
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+            cell.textLabel?.text = String(format: Strings.FindInPage, searchQuery)
+            cell.imageView?.image = UIImage(named: "quickSearch")
+            return cell
         }
     }
 
@@ -533,6 +564,8 @@ extension SearchViewController {
             return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !isPrivate ? 1 : 0
         case .BookmarksAndHistory:
             return data.count
+        case .FindInPage:
+            return 1
         }
     }
 

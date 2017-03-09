@@ -20,7 +20,6 @@ extension Strings {
 // Settings.
 extension Strings {
     public static let ClearPrivateData = NSLocalizedString("Clear Private Data", comment: "Button in settings that clears private data for the selected items. Also used as section title in settings panel")
-    public static let SyncDevices = NSLocalizedString("Devices & Settings", comment: "Sync you browser settings across devices.")
 }
 
 // Error pages.
@@ -198,14 +197,30 @@ extension Strings {
     public static let Dark = NSLocalizedString("Dark", comment: "Dark theme setting in Reading View settings")
     public static let Sepia = NSLocalizedString("Sepia", comment: "Sepia theme setting in Reading View settings")
     public static let General = NSLocalizedString("General", comment: "General settings section title")
+    public static let QRCode = NSLocalizedString("QR Code", comment: "QR Code section title")
+    public static let CodeWords = NSLocalizedString("Code Words", comment: "Code words section title")
     public static let Sync = NSLocalizedString("Sync", comment: "Sync settings section title")
+    public static let BraveSync = NSLocalizedString("Brave Sync", comment: "Brave sync page title")
+    public static let BraveSyncWelcome = NSLocalizedString("Sync browser data between your devices securely using Brave Sync, no account creation required. Tap below to get started.", comment: "Sync settings welcome")
+    public static let NewSyncCode = NSLocalizedString("Get a new sync code", comment: "New sync code button title")
+    public static let ScanSyncCode = NSLocalizedString("Scan or enter code", comment: "Scan sync code button title")
+    public static let SyncAddDevice = NSLocalizedString("Add Device", comment: "Add device to sync")
+    public static let SyncToDevice = NSLocalizedString("Sync to device", comment: "Sync to existing device")
+    public static let SyncToDeviceDescription = NSLocalizedString("Using existing synced device open Brave Settings and navigate to “Devices & Settings”, tap ‘+’ to add a new device and reveal sync code.", comment: "Sync to existing device description")
+    public static let SyncAddDeviceDescription = NSLocalizedString("Using a second device navigate to Brave Settings > Sync. Capture the QR Code (above) with second device, or enter code words if no camera is available.", comment: "Sync add device description")
     public static let SyncOnDevice = NSLocalizedString("Sync on this device", comment: "Sync device settings section title")
+    public static let EnterCodeWords = NSLocalizedString("Enter code words", comment: "Sync enter code words")
+    public static let SyncDevices = NSLocalizedString("Devices & Settings", comment: "Sync you browser settings across devices.")
+    public static let Devices = NSLocalizedString("Devices", comment: "Sync device settings page title.")
+    public static let EnterCodeWordsBelow = NSLocalizedString("Enter code words below", comment: "Enter sync code words below")
     public static let SyncRemoveThisDevice = NSLocalizedString("Remove this device", comment: "Sync remove device.")
     public static let Pair = NSLocalizedString("Pair", comment: "Sync pair device settings section title")
+    public static let SyncDeviceSettingsFooter = NSLocalizedString("Changing settings will only affect data that this device shares with others.", comment: "Sync device settings footer details")
     public static let Close_Private_Tabs = NSLocalizedString("Close Private Tabs", comment: "Setting for closing private tabs")
     public static let When_Leaving_Private_Browsing = NSLocalizedString("When Leaving Private Browsing", comment: "Will be displayed in Settings under 'Close Private Tabs'")
     public static let Saved_Logins = NSLocalizedString("Saved Logins", comment: "Settings item for clearing passwords and login data")
     public static let Browsing_History = NSLocalizedString("Browsing History", comment: "Settings item for clearing browsing history")
+    public static let GrantCameraAccess = NSLocalizedString("Grant camera access", comment: "Grand camera access")
     public static let Cache = NSLocalizedString("Cache", comment: "Settings item for clearing the cache")
     public static let Offline_Website_Data = NSLocalizedString("Offline Website Data", comment: "Settings item for clearing website data")
     public static let Cookies = NSLocalizedString("Cookies", comment: "Settings item for clearing cookies")
@@ -249,6 +264,8 @@ extension Strings {
 
     public static let Search_Settings = NSLocalizedString("Search Settings", comment: "")
     public static let Search = NSLocalizedString("Search", comment: "")
+    public static let SearchInPage = NSLocalizedString("Search in page", comment: "")
+    public static let FindInPage = NSLocalizedString("Find \"%@\"", comment: "Find text in page.")
 }
 
 extension Strings {
