@@ -76,5 +76,4 @@ class NicewareTest: XCTestCase {
             XCTAssertNil(error, "Niceware error with `passphrase`")
         }
     }
-    
 }
