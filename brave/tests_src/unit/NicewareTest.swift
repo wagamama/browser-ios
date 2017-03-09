@@ -4,6 +4,18 @@ import XCTest
 
 class NicewareTest: XCTestCase {
     
+    func testNewByteSeed() {
+        
+    }
+    
+    func testNewPassphrase() {
+        
+    }
+    
+    func testPassphraseToByte() {
+        
+    }
+    
     func testByteToPassphrase() {
         let niceware = Niceware()
         
