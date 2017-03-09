@@ -13,6 +13,30 @@ class NicewareTest: XCTestCase {
     }
     
     func testPassphraseToByte() {
+        let niceware = Niceware()
+        
+        let expect = self.expectationWithDescription("passphraseToByte attempt")
+
+        let input = ["administrational","experimental","disconnection","plane","gigaton","savaging","wheaten","suez","herman","retina","bailment","gorier","overmodestly","idealism","mesa","theurgy",]
+        let expectedOut = ["00", "ee", "4a", "42", "3a", "a3", "a3", "0f", "59", "5f", "c2", "00", "fa", "6a", "d9", "c9", "63", "38", "bb", "02", "0c", "37", "5b", "92", "98", "e7", "68", "79", "84", "ba", "e1", "9f"]
+        
+        niceware.bytes(fromPassphrase: input) { (result, error) in
+            XCTAssertNil(error, "passphraseToByte contained error")
+            XCTAssertNotNil(result, "passphraseToByte result was nil")
+            
+            guard let resultWithStrings = result as? [String] else {
+                XCTAssertNotNil(false, "passphrase cast to [String] failed")
+                return
+            }
+            
+            XCTAssertEqual(input, expectedOut)
+            
+            expect.fulfill()
+        }
+        
+        self.waitForExpectationsWithTimeout(4) { error in
+            XCTAssertNil(error, "Niceware error with `bytes`")
+        }
         
     }
     
