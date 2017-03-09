@@ -64,7 +64,7 @@ class Niceware: JSInjector {
     }
     
     // TODO: Add docs
-    func bytes(fromPassphrase passphrase: Array<String>, completion: ((AnyObject?, NSError?) -> Void)?) {
+    func bytes(fromPassphrase passphrase: Array<String>, completion: (([Int]?, NSError?) -> Void)?) {
         // TODO: Add some keyword validation
         executeBlockOnReady {
             
@@ -73,12 +73,29 @@ class Niceware: JSInjector {
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
                 (result, error) in
                 
-                print(result)
-                if error != nil {
-                    print(error)
+                // Result comes in the format [Index(String): Value(Int)]
+                //  Since dictionary is unordered, index must be pulled via string values
+                guard let nativeResult = result as? [String:Int] else {
+                    completion?(nil, nil)
+                    return
                 }
                 
-                completion?(result, error)
+                var bytes: [Int] = []
+                for i in 0..<nativeResult.count {
+                    guard let byte = nativeResult["\(i)"] else {
+                        // Bad index, break and let count logic handle fulfillment check
+                        break
+                    }
+                    
+                    bytes += [byte]
+                }
+                
+                if bytes.count != nativeResult.count {
+                    completion?(nil, nil)
+                    return
+                }
+                
+                completion?(bytes, error)
             })
         }
     }
