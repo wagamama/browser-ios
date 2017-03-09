@@ -161,6 +161,7 @@
 		59D6B30954B53C907F022CA7 /* FindInPage.js in Resources */ = {isa = PBXBuildFile; fileRef = EA59A531812A82B1DAC03D72 /* FindInPage.js */; };
 		59F67C0B4DAA5B488E2C83EF /* SpotlightHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = E76112E70EDA47CD3A7F2845 /* SpotlightHelper.js */; };
 		5B352CB4FE3A4ED634975490 /* WebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E56C0216FAEB62B2CDF5FE7 /* WebViewProgress.swift */; };
+		5C0293851E70D9AE00CA99D0 /* MigrateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0293841E70D9AE00CA99D0 /* MigrateData.swift */; };
 		5C0FCE4D1E5FB3810016DF0F /* SyncWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */; };
 		5C0FCE531E637B9D0016DF0F /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */; };
 		5C0FCE5C1E637C160016DF0F /* SyncPairCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */; };
@@ -950,6 +951,7 @@
 		5B60ED58454699DB9549B34B /* AutocompleteTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AutocompleteTextField.swift; path = ./Client/Frontend/Widgets/AutocompleteTextField.swift; sourceTree = "<group>"; };
 		5B7417C2784852C8AA016A94 /* filename.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = filename.cc; path = ./brave/ThirdParty/leveldb/db/filename.cc; sourceTree = "<group>"; };
 		5B8A3FF8C10C5708D9DAD03D /* BraveUX.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BraveUX.swift; path = ./brave/src/frontend/BraveUX.swift; sourceTree = "<group>"; };
+		5C0293841E70D9AE00CA99D0 /* MigrateData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MigrateData.swift; path = brave/src/data/MigrateData.swift; sourceTree = "<group>"; };
 		5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncWelcomeViewController.swift; path = brave/src/frontend/sync/SyncWelcomeViewController.swift; sourceTree = "<group>"; };
 		5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncAddDeviceViewController.swift; path = brave/src/frontend/sync/SyncAddDeviceViewController.swift; sourceTree = "<group>"; };
 		5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncPairCameraViewController.swift; path = brave/src/frontend/sync/SyncPairCameraViewController.swift; sourceTree = "<group>"; };
@@ -2025,6 +2027,7 @@
 				5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */,
 				5C44C0DD1E3EE47B00B1FD81 /* History.swift */,
 				5CD7F38F1E3FB7FA00A12BB9 /* TabMO.swift */,
+				5C0293841E70D9AE00CA99D0 /* MigrateData.swift */,
 			);
 			name = data;
 			sourceTree = "<group>";
@@ -4050,6 +4053,7 @@
 				0857095CBFE00F31F190C638 /* BrowserViewController.swift in Sources */,
 				A90DB45DF991E67B7130B8BB /* ContextMenuHelper.swift in Sources */,
 				DD024D7E481298ACAB9EF286 /* ErrorPageHelper.swift in Sources */,
+				5C0293851E70D9AE00CA99D0 /* MigrateData.swift in Sources */,
 				EB00A3081E1BF4CC00680DB8 /* hashFn.cpp in Sources */,
 				91B903FBE39F640B651928D0 /* FaviconManager.swift in Sources */,
 				EBDB7D471E14231900D744C7 /* Sync.swift in Sources */,
