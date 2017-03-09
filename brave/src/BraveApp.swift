@@ -80,13 +80,7 @@ class BraveApp {
             }
        #endif
         
-        // TODO: CoreData Migration...
-    //    DataController.write {
-//            let bookmark = DataController.new("Bookmark") as! Bookmark
-//            bookmark.title = "Brave"
-//            bookmark.url = "https://brave.com/"
-//            bookmark.lastVisited = NSDate()
-      //  }
+        // TODO: Coredata Migrations
         
         UINavigationBar.appearance().tintColor = BraveUX.DefaultBlue
     }
