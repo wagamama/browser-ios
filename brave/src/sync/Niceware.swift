@@ -30,7 +30,6 @@ class Niceware: JSInjector {
         return webCfg
     }
     
-    // TODO: Rename, this is bad
     func uniqueBytes(count byteCount: Int, completion: ((AnyObject?, NSError?) -> Void)?) {
         // TODO: Add byteCount validation (e.g. must be even)
         executeBlockOnReady {
