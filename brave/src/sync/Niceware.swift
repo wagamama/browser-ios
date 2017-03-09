@@ -3,19 +3,20 @@
 import UIKit
 import WebKit
 
-class Niceware: NSObject {
+class Niceware: JSInjector {
 
     static let shared = Niceware()
     
     private let nicewareWebView = WKWebView(frame: CGRectZero, configuration: Niceware.webConfig)
     /// Whehter or not niceware is ready to be used
     private var isNicewareReady = false
-    /// The number of attempts that has been delayed, waiting for niceware to be ready
-    private var readyDelayAttempts = 0
-
     
     override init() {
         super.init()
+        
+        // Overriding javascript check for this subclass
+        self.isJavascriptReadyCheck = { return self.isNicewareReady }
+        
         // Load HTML and await for response, to verify the webpage is loaded to receive niceware commands
         self.nicewareWebView.navigationDelegate = self;
         // Must load HTML for delegate method to fire
@@ -27,23 +28,6 @@ class Niceware: NSObject {
         webCfg.userContentController = WKUserContentController()
         webCfg.userContentController.addUserScript(WKUserScript(source: Sync.getScript("niceware"), injectionTime: .AtDocumentEnd, forMainFrameOnly: true))
         return webCfg
-    }
-    
-    private func executeBlockOnReady(block: () -> ()) {
-        if !self.isNicewareReady && readyDelayAttempts < 2 {
-            // If delay attempts exceeds limit, and still not ready, evaluateJS will just throw errors in the completion block
-            readyDelayAttempts += 1
-            
-            // Perform delayed attempt
-            // TODO: Update with Swift 3 syntax
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.5) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
-                self.executeBlockOnReady(block)
-            })
-            
-            return;
-        }
-        
-        block()
     }
     
     func passphrase(numberOfBytes byteCount: UInt, completion: ((AnyObject?, NSError?) -> Void)?) {
@@ -84,10 +68,8 @@ class Niceware: NSObject {
     }
 }
 
-
 extension Niceware: WKNavigationDelegate {
     func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
         self.isNicewareReady = true
     }
-
 }
