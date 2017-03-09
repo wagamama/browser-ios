@@ -8,11 +8,22 @@ import Shared
 class NicewareTest: XCTestCase {
     
     func testNewByteSeed() {
+        let niceware = Niceware()
+        let byteCount = 8
+        let expect = self.expectationWithDescription("newPassphrase attempt")
         
-    }
-    
-    func testNewPassphrase() {
+        niceware.uniqueBytes(count: byteCount) { (result, error) in
+            XCTAssertNil(error, "new passphrase contained error")
+            XCTAssertNotNil(result, "new passphrase result was nil")
+            // Force unwrapping only okay since this is a unit test
+            XCTAssertEqual(result!.count, byteCount)
+            
+            expect.fulfill()
+        }
         
+        self.waitForExpectationsWithTimeout(4) { error in
+            XCTAssertNil(error, "Niceware new passphrase error")
+        }
     }
     
     func testPassphraseToByte() {

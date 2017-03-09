@@ -30,12 +30,14 @@ class Niceware: JSInjector {
         return webCfg
     }
     
-    func passphrase(numberOfBytes byteCount: UInt, completion: ((AnyObject?, NSError?) -> Void)?) {
+    // TODO: Rename, this is bad
+    func uniqueBytes(count byteCount: Int, completion: ((AnyObject?, NSError?) -> Void)?) {
         // TODO: Add byteCount validation (e.g. must be even)
         executeBlockOnReady {
             self.nicewareWebView.evaluateJavaScript("niceware.passphraseToBytes(niceware.generatePassphrase(\(byteCount)))") { (one, error) in
                 print(one)
                 print(error)
+                completion?(one, error)
             }
         }
     }
