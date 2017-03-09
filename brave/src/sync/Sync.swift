@@ -32,7 +32,7 @@ enum SyncActions: Int {
 
 }
 
-class Sync: NSObject {
+class Sync: JSInjector {
     static let singleton = Sync()
 
     private var webView: WKWebView!
@@ -70,6 +70,7 @@ class Sync: NSObject {
     
     override init() {
         super.init()
+        self.isJavascriptReadyCheck = checkIsSyncReady
         webView = WKWebView(frame: CGRectZero, configuration: webConfig)
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
@@ -164,11 +165,16 @@ extension Sync {
 //                                    }
         })
     }
-    func fetch() {
+    
+    
+    func fetch(completion completion: ((AnyObject?, NSError?) -> Void)?) {
+        // TODO: Add delay check, increase max attempts due to additional logging
+        
         /*  browser -> webview: sent to fetch sync records after a given start time from the sync server.
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
         webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
                                    completionHandler: { (result, error) in
+                                    completion?(result, error)
 //                                    print(result)
 //                                    if error != nil {
 //                                        print(error)

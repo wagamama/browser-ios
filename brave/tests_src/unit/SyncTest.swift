@@ -37,7 +37,7 @@ class SyncTest: XCTestCase {
         sync.sendSyncRecords([.bookmark], recordJson: bm)
 
         sleep(5)
-        sync.fetch()
+        sync.fetch(completion: nil)
 
         // Wait for something that doesn't arrive for now, replace this
         expectationForNotification("never arriving 🤡", object: nil, handler:nil)
