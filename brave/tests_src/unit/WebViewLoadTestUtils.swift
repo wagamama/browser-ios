@@ -4,25 +4,25 @@ import XCTest
 @testable import Client
 import Shared
 
-extension XCTestCase {
-    func tester(file : String = #file, _ line : Int = #line) -> KIFUITestActor {
-        return KIFUITestActor(inFile: file, atLine: line, delegate: self)
-    }
-
-    func system(file : String = #file, _ line : Int = #line) -> KIFSystemTestActor {
-        return KIFSystemTestActor(inFile: file, atLine: line, delegate: self)
-    }
-}
-
-extension KIFTestActor {
-    func tester(file : String = #file, _ line : Int = #line) -> KIFUITestActor {
-        return KIFUITestActor(inFile: file, atLine: line, delegate: self)
-    }
-
-    func system(file : String = #file, _ line : Int = #line) -> KIFSystemTestActor {
-        return KIFSystemTestActor(inFile: file, atLine: line, delegate: self)
-    }
-}
+//extension XCTestCase {
+//    func tester(file : String = #file, _ line : Int = #line) -> KIFUITestActor {
+//        return KIFUITestActor(inFile: file, atLine: line, delegate: self)
+//    }
+//
+//    func system(file : String = #file, _ line : Int = #line) -> KIFSystemTestActor {
+//        return KIFSystemTestActor(inFile: file, atLine: line, delegate: self)
+//    }
+//}
+//
+//extension KIFTestActor {
+//    func tester(file : String = #file, _ line : Int = #line) -> KIFUITestActor {
+//        return KIFUITestActor(inFile: file, atLine: line, delegate: self)
+//    }
+//
+//    func system(file : String = #file, _ line : Int = #line) -> KIFSystemTestActor {
+//        return KIFSystemTestActor(inFile: file, atLine: line, delegate: self)
+//    }
+//}
 
 class WebViewLoadTestUtils {
     static func urlProtocolEnabled(enable:Bool) {
