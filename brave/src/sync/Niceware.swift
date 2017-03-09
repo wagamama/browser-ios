@@ -63,8 +63,24 @@ class Niceware: JSInjector {
         }
     }
     
-    func bytes(fromPassphrase: Array<String>) -> Array<String> {
-        return [""]
+    // TODO: Add docs
+    func bytes(fromPassphrase passphrase: Array<String>, completion: ((AnyObject?, NSError?) -> Void)?) {
+        // TODO: Add some keyword validation
+        executeBlockOnReady {
+            
+            let jsToExecute = "niceware.passphraseToBytes(\(passphrase));"
+            
+            self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
+                (result, error) in
+                
+                print(result)
+                if error != nil {
+                    print(error)
+                }
+                
+                completion?(result, error)
+            })
+        }
     }
 }
 
