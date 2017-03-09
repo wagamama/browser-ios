@@ -40,4 +40,23 @@ class JSInjector: NSObject {
         
         block()
     }
+    
+    
+    /// Javascript results that are "arrays" (e.g. array of niceware words), are returned as [String:valueType]
+    ///     where `key` => String(index), `value` => Sometype(index.value)
+    /// input: A dictionary where keys are string index values
+    /// result: An ordered array based on key order 0..<length (nil if problem)
+    internal func javascriptDictionaryAsNativeArray<T>(input: [String:T]?) -> [T]? {
+        var values: [T] = []
+        for i in 0..<(input?.count ?? 0) {
+            guard let value = input?["\(i)"] else {
+                // Bad index, break and let count logic handle fulfillment check
+                break
+            }
+            
+            values += [value]
+        }
+        
+        return values.count == input?.count ? values : nil
+    }
 }

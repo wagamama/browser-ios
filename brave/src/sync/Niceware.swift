@@ -80,20 +80,7 @@ class Niceware: JSInjector {
                     return
                 }
                 
-                var bytes: [Int] = []
-                for i in 0..<nativeResult.count {
-                    guard let byte = nativeResult["\(i)"] else {
-                        // Bad index, break and let count logic handle fulfillment check
-                        break
-                    }
-                    
-                    bytes += [byte]
-                }
-                
-                if bytes.count != nativeResult.count {
-                    completion?(nil, nil)
-                    return
-                }
+                let bytes = self.javascriptDictionaryAsNativeArray(nativeResult)
                 
                 completion?(bytes, error)
             })
