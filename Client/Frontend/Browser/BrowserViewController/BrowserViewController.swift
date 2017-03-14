@@ -684,7 +684,8 @@ class BrowserViewController: UIViewController {
     }
 
     func addBookmark(url: NSURL, title: String?, parentFolder: NSManagedObjectID? = nil) {
-        Bookmark.add(url: url, title: title, parentFolder: parentFolder)
+        // Custom title can only be applied during an edit
+        Bookmark.add(url: url, title: title, customTitle: nil, parentFolder: parentFolder)
         self.urlBar.updateBookmarkStatus(true)
     }
 
