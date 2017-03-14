@@ -10,8 +10,8 @@ class SyncTest: XCTestCase {
     func testSync() {
         expectationForNotification(NotificationSyncReady, object: nil, handler:nil)
         
-        let sync = Sync()
-        waitForExpectationsWithTimeout(10) { error in
+        let sync = Sync.singleton
+        waitForExpectationsWithTimeout(15) { error in
             XCTAssertNil(error, "Error timeout waiting sync ready")
         }
         
@@ -31,21 +31,24 @@ class SyncTest: XCTestCase {
                 "title: 'Google'," +
                 "customTitle: ''," +
                 "lastAccessedTime: 1486066976216," +
-                "creationTime: 0 }," +
+                "creationTime: 4 }," +
                 "isFolder: false," +
                 "parentFolderObjectId: undefined } }]"
         sync.sendSyncRecords(.bookmark, recordJson: bm)
 
         sleep(5)
-        sync.fetch(completion: nil)
-
-        // Wait for something that doesn't arrive for now, replace this
-        expectationForNotification("never arriving 🤡", object: nil, handler:nil)
-        waitForExpectationsWithTimeout(20) { (error:NSError?) -> Void in
-            if let _ = error {
-                XCTAssert(false, "error")
-            }
+        
+        let fetchExpect = expectationWithDescription("Fetch result expectation")
+        sync.fetch() { error in
+            XCTAssertNil(error, "Fetching had result error")
+            fetchExpect.fulfill()
         }
+
+        waitForExpectationsWithTimeout(4) { (error:NSError?) -> Void in
+            XCTAssertNil(error, "Fetching had expectation error")
+        }
+        
+        // TODO: Somehow need to check the fetched results
 
     }
 
