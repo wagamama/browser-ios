@@ -71,6 +71,8 @@ class Sync: JSInjector {
     override init() {
         super.init()
         self.isJavascriptReadyCheck = checkIsSyncReady
+        self.maximumDelayAttempts = 15
+        
         webView = WKWebView(frame: CGRectZero, configuration: webConfig)
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
