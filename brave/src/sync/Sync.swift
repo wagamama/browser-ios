@@ -218,8 +218,14 @@ extension Sync {
             let objects = data["arg2"] as? [[String: AnyObject]] else { return }
         /*▿ Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
         for item in objects {
-            if item["objectData"] as? String == "bookmark" {
-                print("parse a bookmark")
+            if (item["objectData"] as? String) == "bookmark",
+                let bookmark = item["bookmark"] as? [String: AnyObject],
+                let site = bookmark["site"] as? [String: AnyObject] {
+                
+                let location = NSURL(string: (site["location"] as? String) ?? "")
+                
+                Bookmark.add(url: location, title: site["title"] as? String, customTitle: site["customTitle"] as? String, parentFolder: nil, isFolder: Bool(bookmark["isFolder"]! as! NSNumber) ?? false, save: false)
+                print("Bookmark.add(url: \(site["location"]), title: \(site["customTitle"]) ?? \(site["title"]), parentFolder: \(bookmark["parentFolderObjectId"]), isFolder: \(bookmark["isFolder"]), save: true)")
             }
         }
     }
