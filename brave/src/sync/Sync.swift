@@ -166,20 +166,23 @@ extension Sync {
         })
     }
     
-    
-    func fetch(completion completion: ((AnyObject?, NSError?) -> Void)?) {
+    // TODO: Remove callback
+    func fetch(completion: ((AnyObject?, NSError?) -> Void)?) {
         // TODO: Add delay check, increase max attempts due to additional logging
         
         /*  browser -> webview: sent to fetch sync records after a given start time from the sync server.
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
-        webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
-                                   completionHandler: { (result, error) in
-                                    completion?(result, error)
-//                                    print(result)
-//                                    if error != nil {
-//                                        print(error)
-//                                    }
-        })
+        
+        executeBlockOnReady() {
+            self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
+                                       completionHandler: { (result, error) in
+                                        completion?(result, error)
+//                                        print(result)
+//                                        if error != nil {
+//                                            print(error)
+//                                        }
+            })
+        }
     }
 
     func resolveSyncRecords(data: [String: AnyObject]) {
