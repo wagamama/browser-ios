@@ -22,7 +22,7 @@ class SyncTest: XCTestCase {
         
         // TODO: Implement below
 
-        var bm = "[{ action: \(SyncActions.delete.rawValue),"
+        var bm = "[{ action: \(SyncActions.create.rawValue),"
         bm += "deviceId: [ 0 ]," +
             "objectId: [ 171, 177, 210, 122, 73, 79, 129, 2, 30, 151, 125, 139, 226, 96, 92, 144 ]," +
             "bookmark:" +
@@ -34,7 +34,7 @@ class SyncTest: XCTestCase {
                 "creationTime: 0 }," +
                 "isFolder: false," +
                 "parentFolderObjectId: undefined } }]"
-        sync.sendSyncRecords([.bookmark], recordJson: bm)
+        sync.sendSyncRecords(.bookmark, recordJson: bm)
 
         sleep(5)
         sync.fetch(completion: nil)
