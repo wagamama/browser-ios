@@ -35,7 +35,8 @@ enum SyncActions: Int {
 class Sync: JSInjector {
     static let singleton = Sync()
 
-    private var webView: WKWebView!
+    /// This must be public so it can be added into the view hierarchy 
+    var webView: WKWebView!
 
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
 
@@ -73,7 +74,7 @@ class Sync: JSInjector {
         self.isJavascriptReadyCheck = checkIsSyncReady
         self.maximumDelayAttempts = 15
         
-        webView = WKWebView(frame: CGRectZero, configuration: webConfig)
+        webView = WKWebView(frame: CGRectMake(30, 30, 100, 100), configuration: webConfig)
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
 

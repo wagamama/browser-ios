@@ -29,6 +29,11 @@ class BraveBrowserViewController : BrowserViewController {
         }
 
         RunOnceAtStartup.ran = true
+        
+        // Initialize Sync without connecting. Sync webview needs to be in a "permanent" location to continue working predictably
+        //  If Sync is not in the view "hierarchy" it will behavior extremely unpredictably, often just dying in the middle of a promize chain
+        Sync.singleton.webView.alpha = 0.01
+        self.view.insertSubview(Sync.singleton.webView, atIndex: 0)
     }
 
     override func viewWillAppear(animated: Bool) {
