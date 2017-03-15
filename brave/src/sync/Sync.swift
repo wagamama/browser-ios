@@ -73,9 +73,16 @@ class Sync: JSInjector {
         super.init()
         self.isJavascriptReadyCheck = checkIsSyncReady
         self.maximumDelayAttempts = 15
-        
         webView = WKWebView(frame: CGRectMake(30, 30, 100, 100), configuration: webConfig)
-        self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+        // Attempt sync setup
+        initializeSync()
+    }
+    
+    func initializeSync() {
+        // Autoload sync if already connected to a sync group, otherwise just wait for user initiation
+        if syncSeed != nil {
+            self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+        }
     }
 
     class func getScript(name:String) -> String {
@@ -89,10 +96,9 @@ class Sync: JSInjector {
         print(#function)
     }
 
-    private var syncDeviceId: String {
+    private var syncDeviceId: String? {
         get {
-            let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameId)
-            return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
+            return jsArray(userDefaultKey: prefNameId)
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameId)
@@ -114,14 +120,21 @@ class Sync: JSInjector {
     }
 
     // TODO: Move to keychain
-    private var syncSeed: String {
+    private var syncSeed: String? {
         get {
-            let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
-            return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
+            return jsArray(userDefaultKey: prefNameSeed)
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
         }
+    }
+    
+    private func jsArray(userDefaultKey key: String) -> String? {
+        if let val = NSUserDefaults.standardUserDefaults().stringForKey(key) {
+            return "new Uint8Array(\(val))"
+        }
+        
+        return nil
     }
 
     func checkIsSyncReady() -> Bool {
@@ -163,7 +176,7 @@ extension Sync {
     }
 
     func gotInitData() {
-        let args = "(null, \(syncSeed), \(syncDeviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
+        let args = "(null, \(syncSeed ?? "null"), \(syncDeviceId ?? "null"), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
                                    completionHandler: { (result, error) in
