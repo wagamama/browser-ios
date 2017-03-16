@@ -48,12 +48,11 @@ class Niceware: JSInjector {
     /// fromBytes: Array of hex strings (no "0x" prefix) : ["00", "ee", "4a", "42"]
     /// returns (via completion): Array of words from niceware that map to those hex values : ["administrational", "experimental"]
     // TODO: Massage data a bit more for completion block
-    func passphrase(fromBytes bytes: Array<String>, completion: ((AnyObject?, NSError?) -> Void)?) {
+    func passphrase(fromBytes bytes: [Int], completion: ((AnyObject?, NSError?) -> Void)?) {
         
         executeBlockOnReady {
             
-            let intBytes = bytes.map({ Int($0, radix: 16) ?? 0 })
-            let input = "new Uint8Array(\(intBytes))"
+            let input = "new Uint8Array(\(bytes))"
             let jsToExecute = "niceware.bytesToPassphrase(\(input));"
             
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
@@ -69,10 +68,19 @@ class Niceware: JSInjector {
         }
     }
     
+    /// Takes joined string of unique hex bytes (e.g. from QR code) and returns
+    func passphrase(fromJoinedBytes bytes: String, completion: ((AnyObject?, NSError?) -> Void)?) {
+        if let split = splitBytes(fromJoinedBytes: bytes) {
+            return passphrase(fromBytes: split, completion: completion)
+        }
+        // TODO: Create real error
+        completion?(nil, nil)
+    }
+    
     /// Takes a joined string of unique hex bytes (e.g. from QR code) and splits up the hex values
     /// fromJoinedBytes: a single string of hex data (even # of chars required): 897a6f0219fd2950
-    /// return: hex values split into 8 bit groupings ["98", "7a", "6f", ...]
-    func splitBytes(fromJoinedBytes bytes: String) -> [String]? {
+    /// return: integer values split into 8 bit groupings [0x98, 0x7a, 0x6f, ...]
+    func splitBytes(fromJoinedBytes bytes: String) -> [Int]? {
         var chars = bytes.characters.map { String($0) }
         
         if chars.count % 2 == 1 {
@@ -80,17 +88,22 @@ class Niceware: JSInjector {
             return nil
         }
         
-        var result = [String]()
+        var result = [Int]()
         while !chars.isEmpty {
-            result.append(chars[0...1].reduce("", combine: +))
-            chars.removeFirst(2) // According to docs thsi returns removed result, behavior is different (at least for Swift 2.3)
+            let hex = chars[0...1].reduce("", combine: +)
+            guard let integer = Int(hex, radix: 16) else {
+                // bad error
+                return nil
+            }
+            result.append(integer)
+            chars.removeFirst(2) // According to docs this returns removed result, behavior is different (at least for Swift 2.3)
         }
         return result.isEmpty ? nil : result
     }
     
     /// Takes English words and returns associated bytes (2 bytes per word)
     /// fromPassphrase: An array of words : ["administrational", "experimental"]
-    /// returns (via completion): Array of integer values : [00, ee, 4a, 42]
+    /// returns (via completion): Array of integer values : [0x00, 0xee, 0x4a, 0x42]
     func bytes(fromPassphrase passphrase: Array<String>, completion: (([Int]?, NSError?) -> Void)?) {
         // TODO: Add some keyword validation
         executeBlockOnReady {

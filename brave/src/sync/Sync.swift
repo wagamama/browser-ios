@@ -78,10 +78,20 @@ class Sync: JSInjector {
         initializeSync()
     }
     
-    func initializeSync() {
+    /// Sets up sync to actually start pulling/pushing data. This method can only be called once
+    /// seed (optional): The user seed, in the form of string hex values. Must be even number : ["00", "ee", "4a", "42"]
+    /// Notice:: seed will be ignored if the keychain already has one, a user must disconnect from existing sync group prior to joining a new one
+    func initializeSync(seed: [Int]? = nil) {
+        
+        if let joinedSeed = seed where joinedSeed.count > 0 {
+            // Always attempt seed write, setter prevents bad overwrites
+            syncSeed = "\(joinedSeed)"
+        }
+        
         // Autoload sync if already connected to a sync group, otherwise just wait for user initiation
-        if syncSeed != nil {
+        if let _ = syncSeed {
             self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+            self.fetch()
         }
     }
 
@@ -113,10 +123,6 @@ class Sync: JSInjector {
     /// Seed byte array, 2 indeces for each word
     var seedAsBytes: String {
         return ""
-    }
-    
-    func joinSyncGroup(keywords: String) {
-        
     }
 
     // TODO: Move to keychain
@@ -245,6 +251,8 @@ extension Sync {
 
     func saveInitData(data: [String: AnyObject]) {
         if let seedDict = data["arg1"] as? [String: Int] {
+            
+            // TODO: Use js util converter
             var seedArray = [Int](count: 32, repeatedValue: 0)
             for (k, v) in seedDict {
                 if let k = Int(k) where k < 32 {
