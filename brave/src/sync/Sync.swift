@@ -32,7 +32,7 @@ enum SyncActions: Int {
 
 }
 
-class Sync: NSObject {
+class Sync: JSInjector {
     static let singleton = Sync()
 
     private var webView: WKWebView!
@@ -70,6 +70,9 @@ class Sync: NSObject {
     
     override init() {
         super.init()
+        self.isJavascriptReadyCheck = checkIsSyncReady
+        self.maximumDelayAttempts = 15
+        
         webView = WKWebView(frame: CGRectZero, configuration: webConfig)
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
@@ -140,17 +143,22 @@ class Sync: NSObject {
 
 // MARK: Native-initiated Message category
 extension Sync {
-    func sendSyncRecords(recordType: [SyncRecordType], recordJson: String) {
-        /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
-         @param {string} categoryName, @param {Array.<Object>} records */
-        let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
-        webView.evaluateJavaScript("callbackList['send-sync-records'](null, \(arg1),\(recordJson))",
-                                   completionHandler: { (result, error) in
-//                                    print(result)
-//                                    if error != nil {
-//                                        print(error)
-//                                    }
-        })
+    func sendSyncRecords(recordType: SyncRecordType, recordJson: String) {
+        
+        executeBlockOnReady() {
+            /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
+             @param {string} categoryName, @param {Array.<Object>} records */
+//            let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
+            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(recordJson))"
+            print(evaluate)
+            self.webView.evaluateJavaScript(evaluate,
+                                       completionHandler: { (result, error) in
+                                        print(result)
+                                        if error != nil {
+                                            print(error)
+                                        }
+            })
+        }
     }
 
     func gotInitData() {
@@ -164,16 +172,18 @@ extension Sync {
 //                                    }
         })
     }
-    func fetch() {
+    
+    /// Makes call to sync to fetch new records, instead of just returning records, sync sends `get-existing-objects` message
+    func fetch(completion: (NSError? -> Void)? = nil) {
         /*  browser -> webview: sent to fetch sync records after a given start time from the sync server.
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
-        webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
-                                   completionHandler: { (result, error) in
-//                                    print(result)
-//                                    if error != nil {
-//                                        print(error)
-//                                    }
-        })
+        
+        executeBlockOnReady() {
+            self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
+                                       completionHandler: { (result, error) in
+                                        completion?(error)
+            })
+        }
     }
 
     func resolveSyncRecords(data: [String: AnyObject]) {
@@ -202,8 +212,14 @@ extension Sync {
             let objects = data["arg2"] as? [[String: AnyObject]] else { return }
         /*▿ Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
         for item in objects {
-            if item["objectData"] as? String == "bookmark" {
-                print("parse a bookmark")
+            if (item["objectData"] as? String) == "bookmark",
+                let bookmark = item["bookmark"] as? [String: AnyObject],
+                let site = bookmark["site"] as? [String: AnyObject] {
+                
+                let location = NSURL(string: (site["location"] as? String) ?? "")
+                
+                Bookmark.add(url: location, title: site["title"] as? String, customTitle: site["customTitle"] as? String, parentFolder: nil, isFolder: Bool(bookmark["isFolder"]! as! NSNumber) ?? false, save: false)
+                print("Bookmark.add(url: \(site["location"]), title: \(site["customTitle"]) ?? \(site["title"]), parentFolder: \(bookmark["parentFolderObjectId"]), isFolder: \(bookmark["isFolder"]), save: true)")
             }
         }
     }

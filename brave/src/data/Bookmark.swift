@@ -52,7 +52,7 @@ class Bookmark: NSManagedObject {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
-    class func add(url url: NSURL?, title: String?, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) {
+    class func add(url url: NSURL?, title: String?, customTitle: String?, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) {
         if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
             return
         }
@@ -60,6 +60,7 @@ class Bookmark: NSManagedObject {
         let bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         bk.url = url?.absoluteString
         bk.title = title
+        bk.customTitle = customTitle
         bk.isFolder = isFolder
 
         if let url = url {
