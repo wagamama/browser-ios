@@ -125,6 +125,11 @@ class Sync: JSInjector {
             return jsArray(userDefaultKey: prefNameSeed)
         }
         set(value) {
+            if syncSeed != nil && value != nil {
+                // Error, cannot replace sync seed with another seed
+                //  must set syncSeed to ni prior to replacing it
+                return
+            }
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
         }
     }
