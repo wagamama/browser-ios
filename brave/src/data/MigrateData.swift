@@ -1,6 +1,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import Storage
+
 class MigrateData: NSObject {
+    
+    private var files: FileAccessor!
+    private var db: COpaquePointer = nil
     
     // TODO: WIP:
     // Detect old db type.
@@ -25,6 +30,8 @@ class MigrateData: NSObject {
     
     required convenience init(completed: ((success: Bool) -> Void)?) {
         self.init()
+        self.files = ProfileFileAccessor(localName: "profile")
+        
         completedCallback = completed
         process()
     }
@@ -61,10 +68,17 @@ class MigrateData: NSObject {
     }
     
     private func hasOldDb() -> Bool {
+        let file = ((try! files.getAndEnsureDirectory()) as NSString).stringByAppendingPathComponent("browser.db")
+        let status = sqlite3_open_v2(file.cStringUsingEncoding(NSUTF8StringEncoding)!, &db, SQLITE_OPEN_READONLY, nil)
+        if status != SQLITE_OK {
+            debugPrint("Error: Opening Database with Flags")
+            return false
+        }
         return true
     }
     
     private func migrateBookmarks(completed: (success: Bool) -> Void) {
+        
         completed(success: true)
     }
     
@@ -85,7 +99,14 @@ class MigrateData: NSObject {
     }
     
     private func removeOldDb(completed: (success: Bool) -> Void) {
-        completed(success: true)
+//        do {
+//            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
+//            completed(success: true)
+//        } catch {
+//            debugPrint("Cannot clear profile data: \(error)")
+//            completed(success: false)
+//        }
+        completed(success: false)
     }
     
     private func checkCompleted() {
