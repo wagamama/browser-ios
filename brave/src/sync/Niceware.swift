@@ -108,19 +108,18 @@ class Niceware: JSInjector {
         // TODO: Add some keyword validation
         executeBlockOnReady {
             
-            let jsToExecute = "niceware.passphraseToBytes(\(passphrase));"
+            let jsToExecute = "JSON.stringify(niceware.passphraseToBytes(\(passphrase)));"
             
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
                 (result, error) in
                 
-                // Result comes in the format [Index(String): Value(Int)]
-                //  Since dictionary is unordered, index must be pulled via string values
-                guard let nativeResult = result as? [String:Int] else {
-                    completion?(nil, nil)
+                guard let nativeResult = NSJSONSerialization.swiftObject(withJSON: result) as? [String: AnyObject] else {
                     return
                 }
                 
-                let bytes = self.javascriptDictionaryAsNativeArray(nativeResult)
+                guard let bytes = nativeResult["data"] as? [Int] else {
+                    return
+                }
                 
                 completion?(bytes, error)
             })

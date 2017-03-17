@@ -192,6 +192,7 @@
 		5D2B07EB1E6733B900244C39 /* niceware.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D2B07EA1E6733B900244C39 /* niceware.js */; };
 		5D71B69B1E6885E00073621F /* Niceware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D71B69A1E6885E00073621F /* Niceware.swift */; };
 		5DCC5D701E7C2F0100054BBD /* SwiftJSConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */; };
+		5DCC5D841E7C50B300054BBD /* NSJSONSerializationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */; };
 		5E5E76550DFB4EB71194132F /* LICENSE in Sources */ = {isa = PBXBuildFile; fileRef = 36C647DC00749BCC944D6EC6 /* LICENSE */; };
 		5E6571D452F3C000461D2481 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F94204C0EC007236424A86 /* AppDelegate.swift */; };
 		5F05A9BDFA985F96C2CFCA35 /* testutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0FA8929C0D08EA248F350718 /* testutil.cc */; };
@@ -985,6 +986,7 @@
 		5D84AB2CBD701CBBDC40620C /* ReadingListAuthenticator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReadingListAuthenticator.swift; path = ./ReadingList/ReadingListAuthenticator.swift; sourceTree = "<group>"; };
 		5DC93C70E9DA3485A2FD2BD3 /* Error.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Error.swift; path = ./ThirdParty/Result/Error.swift; sourceTree = "<group>"; };
 		5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftJSConverter.swift; sourceTree = "<group>"; };
+		5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSJSONSerializationExtensions.swift; sourceTree = "<group>"; };
 		5E2DD2C9767F04D79BD241B0 /* port_posix.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = port_posix.h; path = ./brave/ThirdParty/leveldb/port/port_posix.h; sourceTree = "<group>"; };
 		5ED8720B8C08231F6A2FC090 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsTableViewController.swift; path = ./Client/Frontend/Settings/SettingsTableViewController.swift; sourceTree = "<group>"; };
 		603F85E39F9E018441B742A3 /* amazondotcom.xml */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = amazondotcom.xml; path = ./Client/Assets/Search/SearchOverrides/en/amazondotcom.xml; sourceTree = "<group>"; };
@@ -3026,6 +3028,7 @@
 				A127F3B5A0BED3305F68B2E0 /* HexExtensions.swift */,
 				85BF1920738AC219D231C69E /* NSCharacterSetExtensions.swift */,
 				8C505FBF5BDE8520B98BCCF8 /* NSFileManagerExtensions.swift */,
+				5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */,
 				A62C053A18EDCEAE240498A6 /* NSMutableAttributedStringExtensions.swift */,
 				A9E39E85A79516D1E92939CB /* NSScannerExtensions.swift */,
 				D2243796CB0C27B99AED9742 /* NSStringExtensions.swift */,
@@ -4090,6 +4093,7 @@
 				1A23068D5E66CD83B1512D15 /* URIFixup.swift in Sources */,
 				7A4740A67EFB857AA6E9944A /* URLBarView.swift in Sources */,
 				EB00A2F51E1BF4CC00680DB8 /* BloomFilter.cpp in Sources */,
+				5DCC5D841E7C50B300054BBD /* NSJSONSerializationExtensions.swift in Sources */,
 				5F4A4A111C9E46036CF35F76 /* WindowCloseHelper.swift in Sources */,
 				68450568B88EB41CBF2CF6B0 /* BookmarksPanel.swift in Sources */,
 				162A3AF42CC684A194F305D6 /* HistoryPanel.swift in Sources */,
