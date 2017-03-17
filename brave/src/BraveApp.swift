@@ -80,8 +80,6 @@ class BraveApp {
             }
        #endif
         
-        // TODO: Coredata Migrations
-        
         UINavigationBar.appearance().tintColor = BraveUX.DefaultBlue
     }
 

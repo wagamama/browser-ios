@@ -122,6 +122,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true
         self.window!.rootViewController = rootViewController
+        
+        // TODO: Show activity indicator instead of launching app.
+        _ = MigrateData(completed: { (success) in
+            if success {
+                // TODO: Remove activity indicator.
+            }
+        })
 
 #if !BRAVE
         activeCrashReporter = BreakpadCrashReporter(breakpadInstance: BreakpadController.sharedInstance())
