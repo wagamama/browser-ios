@@ -94,6 +94,15 @@ class Sync: JSInjector {
             self.fetch()
         }
     }
+    
+    func initializeNewSyncGroup() {
+        if syncSeed != nil {
+            // Error, to setup new sync group, must have no seed
+            return
+        }
+        
+        self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+    }
 
     class func getScript(name:String) -> String {
         // TODO: Add unwrapping warnings
