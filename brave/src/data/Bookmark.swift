@@ -16,7 +16,7 @@ class Bookmark: NSManagedObject {
     @NSManaged var created: NSDate?
     @NSManaged var order: Int16
     @NSManaged var tags: [String]?
-    @NSManaged var syncUUID: NSUUID?
+    @NSManaged var syncUUID: String?
 
     @NSManaged var parentFolder: Bookmark?
     @NSManaged var children: Set<Bookmark>?
@@ -52,7 +52,7 @@ class Bookmark: NSManagedObject {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
-    class func add(url url: NSURL?, title: String?, customTitle: String?, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) {
+    class func add(url url: NSURL?, title: String?, customTitle: String?, syncUUID: String? = nil, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) {
         if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
             return
         }
@@ -62,6 +62,12 @@ class Bookmark: NSManagedObject {
         bk.title = title
         bk.customTitle = customTitle
         bk.isFolder = isFolder
+        
+        if let syncUUID = syncUUID {
+            bk.syncUUID = syncUUID.stringByReplacingOccurrencesOfString(" ", withString: "")
+        } else {
+            // Need async creation of UUID
+        }
 
         if let url = url {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
@@ -110,7 +116,23 @@ class Bookmark: NSManagedObject {
         }
         return nil
     }
-
+    
+    static func get(syncUUID: String?) -> [Bookmark]? {
+        guard let syncUUID = syncUUID?.stringByReplacingOccurrencesOfString(" ", withString: "") else {
+            return nil
+        }
+        
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Bookmark.entity(DataController.moc)
+        // TODO: Fill predicate with syncUUID option[s]
+        fetchRequest.predicate = NSPredicate(format: "")
+        
+        if let results = try? DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
+            return results
+        }
+        
+        return nil
+    }
 
     static func getFolders(bookmark: Bookmark?) -> [Bookmark] {
         let fetchRequest = NSFetchRequest()
