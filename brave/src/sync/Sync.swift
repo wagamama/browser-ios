@@ -35,7 +35,8 @@ enum SyncActions: Int {
 class Sync: JSInjector {
     static let singleton = Sync()
 
-    private var webView: WKWebView!
+    /// This must be public so it can be added into the view hierarchy 
+    var webView: WKWebView!
 
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
 
@@ -70,10 +71,42 @@ class Sync: JSInjector {
     
     override init() {
         super.init()
+        
+        // TODO: Remove - currently for sync testing
+        syncSeed = nil
+        
         self.isJavascriptReadyCheck = checkIsSyncReady
         self.maximumDelayAttempts = 15
+        self.delayLengthInSeconds = Int64(3.0)
         
-        webView = WKWebView(frame: CGRectZero, configuration: webConfig)
+        webView = WKWebView(frame: CGRectMake(30, 30, 100, 100), configuration: webConfig)
+        // Attempt sync setup
+        initializeSync()
+    }
+    
+    /// Sets up sync to actually start pulling/pushing data. This method can only be called once
+    /// seed (optional): The user seed, in the form of string hex values. Must be even number : ["00", "ee", "4a", "42"]
+    /// Notice:: seed will be ignored if the keychain already has one, a user must disconnect from existing sync group prior to joining a new one
+    func initializeSync(seed: [Int]? = nil) {
+        
+        if let joinedSeed = seed where joinedSeed.count > 0 {
+            // Always attempt seed write, setter prevents bad overwrites
+            syncSeed = "\(joinedSeed)"
+        }
+        
+        // Autoload sync if already connected to a sync group, otherwise just wait for user initiation
+        if let _ = syncSeed {
+            self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
+            self.fetch()
+        }
+    }
+    
+    func initializeNewSyncGroup() {
+        if syncSeed != nil {
+            // Error, to setup new sync group, must have no seed
+            return
+        }
+        
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
 
@@ -88,10 +121,9 @@ class Sync: JSInjector {
         print(#function)
     }
 
-    private var syncDeviceId: String {
+    private var syncDeviceId: String? {
         get {
-            let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameId)
-            return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
+            return jsArray(userDefaultKey: prefNameId)
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameId)
@@ -107,26 +139,38 @@ class Sync: JSInjector {
     var seedAsBytes: String {
         return ""
     }
-    
-    func joinSyncGroup(keywords: String) {
-        
-    }
 
     // TODO: Move to keychain
-    private var syncSeed: String {
+    private var syncSeed: String? {
         get {
-            let val = NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
-            return val == nil || val!.isEmpty ? "null" : "new Uint8Array(\(val!))"
+            return jsArray(userDefaultKey: prefNameSeed)
         }
         set(value) {
+            if syncSeed != nil && value != nil {
+                // Error, cannot replace sync seed with another seed
+                //  must set syncSeed to ni prior to replacing it
+                return
+            }
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
         }
+    }
+    
+    private func jsArray(userDefaultKey key: String) -> String? {
+        if let val = NSUserDefaults.standardUserDefaults().stringForKey(key) {
+            return "new Uint8Array(\(val))"
+        }
+        
+        return nil
     }
 
     func checkIsSyncReady() -> Bool {
         struct Static {
             static var isReady = false
         }
+        
+        print("******")
+        print(isSyncFullyInitialized.0, isSyncFullyInitialized.1, isSyncFullyInitialized.2, isSyncFullyInitialized.3, isSyncFullyInitialized.4, isSyncFullyInitialized.5, isSyncFullyInitialized.6)
+        
         if Static.isReady {
             return true
         }
@@ -162,7 +206,7 @@ extension Sync {
     }
 
     func gotInitData() {
-        let args = "(null, \(syncSeed), \(syncDeviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
+        let args = "(null, \(syncSeed ?? "null"), \(syncDeviceId ?? "null"), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
                                    completionHandler: { (result, error) in
@@ -181,6 +225,10 @@ extension Sync {
         executeBlockOnReady() {
             self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
                                        completionHandler: { (result, error) in
+                                        // Process merging
+                                        
+                                        
+                                        print(error)
                                         completion?(error)
             })
         }
@@ -226,6 +274,8 @@ extension Sync {
 
     func saveInitData(data: [String: AnyObject]) {
         if let seedDict = data["arg1"] as? [String: Int] {
+            
+            // TODO: Use js util converter
             var seedArray = [Int](count: 32, repeatedValue: 0)
             for (k, v) in seedDict {
                 if let k = Int(k) where k < 32 {
