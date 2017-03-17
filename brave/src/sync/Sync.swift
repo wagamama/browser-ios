@@ -71,8 +71,14 @@ class Sync: JSInjector {
     
     override init() {
         super.init()
+        
+        // TODO: Remove - currently for sync testing
+        syncSeed = nil
+        
         self.isJavascriptReadyCheck = checkIsSyncReady
         self.maximumDelayAttempts = 15
+        self.delayLengthInSeconds = Int64(3.0)
+        
         webView = WKWebView(frame: CGRectMake(30, 30, 100, 100), configuration: webConfig)
         // Attempt sync setup
         initializeSync()
@@ -161,6 +167,10 @@ class Sync: JSInjector {
         struct Static {
             static var isReady = false
         }
+        
+        print("******")
+        print(isSyncFullyInitialized.0, isSyncFullyInitialized.1, isSyncFullyInitialized.2, isSyncFullyInitialized.3, isSyncFullyInitialized.4, isSyncFullyInitialized.5, isSyncFullyInitialized.6)
+        
         if Static.isReady {
             return true
         }
@@ -215,6 +225,10 @@ extension Sync {
         executeBlockOnReady() {
             self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
                                        completionHandler: { (result, error) in
+                                        // Process merging
+                                        
+                                        
+                                        print(error)
                                         completion?(error)
             })
         }
