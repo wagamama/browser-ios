@@ -5,13 +5,13 @@ import Foundation
 
 extension NSJSONSerialization {
     
-    class func swiftObject(withJSON json: AnyObject?) -> AnyObject? {
+    class func swiftObject(withJSON json: AnyObject?) -> [String: AnyObject]? {
 
         guard let jsonData = json?.dataUsingEncoding(NSUTF8StringEncoding) else  {
             return nil
         }
         
-        guard let nativeObject = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: []) else {
+        guard let nativeObject = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: []) as? [String: AnyObject] else {
             return nil
         }
         
