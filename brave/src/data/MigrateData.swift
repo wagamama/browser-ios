@@ -187,7 +187,7 @@ class MigrateData: NSObject {
     }
     
     private func migrateBookmarks(completed: (success: Bool) -> Void) {
-        let query: String = "SELECT guid, type, parentid, title, description, bmkUrl, faviconID FROM bookmarksLocal WHERE is_deleted = 0 ORDER BY type DESC"
+        let query: String = "SELECT guid, type, parentid, title, description, bmkUri, faviconID FROM bookmarksLocal WHERE (id > 4 AND is_deleted = 0) ORDER BY type DESC"
         var results: COpaquePointer = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
@@ -195,16 +195,17 @@ class MigrateData: NSObject {
             while sqlite3_step(results) == SQLITE_ROW {
                 let guid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0)))!
                 let type = sqlite3_column_int(results, 1)
-                let parentid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2)))!
-                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 3)))!
-                let description = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 4)))!
-                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5)))!
+                let parentid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2))) ?? ""
+                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 3))) ?? ""
+                let description = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 4))) ?? ""
+                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5))) ?? ""
                 
-                let bk = Bookmark.add(url: NSURL(string: url), title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2))
+                let bk = Bookmark.add(url: NSURL(string: url), title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2), save: true)
                 relationshipHash[guid] = bk
             }
         } else {
-            debugPrint("SELECT statement could not be prepared")
+            let errmsg = String(UTF8String: sqlite3_errmsg(db))
+            debugPrint("SELECT statement could not be prepared \(errmsg)")
         }
         
         if sqlite3_finalize(results) != SQLITE_OK {
@@ -246,13 +247,14 @@ class MigrateData: NSObject {
     }
     
     private func removeOldDb(completed: (success: Bool) -> Void) {
-        do {
-            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
-            completed(success: true)
-        } catch {
-            debugPrint("Cannot clear profile data: \(error)")
-            completed(success: false)
-        }
+//        do {
+//            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
+//            completed(success: true)
+//        } catch {
+//            debugPrint("Cannot clear profile data: \(error)")
+//            completed(success: false)
+//        }
+        completed(success: false)
     }
     
     private func checkCompleted() {
