@@ -39,10 +39,6 @@ class MigrateData: NSObject {
         if hasOldDb() {
             debugPrint("Found old database...")
             
-            migrateBookmarks { (success) in
-                debugPrint("Migrate bookmarks... \(success ? "Done" : "Failed")")
-                self.completedCalls[ProcessOrder.Bookmarks] = success
-            }
             migrateDomainData { (success) in
                 debugPrint("Migrate domains... \(success ? "Done" : "Failed")")
                 self.completedCalls[ProcessOrder.Domains] = success
@@ -54,6 +50,10 @@ class MigrateData: NSObject {
             migrateHistory { (success) in
                 debugPrint("Migrate history... \(success ? "Done" : "Failed")")
                 self.completedCalls[ProcessOrder.History] = success
+            }
+            migrateBookmarks { (success) in
+                debugPrint("Migrate bookmarks... \(success ? "Done" : "Failed")")
+                self.completedCalls[ProcessOrder.Bookmarks] = success
             }
             migrateTabs { (success) in
                 debugPrint("Migrate tabs... \(success ? "Done" : "Failed")")
@@ -70,39 +70,6 @@ class MigrateData: NSObject {
             return false
         }
         return true
-    }
-    
-    internal var faviconHash: [Int32: NSManagedObjectID] = [:]
-    
-    private func migrateBookmarks(completed: (success: Bool) -> Void) {
-        let query: String = "SELECT guid, type, parentid, title, description, bmkUrl, faviconID FROM bookmarksLocal WHERE is_deleted = 0"
-        var results: COpaquePointer = nil
-        
-        if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
-            var relationshipHash: [String: NSManagedObjectID] = [:]
-            while sqlite3_step(results) == SQLITE_ROW {
-                let guid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0)))!
-                let type = sqlite3_column_int(results, 1)
-                let parentid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2)))!
-                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 3)))!
-                let description = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 4)))!
-                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5)))!
-                let faviconId = sqlite3_column_int(results, 6)
-                
-                let bk = Bookmark.add(url: NSURL(string: url), title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2))
-                relationshipHash[guid] = bk
-                faviconHash[faviconId] = bk
-            }
-        } else {
-            debugPrint("SELECT statement could not be prepared")
-        }
-        
-        if sqlite3_finalize(results) != SQLITE_OK {
-            let error = String.fromCString(sqlite3_errmsg(db))
-            debugPrint("Error finalizing prepared statement: \(error)")
-        }
-        results = nil
-        completed(success: true)
     }
     
     internal var domainHash: [Int32: Domain] = [:]
@@ -219,6 +186,35 @@ class MigrateData: NSObject {
         completed(success: true)
     }
     
+    private func migrateBookmarks(completed: (success: Bool) -> Void) {
+        let query: String = "SELECT guid, type, parentid, title, description, bmkUrl, faviconID FROM bookmarksLocal WHERE is_deleted = 0"
+        var results: COpaquePointer = nil
+        
+        if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
+            var relationshipHash: [String: NSManagedObjectID] = [:]
+            while sqlite3_step(results) == SQLITE_ROW {
+                let guid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0)))!
+                let type = sqlite3_column_int(results, 1)
+                let parentid = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2)))!
+                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 3)))!
+                let description = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 4)))!
+                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5)))!
+                
+                let bk = Bookmark.add(url: NSURL(string: url), title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2))
+                relationshipHash[guid] = bk
+            }
+        } else {
+            debugPrint("SELECT statement could not be prepared")
+        }
+        
+        if sqlite3_finalize(results) != SQLITE_OK {
+            let error = String.fromCString(sqlite3_errmsg(db))
+            debugPrint("Error finalizing prepared statement: \(error)")
+        }
+        results = nil
+        completed(success: true)
+    }
+    
     private func migrateTabs(completed: (success: Bool) -> Void) {
         let query: String = "SELECT url, title, history FROM tabs ORDER BY last_used"
         var results: COpaquePointer = nil
@@ -257,7 +253,6 @@ class MigrateData: NSObject {
             debugPrint("Cannot clear profile data: \(error)")
             completed(success: false)
         }
-        completed(success: false)
     }
     
     private func checkCompleted() {
