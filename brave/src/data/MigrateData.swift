@@ -187,7 +187,7 @@ class MigrateData: NSObject {
     }
     
     private func migrateBookmarks(completed: (success: Bool) -> Void) {
-        let query: String = "SELECT guid, type, parentid, title, description, bmkUrl, faviconID FROM bookmarksLocal WHERE is_deleted = 0"
+        let query: String = "SELECT guid, type, parentid, title, description, bmkUrl, faviconID FROM bookmarksLocal WHERE is_deleted = 0 ORDER BY type DESC"
         var results: COpaquePointer = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
