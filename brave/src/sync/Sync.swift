@@ -300,8 +300,13 @@ extension Sync {
 extension Sync: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
-        guard let data = message.body as? [String: AnyObject], let messageName = data["message"] as? String else {
-            assert(false) ;
+        
+        
+        guard
+            let data = NSJSONSerialization.swiftObject(withJSON: message.body),
+            let messageName = data["message"] as? String else {
+                
+            assert(false)
             return
         }
 

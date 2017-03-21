@@ -33,13 +33,14 @@ class Niceware: JSInjector {
     /// Used to retrive unique bytes for UUIDs (e.g. bookmarks), that will map well with niceware
     /// count: The number of unique bytes desired
     /// returns (via completion): Array of unique bytes
-    func uniqueBytes(count byteCount: Int, completion: ((AnyObject?, NSError?) -> Void)?) {
+    func uniqueBytes(count byteCount: Int, completion: (([Int]?, NSError?) -> Void)) {
         // TODO: Add byteCount validation (e.g. must be even)
+        
         executeBlockOnReady {
-            self.nicewareWebView.evaluateJavaScript("niceware.passphraseToBytes(niceware.generatePassphrase(\(byteCount)))") { (one, error) in
-                print(one)
-                print(error)
-                completion?(one, error)
+            self.nicewareWebView.evaluateJavaScript("JSON.stringify(niceware.passphraseToBytes(niceware.generatePassphrase(\(byteCount))))") { (result, error) in
+                
+                let bytes = NSJSONSerialization.swiftObject(withJSON: result)?["data"] as? [Int]
+                completion(bytes, error)
             }
         }
     }
@@ -48,33 +49,29 @@ class Niceware: JSInjector {
     /// fromBytes: Array of hex strings (no "0x" prefix) : ["00", "ee", "4a", "42"]
     /// returns (via completion): Array of words from niceware that map to those hex values : ["administrational", "experimental"]
     // TODO: Massage data a bit more for completion block
-    func passphrase(fromBytes bytes: [Int], completion: ((AnyObject?, NSError?) -> Void)?) {
+    func passphrase(fromBytes bytes: [Int], completion: (([String]?, NSError?) -> Void)) {
         
         executeBlockOnReady {
             
             let input = "new Uint8Array(\(bytes))"
-            let jsToExecute = "niceware.bytesToPassphrase(\(input));"
+            let jsToExecute = "JSON.stringify(niceware.bytesToPassphrase(\(input)));"
             
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
                 (result, error) in
-                    
-                print(result)
-                if error != nil {
-                    print(error)
-                }
                 
-                completion?(result, error)
+                let words = NSJSONSerialization.swiftObject(withJSON: result)?["data"] as? [String]
+                completion(words, error)
             })
         }
     }
     
     /// Takes joined string of unique hex bytes (e.g. from QR code) and returns
-    func passphrase(fromJoinedBytes bytes: String, completion: ((AnyObject?, NSError?) -> Void)?) {
+    func passphrase(fromJoinedBytes bytes: String, completion: (([String]?, NSError?) -> Void)) {
         if let split = splitBytes(fromJoinedBytes: bytes) {
             return passphrase(fromBytes: split, completion: completion)
         }
         // TODO: Create real error
-        completion?(nil, nil)
+        completion(nil, nil)
     }
     
     /// Takes a joined string of unique hex bytes (e.g. from QR code) and splits up the hex values
@@ -108,20 +105,12 @@ class Niceware: JSInjector {
         // TODO: Add some keyword validation
         executeBlockOnReady {
             
-            let jsToExecute = "niceware.passphraseToBytes(\(passphrase));"
+            let jsToExecute = "JSON.stringify(niceware.passphraseToBytes(\(passphrase)));"
             
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
                 (result, error) in
                 
-                // Result comes in the format [Index(String): Value(Int)]
-                //  Since dictionary is unordered, index must be pulled via string values
-                guard let nativeResult = result as? [String:Int] else {
-                    completion?(nil, nil)
-                    return
-                }
-                
-                let bytes = self.javascriptDictionaryAsNativeArray(nativeResult)
-                
+                let bytes = NSJSONSerialization.swiftObject(withJSON: result)?["data"] as? [Int]
                 completion?(bytes, error)
             })
         }
