@@ -81,7 +81,7 @@ class MigrateData: NSObject {
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
                 let id = sqlite3_column_int(results, 0)
-                let domain = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1)))!
+                let domain = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
                 let showOnTopSites = sqlite3_column_int(results, 2)
                 
                 if let d = Domain.getOrCreateForUrl(NSURL(string: domain)!, context: DataController.moc) {
@@ -108,8 +108,8 @@ class MigrateData: NSObject {
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
-                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0)))!
-                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1)))!
+                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0))) ?? ""
+                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
                 
                 History.add(title: title, url: NSURL(string: url)!)
             }
@@ -159,7 +159,7 @@ class MigrateData: NSObject {
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
                 let id = sqlite3_column_int(results, 0)
-                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1)))!
+                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
                 let width = sqlite3_column_int(results, 2)
                 let height = sqlite3_column_int(results, 3)
                 let type = sqlite3_column_int(results, 4)
@@ -223,16 +223,15 @@ class MigrateData: NSObject {
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             var order: Int16 = 0
             while sqlite3_step(results) == SQLITE_ROW {
-                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0)))!
-                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1)))!
-                let history = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2)))!
+                let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0))) ?? ""
+                let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
+                let history = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2))) ?? ""
                 
                 let tab = SavedTab(title: title, url: url, isSelected: false, order: order, screenshot: nil, history: [history], historyIndex: 0)
                 
                 TabMO.add(tab, context: DataController.moc)
                 order = order + 1
             }
-            
             DataController.saveContext()
         } else {
             debugPrint("SELECT statement could not be prepared")
@@ -247,14 +246,13 @@ class MigrateData: NSObject {
     }
     
     private func removeOldDb(completed: (success: Bool) -> Void) {
-//        do {
-//            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
-//            completed(success: true)
-//        } catch {
-//            debugPrint("Cannot clear profile data: \(error)")
-//            completed(success: false)
-//        }
-        completed(success: false)
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
+            completed(success: true)
+        } catch {
+            debugPrint("Cannot clear profile data: \(error)")
+            completed(success: false)
+        }
     }
     
     private func checkCompleted() {
