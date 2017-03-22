@@ -180,6 +180,8 @@ class Sync: JSInjector {
         if ready {
             Static.isReady = true
             NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
+            
+            // TODO: Start fetch recusive
         }
         return ready
     }
@@ -256,14 +258,8 @@ extension Sync {
 extension Sync {
 
     func getExistingObjects(data: [String: AnyObject]) {
-        guard let typeName = data["arg1"] as? String,
-            let objects = data["arg2"] as? [[String: AnyObject]] else { return }
+        guard let objects = data["arg2"] as? [[String: AnyObject]] else { return }
         /* Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
-        
-        // flatmap removes nils allowing this to be [String] rather than [String?]
-        let objectIds = objects.map { ($0["objectId"] as? [Int])?.description.withoutSpaces }.flatMap { $0 }
-        let localBookmarks = Bookmark.get(syncUUIDs: objectIds)
-        
         
         // Root "AnyObject" here should either be [String:AnyObject] or the string literal "null"
         var matchedBookmarks = [[AnyObject]]()
@@ -272,12 +268,11 @@ extension Sync {
                 continue
             }
             
-            // TODO: Replace with individual `gets`
-            let bookmarks = localBookmarks?.filter { $0.syncUUID == fetchedId }
+            // Pulls bookmarks individually from CD to verify duplicates do not get added
+            let bookmarks = Bookmark.get(syncUUIDs: [fetchedId])
             
             // TODO: Validate count, should never be more than one!
             
-//            var singleBookmark: Bookmark!
             var singleBookmark = bookmarks?.first
             if singleBookmark == nil {
                 // Add, not found
