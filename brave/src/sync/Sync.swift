@@ -234,7 +234,7 @@ extension Sync {
         }
     }
 
-    func resolveSyncRecords(data: [String: AnyObject]) {
+    func resolvedSyncRecords(data: [String: AnyObject]) {
         print("not implemented: resolveSyncRecords() \(data)")
     }
 
@@ -345,7 +345,6 @@ extension Sync: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
         
-        
         guard
             let data = NSJSONSerialization.swiftObject(withJSON: message.body),
             let messageName = data["message"] as? String else {
@@ -363,7 +362,10 @@ extension Sync: WKScriptMessageHandler {
         case "save-init-data" :
             saveInitData(data)
         case "get-existing-objects":
+            // TODO: Should just return records, and immediately call resolve-sync-records
             getExistingObjects(data)
+        case "resolved-sync-records":
+            resolvedSyncRecords(data)
         case "sync-debug":
             print("---- Sync Debug: \(data)")
         case "sync-ready":
