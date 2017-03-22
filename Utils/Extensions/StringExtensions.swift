@@ -94,4 +94,9 @@ public extension String {
         }
         return trimmed
     }
+    
+    /// Removes all literal spaces " " in string
+    public var withoutSpaces: String {
+        return self.stringByReplacingOccurrencesOfString(" ", withString: "")
+    }
 }
