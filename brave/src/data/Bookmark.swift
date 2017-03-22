@@ -32,6 +32,35 @@ class Bookmark: NSManagedObject {
         created = NSDate()
         lastVisited = created
     }
+    
+    func asSyncBookmark(deviceId deviceId: String, action: Int) -> [String: AnyObject] {
+        
+        let unixCreated = Int((created?.timeIntervalSince1970 ?? 0) * 1000)
+        let unixAccessed = Int((lastVisited?.timeIntervalSince1970 ?? 0) * 1000)
+        
+        let site = [
+            "creationTime": unixCreated,
+            "customTitle": customTitle ?? "",
+            "favicon": domain?.favicon?.url ?? "",
+            "lastAccessedTime": unixAccessed,
+            "location": url ?? "",
+            "title": title ?? ""
+        ]
+        
+        let nativeObject: [String: AnyObject] = [
+            "objectData": "bookmark",
+            "deviceId": deviceId,
+            "objectId": syncUUID ?? "null",
+            "action": String(action) ?? "0",
+            "bookmark": [
+                "isFolder": Int(isFolder),
+                "parentFolderObjectId": "undefined", // TODO: Fix
+                "site": site
+            ]
+        ]
+        
+        return nativeObject
+    }
 
     static func entity(context:NSManagedObjectContext) -> NSEntityDescription {
         return NSEntityDescription.entityForName("Bookmark", inManagedObjectContext: context)!
@@ -52,7 +81,17 @@ class Bookmark: NSManagedObject {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
-    class func add(url url: NSURL?, title: String?, customTitle: String?, syncUUID: String? = nil, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) -> NSManagedObjectID? {
+    class func add(url url: NSURL?,
+                       title: String?,
+                       customTitle: String?,
+                       // Optionals
+                       syncUUID: String? = nil,
+                       created: UInt? = nil,
+                       lastAccessed: UInt? = nil,
+                       parentFolder:NSManagedObjectID? = nil,
+                       isFolder: Bool = false,
+                       save: Bool = true) -> Bookmark? {
+        
         if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
             return nil
         }
@@ -60,9 +99,21 @@ class Bookmark: NSManagedObject {
         let bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         bk.url = url?.absoluteString
         bk.title = title
-        bk.customTitle = customTitle
+        bk.customTitle = customTitle // TODO: Check against empty titles
         bk.isFolder = isFolder
         
+        if let created = created {
+            bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
+        } else {
+            bk.created = NSDate()
+        }
+        
+        if let visited = lastAccessed {
+            bk.lastVisited = NSDate(timeIntervalSince1970:(Double(visited) / 1000.0))
+        } else {
+            bk.lastVisited = NSDate()
+        }
+
         if let syncUUID = syncUUID {
             bk.syncUUID = syncUUID.stringByReplacingOccurrencesOfString(" ", withString: "")
         } else {
@@ -80,7 +131,7 @@ class Bookmark: NSManagedObject {
             DataController.saveContext()
         }
         
-        return bk.objectID
+        return bk
     }
 
     class func contains(url url: NSURL, completionOnMain completion: ((Bool)->Void)) {
@@ -119,15 +170,25 @@ class Bookmark: NSManagedObject {
         return nil
     }
     
-    static func get(syncUUID: String?) -> [Bookmark]? {
-        guard let syncUUID = syncUUID?.stringByReplacingOccurrencesOfString(" ", withString: "") else {
+    static func get(intSyncUUIDs intSyncUUIDs: [[Int]]?) -> [Bookmark]? {
+
+        let uuids = intSyncUUIDs?.map { $0.description }
+        return get(syncUUIDs: uuids)
+    }
+    
+    static func get(syncUUIDs syncUUIDs: [String]?) -> [Bookmark]? {
+        
+        guard var syncUUIDs = syncUUIDs else {
             return nil
         }
         
+        syncUUIDs = syncUUIDs.map { $0.stringByReplacingOccurrencesOfString(" ", withString: "") }
+        
+        // TODO: filter a unique set of syncUUIDs
+
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
-        // TODO: Fill predicate with syncUUID option[s]
-        fetchRequest.predicate = NSPredicate(format: "")
+        fetchRequest.predicate = NSPredicate(format: "syncUUID IN %@", syncUUIDs)
         
         if let results = try? DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
             return results

@@ -201,7 +201,7 @@ class MigrateData: NSObject {
                 let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5))) ?? ""
                 
                 let bk = Bookmark.add(url: NSURL(string: url), title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2), save: true)
-                relationshipHash[guid] = bk
+                relationshipHash[guid] = bk?.objectID
             }
         } else {
             let errmsg = String(UTF8String: sqlite3_errmsg(db))

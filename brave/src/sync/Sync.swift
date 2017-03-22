@@ -73,13 +73,13 @@ class Sync: JSInjector {
         super.init()
         
         // TODO: Remove - currently for sync testing
-        syncSeed = nil
+//        syncSeed = nil
         
         self.isJavascriptReadyCheck = checkIsSyncReady
         self.maximumDelayAttempts = 15
         self.delayLengthInSeconds = Int64(3.0)
         
-        webView = WKWebView(frame: CGRectMake(30, 30, 100, 100), configuration: webConfig)
+        webView = WKWebView(frame: CGRectMake(30, 30, 300, 500), configuration: webConfig)
         // Attempt sync setup
         initializeSync()
     }
@@ -234,7 +234,7 @@ extension Sync {
         }
     }
 
-    func resolveSyncRecords(data: [String: AnyObject]) {
+    func resolvedSyncRecords(data: [String: AnyObject]) {
         print("not implemented: resolveSyncRecords() \(data)")
     }
 
@@ -258,18 +258,62 @@ extension Sync {
     func getExistingObjects(data: [String: AnyObject]) {
         guard let typeName = data["arg1"] as? String,
             let objects = data["arg2"] as? [[String: AnyObject]] else { return }
-        /*▿ Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
-        for item in objects {
-            if (item["objectData"] as? String) == "bookmark",
-                let bookmark = item["bookmark"] as? [String: AnyObject],
-                let site = bookmark["site"] as? [String: AnyObject] {
-                
-                let location = NSURL(string: (site["location"] as? String) ?? "")
-                
-                Bookmark.add(url: location, title: site["title"] as? String, customTitle: site["customTitle"] as? String, parentFolder: nil, isFolder: Bool(bookmark["isFolder"]! as! NSNumber) ?? false, save: false)
-                print("Bookmark.add(url: \(site["location"]), title: \(site["customTitle"]) ?? \(site["title"]), parentFolder: \(bookmark["parentFolderObjectId"]), isFolder: \(bookmark["isFolder"]), save: true)")
+        /* Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
+        
+        // flatmap removes nils allowing this to be [String] rather than [String?]
+        let objectIds = objects.map { ($0["objectId"] as? [Int])?.description.withoutSpaces }.flatMap { $0 }
+        let localBookmarks = Bookmark.get(syncUUIDs: objectIds)
+        
+        
+        // Root "AnyObject" here should either be [String:AnyObject] or the string literal "null"
+        var matchedBookmarks = [[AnyObject]]()
+        for var fetchedBookmark in objects {
+            guard let fetchedId = (fetchedBookmark["objectId"] as? [Int])?.description.withoutSpaces else {
+                continue
             }
+            
+            // TODO: Replace with individual `gets`
+            let bookmarks = localBookmarks?.filter { $0.syncUUID == fetchedId }
+            
+            // TODO: Validate count, should never be more than one!
+            
+//            var singleBookmark: Bookmark!
+            var singleBookmark = bookmarks?.first
+            if singleBookmark == nil {
+                // Add, not found
+
+                if (fetchedBookmark["objectData"] as? String) == "bookmark",
+                    let bookmark = fetchedBookmark["bookmark"] as? [String: AnyObject],
+                    let site = bookmark["site"] as? [String: AnyObject] {
+                    
+                    let location = NSURL(string: (site["location"] as? String) ?? "")
+                    
+                    singleBookmark = Bookmark.add(url: location, title: site["title"] as? String, customTitle: site["customTitle"] as? String, syncUUID: fetchedId, created: site["creationTime"] as? UInt, lastAccessed: site["lastAccessedTime"] as? UInt, parentFolder: nil, isFolder: bookmark["isFolder"] as? Bool ?? false, save: true)
+                    print("(url: \(location), title: \(site["title"] as? String), customTitle: \(site["customTitle"] as? String), syncUUID: \(fetchedId), created: \(site["creationTime"] as? UInt), lastAccessed: \(site["lastAccessedTime"] as? UInt), parentFolder: nil, isFolder: \(bookmark["isFolder"] as? Bool ?? false), save: true)")
+                }
+                
+            }
+            
+            guard let bm = singleBookmark?.asSyncBookmark(deviceId: syncDeviceId ?? "0", action: 0) else {
+                return
+            }
+            
+            matchedBookmarks.append([fetchedBookmark, bm])
         }
+        
+        guard let serializedData = NSJSONSerialization.jsObject(withNative: matchedBookmarks) else {
+            // Huge error
+            return
+        }
+        
+        let jsonParser = "JSON.parse(\"\(serializedData)\")"
+        print(jsonParser)
+        
+        
+        self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(jsonParser))",
+            completionHandler: { (result, error) in
+                print(error)
+        })
     }
 
     func saveInitData(data: [String: AnyObject]) {
@@ -301,7 +345,6 @@ extension Sync: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
         
-        
         guard
             let data = NSJSONSerialization.swiftObject(withJSON: message.body),
             let messageName = data["message"] as? String else {
@@ -319,7 +362,10 @@ extension Sync: WKScriptMessageHandler {
         case "save-init-data" :
             saveInitData(data)
         case "get-existing-objects":
+            // TODO: Should just return records, and immediately call resolve-sync-records
             getExistingObjects(data)
+        case "resolved-sync-records":
+            resolvedSyncRecords(data)
         case "sync-debug":
             print("---- Sync Debug: \(data)")
         case "sync-ready":

@@ -35,6 +35,11 @@ class BraveBrowserViewController : BrowserViewController {
         //  Added to keyWindow, since it can then be utilized from any VC (e.g. settings modal)
         Sync.singleton.webView.alpha = 0.01
         UIApplication.sharedApplication().keyWindow?.insertSubview(Sync.singleton.webView, atIndex: 0)
+        
+        // TODO: Remove
+        // Makes webview visible for debug logging
+//        Sync.singleton.webView.alpha = 1
+//        UIApplication.sharedApplication().keyWindow?.addSubview(Sync.singleton.webView)
     }
 
     override func viewWillAppear(animated: Bool) {
