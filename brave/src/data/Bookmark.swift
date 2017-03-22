@@ -52,17 +52,39 @@ class Bookmark: NSManagedObject {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
-    class func add(url url: NSURL?, title: String?, customTitle: String?, syncUUID: String? = nil, parentFolder:NSManagedObjectID? = nil, isFolder: Bool = false, save: Bool = true) {
+    class func add(url url: NSURL?,
+                       title: String?,
+                       customTitle: String?,
+                       // Optionals
+                       syncUUID: String? = nil,
+                       created: UInt? = nil,
+                       lastAccessed: UInt? = nil,
+                       parentFolder:NSManagedObjectID? = nil,
+                       isFolder: Bool = false,
+                       save: Bool = true) -> Bookmark? {
+        
         if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
-            return
+            return nil
         }
         
         let bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         bk.url = url?.absoluteString
         bk.title = title
-        bk.customTitle = customTitle
+        bk.customTitle = customTitle // TODO: Check against empty titles
         bk.isFolder = isFolder
         
+        if let created = created {
+            bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
+        } else {
+            bk.created = NSDate()
+        }
+        
+        if let visited = lastAccessed {
+            bk.lastVisited = NSDate(timeIntervalSince1970:(Double(visited) / 1000.0))
+        } else {
+            bk.lastVisited = NSDate()
+        }
+
         if let syncUUID = syncUUID {
             bk.syncUUID = syncUUID.stringByReplacingOccurrencesOfString(" ", withString: "")
         } else {
@@ -79,6 +101,8 @@ class Bookmark: NSManagedObject {
         if save {
             DataController.saveContext()
         }
+        
+        return bk
     }
 
     class func contains(url url: NSURL, completionOnMain completion: ((Bool)->Void)) {
