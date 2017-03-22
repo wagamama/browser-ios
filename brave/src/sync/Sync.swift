@@ -97,7 +97,6 @@ class Sync: JSInjector {
         // Autoload sync if already connected to a sync group, otherwise just wait for user initiation
         if let _ = syncSeed {
             self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
-            self.fetch()
         }
     }
     
@@ -182,6 +181,7 @@ class Sync: JSInjector {
             NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
             
             // TODO: Start fetch recusive
+            self.fetch()
         }
         return ready
     }
