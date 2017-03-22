@@ -117,15 +117,25 @@ class Bookmark: NSManagedObject {
         return nil
     }
     
-    static func get(syncUUID: String?) -> [Bookmark]? {
-        guard let syncUUID = syncUUID?.stringByReplacingOccurrencesOfString(" ", withString: "") else {
+    static func get(intSyncUUIDs intSyncUUIDs: [[Int]]?) -> [Bookmark]? {
+
+        let uuids = intSyncUUIDs?.map { $0.description }
+        return get(syncUUIDs: uuids)
+    }
+    
+    static func get(syncUUIDs syncUUIDs: [String]?) -> [Bookmark]? {
+        
+        guard var syncUUIDs = syncUUIDs else {
             return nil
         }
         
+        syncUUIDs = syncUUIDs.map { $0.stringByReplacingOccurrencesOfString(" ", withString: "") }
+        
+        // TODO: filter a unique set of syncUUIDs
+
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
-        // TODO: Fill predicate with syncUUID option[s]
-        fetchRequest.predicate = NSPredicate(format: "")
+        fetchRequest.predicate = NSPredicate(format: "syncUUID IN %@", syncUUIDs)
         
         if let results = try? DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
             return results
