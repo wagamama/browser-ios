@@ -73,13 +73,13 @@ class Sync: JSInjector {
         super.init()
         
         // TODO: Remove - currently for sync testing
-        syncSeed = nil
+//        syncSeed = nil
         
         self.isJavascriptReadyCheck = checkIsSyncReady
         self.maximumDelayAttempts = 15
         self.delayLengthInSeconds = Int64(3.0)
         
-        webView = WKWebView(frame: CGRectMake(30, 30, 100, 100), configuration: webConfig)
+        webView = WKWebView(frame: CGRectMake(30, 30, 300, 500), configuration: webConfig)
         // Attempt sync setup
         initializeSync()
     }
