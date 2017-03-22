@@ -74,6 +74,4 @@ class FaviconMO: NSManagedObject {
             DataController.saveContext(context)
         }
     }
-
-
 }
