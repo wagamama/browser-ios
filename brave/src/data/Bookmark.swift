@@ -32,6 +32,35 @@ class Bookmark: NSManagedObject {
         created = NSDate()
         lastVisited = created
     }
+    
+    func asSyncBookmark(deviceId deviceId: String, action: Int) -> [String: AnyObject] {
+        
+        let unixCreated = Int((created?.timeIntervalSince1970 ?? 0) * 1000)
+        let unixAccessed = Int((lastVisited?.timeIntervalSince1970 ?? 0) * 1000)
+        
+        let site = [
+            "creationTime": unixCreated,
+            "customTitle": customTitle ?? "",
+            "favicon": domain?.favicon?.url ?? "",
+            "lastAccessedTime": unixAccessed,
+            "location": url ?? "",
+            "title": title ?? ""
+        ]
+        
+        let nativeObject: [String: AnyObject] = [
+            "objectData": "bookmark",
+            "deviceId": deviceId,
+            "objectId": syncUUID ?? "null",
+            "action": String(action) ?? "0",
+            "bookmark": [
+                "isFolder": Int(isFolder),
+                "parentFolderObjectId": "undefined", // TODO: Fix
+                "site": site
+            ]
+        ]
+        
+        return nativeObject
+    }
 
     static func entity(context:NSManagedObjectContext) -> NSEntityDescription {
         return NSEntityDescription.entityForName("Bookmark", inManagedObjectContext: context)!
