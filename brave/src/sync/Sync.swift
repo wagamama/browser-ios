@@ -50,6 +50,8 @@ class Sync: JSInjector {
     // TODO: Move to a better place
     private let prefNameId = "device-id-js-array"
     private let prefNameSeed = "seed-js-array"
+    private let prefFetchTimestamp = "sync-fetch-timestamp"
+    
     #if DEBUG
     private let isDebug = true
     private let serverUrl = "https://sync-staging.brave.com"
@@ -151,6 +153,16 @@ class Sync: JSInjector {
         }
     }
     
+    private var fetchTimestamp: Double {
+        get {
+            return NSUserDefaults.standardUserDefaults().doubleForKey(prefFetchTimestamp)
+        }
+        set(value) {
+            NSUserDefaults.standardUserDefaults().setDouble(value, forKey: prefFetchTimestamp)
+            NSUserDefaults.standardUserDefaults().synchronize()
+        }
+    }
+    
     private func jsArray(userDefaultKey key: String) -> String? {
         if let val = NSUserDefaults.standardUserDefaults().stringForKey(key) {
             return "new Uint8Array(\(val))"
@@ -225,11 +237,9 @@ extension Sync {
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
         
         executeBlockOnReady() {
-            let syncTimeKey = "SyncLastFetch"
-            let userDefaults = NSUserDefaults.standardUserDefaults()
 
             let nextFetch = NSDate().timeIntervalSince1970
-            let lastFetch = UInt(userDefaults.doubleForKey(syncTimeKey) ?? 0)
+            let lastFetch = UInt(self.fetchTimestamp)
             
             // Pass in `lastFetch` to get records since that time
             self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], \(lastFetch))",
@@ -238,8 +248,7 @@ extension Sync {
                                         
                                         if error == nil {
                                             // No error we can safely update fetched timestamp
-                                            userDefaults.setDouble(nextFetch, forKey: syncTimeKey)
-                                            userDefaults.synchronize()
+                                            self.fetchTimestamp = nextFetch
                                         }
                                         
                                         print(error)
