@@ -204,7 +204,6 @@ extension Sync {
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
             let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',[\(jsonParser)])"
-            print(evaluate)
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
                                         print(result)
@@ -276,6 +275,9 @@ extension Sync {
         
         // Root "AnyObject" here should either be [String:AnyObject] or the string literal "null"
         var matchedBookmarks = [[AnyObject]]()
+        
+        var counterForAdditions = 0
+        var counterForExisting = 0
         for fetchedBookmark in syncRecords {
             guard let fetchedId = fetchedBookmark.objectId else {
                 continue
@@ -300,23 +302,20 @@ extension Sync {
                     // TODO: Needs favicon
                     // TODO: Create better `add` method to accept sync bookmark
                     singleBookmark = Bookmark.add(url: location, title: site.title, customTitle: site.customTitle, syncUUID: fetchedId, created: site.creationTime, lastAccessed: site.lastAccessedTime, parentFolder: nil, isFolder: bookmark.isFolder ?? false, save: true)
-                    
-                    print("(url: \(location), title: \(site.title), customTitle: \(site.customTitle), syncUUID: \(fetchedId), created: \(site.creationTime), lastAccessed: \(site.lastAccessedTime), parentFolder: nil, isFolder: \(bookmark.isFolder ?? false), save: true)")
+                    counterForAdditions += 1
                 }
-                
+            } else {
+                counterForExisting += 1
             }
             
             guard let bm = singleBookmark?.asSyncBookmark(deviceId: syncDeviceId ?? "0", action: 0) else {
                 return
             }
             
-//            let dict = bm.as
-            
-            // TODO: Clean this up
-            let temp = [fetchedBookmark.dictionaryRepresentation(), SyncRoot(json: bm).dictionaryRepresentation()]
-            print(temp)
             matchedBookmarks.append([fetchedBookmark.dictionaryRepresentation(), SyncRoot(json: bm).dictionaryRepresentation()])
         }
+        
+        print("Added \(counterForAdditions) new bookmarks\nFound \(counterForExisting) existing bookmarks")
         
         // TODO: Check if parsing not required
         guard let serializedData = NSJSONSerialization.jsObject(withNative: matchedBookmarks, escaped: true) else {
@@ -325,8 +324,6 @@ extension Sync {
         }
         
         let jsonParser = "JSON.parse(\"\(serializedData)\")"
-        print(jsonParser)
-        
         
         self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(jsonParser))",
             completionHandler: { (result, error) in
