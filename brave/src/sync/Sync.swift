@@ -219,7 +219,7 @@ extension Sync {
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
 //            let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
-            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(jsonParser))"
+            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',[\(jsonParser)])"
             print(evaluate)
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
