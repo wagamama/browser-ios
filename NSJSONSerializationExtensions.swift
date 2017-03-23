@@ -18,7 +18,7 @@ extension NSJSONSerialization {
         return nativeObject
     }
     
-    class func jsObject(withNative native: AnyObject?) -> String? {
+    class func jsObject(withNative native: AnyObject?, escaped: Bool = false) -> String? {
         
         print(NSJSONWritingOptions(rawValue: 0))
         guard let native = native, let data = try? NSJSONSerialization.dataWithJSONObject(native, options: NSJSONWritingOptions(rawValue: 0)) else {
@@ -26,6 +26,12 @@ extension NSJSONSerialization {
         }
         
         // Convert to string of JSON data, encode " for JSON to JS conversion
-        return String(data: data, encoding: NSUTF8StringEncoding)?.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
+        var encoded = String(data: data, encoding: NSUTF8StringEncoding)
+        
+        if escaped {
+            encoded = encoded?.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
+        }
+        
+        return encoded
     }
 }

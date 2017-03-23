@@ -2,6 +2,7 @@
 
 import UIKit
 import WebKit
+import Shared
 
 /*
  module.exports.categories = {
@@ -186,7 +187,7 @@ class Sync: JSInjector {
             self.fetch()
             
             // Fetch timer to run on regular basis
-            fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
+//            fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
         }
         return ready
     }
@@ -194,13 +195,31 @@ class Sync: JSInjector {
 
 // MARK: Native-initiated Message category
 extension Sync {
-    func sendSyncRecords(recordType: SyncRecordType, recordJson: String) {
+    // TODO: Rename
+    func sendSyncRecords(recordType: SyncRecordType, recordJson: JSON) {
         
         executeBlockOnReady() {
+            let jsonParser = recordJson.toString()
+            
+            // TODO: Remove
+            // JSON Example
+//            var jsonParser2 = "[{ action: \(SyncActions.create.rawValue),"
+//            jsonParser2 += "deviceId: [ 0 ]," +
+//                "objectId: [ 171, 177, 210, 122, 73, 79, 129, 2, 30, 151, 125, 139, 226, 96, 92, 144 ]," +
+//                "bookmark:" +
+//                "{ site:" +
+//                "{ location: 'https://www.google.com/'," +
+//                "title: 'Google'," +
+//                "customTitle: ''," +
+//                "lastAccessedTime: 1486066976216," +
+//                "creationTime: 4 }," +
+//                "isFolder: false," +
+//            "parentFolderObjectId: undefined } }]"
+            
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
 //            let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
-            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(recordJson))"
+            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(jsonParser))"
             print(evaluate)
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
@@ -241,7 +260,7 @@ extension Sync {
         }
     }
 
-    func resolvedSyncRecords(data: [String: AnyObject]) {
+    func resolvedSyncRecords(data: JSON) {
         print("not implemented: resolveSyncRecords() \(data)")
     }
 
@@ -262,17 +281,23 @@ extension Sync {
 // MARK: Server To Native Message category
 extension Sync {
 
-    func getExistingObjects(data: [String: AnyObject]) {
-        guard let objects = data["arg2"] as? [[String: AnyObject]] else { return }
+    func getExistingObjects(data: JSON) {
+        //  as? [[String: AnyObject]]
+        guard
+            let objects = data["arg2"].asArray,
+            let syncRecords = SyncRoot.syncObject(objects)
+            else { return }
+        
         /* Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
         
         // Root "AnyObject" here should either be [String:AnyObject] or the string literal "null"
         var matchedBookmarks = [[AnyObject]]()
-        for var fetchedBookmark in objects {
-            guard let fetchedId = (fetchedBookmark["objectId"] as? [Int])?.description.withoutSpaces else {
+        for fetchedBookmark in syncRecords {
+            guard let fetchedId = fetchedBookmark.objectId else {
                 continue
             }
             
+            // TODO: Updated `get` method to accept only one record
             // Pulls bookmarks individually from CD to verify duplicates do not get added
             let bookmarks = Bookmark.get(syncUUIDs: [fetchedId])
             
@@ -282,14 +307,17 @@ extension Sync {
             if singleBookmark == nil {
                 // Add, not found
 
-                if (fetchedBookmark["objectData"] as? String) == "bookmark",
-                    let bookmark = fetchedBookmark["bookmark"] as? [String: AnyObject],
-                    let site = bookmark["site"] as? [String: AnyObject] {
+                if fetchedBookmark.objectData == "bookmark",
+                    let bookmark = fetchedBookmark.bookmark,
+                    let site = bookmark.site {
                     
-                    let location = NSURL(string: (site["location"] as? String) ?? "")
+                    let location = NSURL(string: site.location ?? "")
                     
-                    singleBookmark = Bookmark.add(url: location, title: site["title"] as? String, customTitle: site["customTitle"] as? String, syncUUID: fetchedId, created: site["creationTime"] as? UInt, lastAccessed: site["lastAccessedTime"] as? UInt, parentFolder: nil, isFolder: bookmark["isFolder"] as? Bool ?? false, save: true)
-                    print("(url: \(location), title: \(site["title"] as? String), customTitle: \(site["customTitle"] as? String), syncUUID: \(fetchedId), created: \(site["creationTime"] as? UInt), lastAccessed: \(site["lastAccessedTime"] as? UInt), parentFolder: nil, isFolder: \(bookmark["isFolder"] as? Bool ?? false), save: true)")
+                    // TODO: Needs favicon
+                    // TODO: Create better `add` method to accept sync bookmark
+                    singleBookmark = Bookmark.add(url: location, title: site.title, customTitle: site.customTitle, syncUUID: fetchedId, created: site.creationTime, lastAccessed: site.lastAccessedTime, parentFolder: nil, isFolder: bookmark.isFolder ?? false, save: true)
+                    
+                    print("(url: \(location), title: \(site.title), customTitle: \(site.customTitle), syncUUID: \(fetchedId), created: \(site.creationTime), lastAccessed: \(site.lastAccessedTime), parentFolder: nil, isFolder: \(bookmark.isFolder ?? false), save: true)")
                 }
                 
             }
@@ -298,10 +326,16 @@ extension Sync {
                 return
             }
             
-            matchedBookmarks.append([fetchedBookmark, bm])
+//            let dict = bm.as
+            
+            // TODO: Clean this up
+            let temp = [fetchedBookmark.dictionaryRepresentation(), SyncRoot(json: bm).dictionaryRepresentation()]
+            print(temp)
+            matchedBookmarks.append([fetchedBookmark.dictionaryRepresentation(), SyncRoot(json: bm).dictionaryRepresentation()])
         }
         
-        guard let serializedData = NSJSONSerialization.jsObject(withNative: matchedBookmarks) else {
+        // TODO: Check if parsing not required
+        guard let serializedData = NSJSONSerialization.jsObject(withNative: matchedBookmarks, escaped: true) else {
             // Huge error
             return
         }
@@ -316,19 +350,19 @@ extension Sync {
         })
     }
 
-    func saveInitData(data: [String: AnyObject]) {
-        if let seedDict = data["arg1"] as? [String: Int] {
+    func saveInitData(data: JSON) {
+        if let seedDict = data["arg1"].asDictionary {
             
             // TODO: Use js util converter
             var seedArray = [Int](count: 32, repeatedValue: 0)
             for (k, v) in seedDict {
                 if let k = Int(k) where k < 32 {
-                    seedArray[k] = v
+                    seedArray[k] = v.asInt!
                 }
             }
             syncSeed = "\(seedArray)"
 
-            if let idDict = data["arg2"] as? [String: Int] {
+            if let idDict = data["arg2"].asDictionary {
                 if let id = idDict["0"] {
                     syncDeviceId = "[\(id)]"
                     print(id)
@@ -345,10 +379,8 @@ extension Sync: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
         
-        guard
-            let data = NSJSONSerialization.swiftObject(withJSON: message.body),
-            let messageName = data["message"] as? String else {
-                
+        let data = JSON(string: message.body as? String ?? "")
+        guard let messageName = data["message"].asString  else {
             assert(false)
             return
         }

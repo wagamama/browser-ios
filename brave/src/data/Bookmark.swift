@@ -4,6 +4,7 @@
 import UIKit
 import CoreData
 import Foundation
+import Shared
 
 class Bookmark: NSManagedObject {
     
@@ -16,7 +17,10 @@ class Bookmark: NSManagedObject {
     @NSManaged var created: NSDate?
     @NSManaged var order: Int16
     @NSManaged var tags: [String]?
-    @NSManaged var syncUUID: String?
+    @NSManaged var syncUUID: [Int]?
+    /// CD does not allow (easily) searching on transformable properties, could use binary, but easier to just have two
+    //  As syncUUID should never change
+    @NSManaged var syncDisplayUUID: String?
 
     @NSManaged var parentFolder: Bookmark?
     @NSManaged var children: Set<Bookmark>?
@@ -33,7 +37,11 @@ class Bookmark: NSManagedObject {
         lastVisited = created
     }
     
-    func asSyncBookmark(deviceId deviceId: String, action: Int) -> [String: AnyObject] {
+    // TODO: Better use of `deviceId`
+    // TODO: Use `action` enum
+    func asSyncBookmark(deviceId deviceId: String, action: Int) -> JSON {
+        
+        // TODO: Could convert to 'actual' SyncBookmark record if handled objectId properly
         
         let unixCreated = Int((created?.timeIntervalSince1970 ?? 0) * 1000)
         let unixAccessed = Int((lastVisited?.timeIntervalSince1970 ?? 0) * 1000)
@@ -49,17 +57,17 @@ class Bookmark: NSManagedObject {
         
         let nativeObject: [String: AnyObject] = [
             "objectData": "bookmark",
-            "deviceId": deviceId,
+            "deviceId": [0], // TODO: Actually set
             "objectId": syncUUID ?? "null",
-            "action": String(action) ?? "0",
+            "action": action,
             "bookmark": [
                 "isFolder": Int(isFolder),
-                "parentFolderObjectId": "undefined", // TODO: Fix
+//                "parentFolderObjectId": "undefined", // TODO: Fix
                 "site": site
             ]
         ]
         
-        return nativeObject
+        return JSON(nativeObject)
     }
 
     static func entity(context:NSManagedObjectContext) -> NSEntityDescription {
@@ -85,9 +93,10 @@ class Bookmark: NSManagedObject {
                        title: String?,
                        customTitle: String?,
                        // Optionals
-                       syncUUID: String? = nil,
-                       created: UInt? = nil,
-                       lastAccessed: UInt? = nil,
+                       // If no syncUUID is sent, this record will set id and attempt to sync with server
+                       syncUUID: [Int]? = nil,
+                       created: Int? = nil,
+                       lastAccessed: Int? = nil,
                        parentFolder:NSManagedObjectID? = nil,
                        isFolder: Bool = false,
                        save: Bool = true) -> Bookmark? {
@@ -114,10 +123,30 @@ class Bookmark: NSManagedObject {
             bk.lastVisited = NSDate()
         }
 
-        if let syncUUID = syncUUID {
-            bk.syncUUID = syncUUID.stringByReplacingOccurrencesOfString(" ", withString: "")
-        } else {
+        func set(uuid uuid: [Int]?) -> Bool {
+            if let syncUUID = uuid {
+                bk.syncUUID = syncUUID
+                bk.syncDisplayUUID = syncUUID.description
+                return true
+            }
+            return false
+        }
+        
+        if !set(uuid: syncUUID) {
             // Need async creation of UUID
+            Niceware.shared.uniqueBytes(count: 16) {
+                (result, error) in
+                // TODO: Must centralize this logic
+                
+                set(uuid: result)
+                
+                if save {
+                    DataController.saveContext()
+                }
+                
+                // Sync
+                Sync.singleton.sendSyncRecords(.bookmark, recordJson: bk.asSyncBookmark(deviceId: "0", action: 0))
+            }
         }
 
         if let url = url {
@@ -127,7 +156,8 @@ class Bookmark: NSManagedObject {
             bk.parentFolder = DataController.moc.objectWithID(id) as? Bookmark
         }
 
-        if save {
+        if save && syncUUID != nil {
+            // If no syncUUI is available, it will be saved after id is set
             DataController.saveContext()
         }
         
@@ -170,25 +200,18 @@ class Bookmark: NSManagedObject {
         return nil
     }
     
-    static func get(intSyncUUIDs intSyncUUIDs: [[Int]]?) -> [Bookmark]? {
-
-        let uuids = intSyncUUIDs?.map { $0.description }
-        return get(syncUUIDs: uuids)
-    }
-    
-    static func get(syncUUIDs syncUUIDs: [String]?) -> [Bookmark]? {
+    static func get(syncUUIDs syncUUIDs: [[Int]]?) -> [Bookmark]? {
         
-        guard var syncUUIDs = syncUUIDs else {
+        guard let syncUUIDs = syncUUIDs else {
             return nil
         }
-        
-        syncUUIDs = syncUUIDs.map { $0.stringByReplacingOccurrencesOfString(" ", withString: "") }
         
         // TODO: filter a unique set of syncUUIDs
 
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
-        fetchRequest.predicate = NSPredicate(format: "syncUUID IN %@", syncUUIDs)
+        // Cannot search on transformable CD objects so using display
+        fetchRequest.predicate = NSPredicate(format: "syncDisplayUUID IN %@", syncUUIDs.map { $0.description} )
         
         if let results = try? DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
             return results
