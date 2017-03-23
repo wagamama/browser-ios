@@ -43,7 +43,7 @@ class SyncPairCameraViewController: UIViewController {
                 
                 self.cameraView.cameraOverlaySucess()
                 
-                Sync.singleton.initializeSync(bytes)
+                Sync.shared.initializeSync(bytes)
                 
                 // TODO: Navigate away
             } else {

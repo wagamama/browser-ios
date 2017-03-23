@@ -33,13 +33,13 @@ class BraveBrowserViewController : BrowserViewController {
         // Initialize Sync without connecting. Sync webview needs to be in a "permanent" location to continue working predictably
         //  If Sync is not in the view "hierarchy" it will behavior extremely unpredictably, often just dying in the middle of a promize chain
         //  Added to keyWindow, since it can then be utilized from any VC (e.g. settings modal)
-        Sync.singleton.webView.alpha = 0.01
-        UIApplication.sharedApplication().keyWindow?.insertSubview(Sync.singleton.webView, atIndex: 0)
+        Sync.shared.webView.alpha = 0.01
+        UIApplication.sharedApplication().keyWindow?.insertSubview(Sync.shared.webView, atIndex: 0)
         
         // TODO: Remove
         // Makes webview visible for debug logging
-//        Sync.singleton.webView.alpha = 1
-//        UIApplication.sharedApplication().keyWindow?.addSubview(Sync.singleton.webView)
+//        Sync.shared.webView.alpha = 1
+//        UIApplication.sharedApplication().keyWindow?.addSubview(Sync.shared.webView)
     }
 
     override func viewWillAppear(animated: Bool) {

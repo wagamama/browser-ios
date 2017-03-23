@@ -34,7 +34,7 @@ enum SyncActions: Int {
 }
 
 class Sync: JSInjector {
-    static let singleton = Sync()
+    static let shared = Sync()
 
     /// This must be public so it can be added into the view hierarchy 
     var webView: WKWebView!

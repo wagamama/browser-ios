@@ -10,7 +10,7 @@ class SyncTest: XCTestCase {
     func testSync() {
         expectationForNotification(NotificationSyncReady, object: nil, handler:nil)
         
-        let sync = Sync.singleton
+        let sync = Sync.shared
         waitForExpectationsWithTimeout(15) { error in
             XCTAssertNil(error, "Error timeout waiting sync ready")
         }
