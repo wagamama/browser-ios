@@ -170,9 +170,6 @@ class Sync: JSInjector {
             static var isReady = false
         }
         
-        print("******")
-        print(isSyncFullyInitialized.0, isSyncFullyInitialized.1, isSyncFullyInitialized.2, isSyncFullyInitialized.3, isSyncFullyInitialized.4, isSyncFullyInitialized.5, isSyncFullyInitialized.6)
-        
         if Static.isReady {
             return true
         }
