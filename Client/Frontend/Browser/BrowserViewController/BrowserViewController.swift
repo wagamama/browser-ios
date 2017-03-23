@@ -683,9 +683,9 @@ class BrowserViewController: UIViewController {
         tab.loadRequest(NSURLRequest(URL: url))
     }
 
-    func addBookmark(url: NSURL, title: String?, parentFolder: NSManagedObjectID? = nil) {
+    func addBookmark(url: String?, title: String?, parentFolder: NSManagedObjectID? = nil) {
         // Custom title can only be applied during an edit
-        Bookmark.add(url: url, title: title, customTitle: nil, parentFolder: parentFolder)
+        Bookmark.add(url: url, title: title, parentFolder: parentFolder)
         self.urlBar.updateBookmarkStatus(true)
     }
 
@@ -1167,8 +1167,8 @@ extension BrowserViewController: TabTrayDelegate {
     }
 
     func tabTrayDidAddBookmark(tab: Browser) {
-        guard let url = tab.url else { return }
-        self.addBookmark(url, title: tab.title)
+        // A bit silly to convert to string to convert back to URL, may change this
+        self.addBookmark(tab.url?.absoluteString, title: tab.title)
     }
 
 

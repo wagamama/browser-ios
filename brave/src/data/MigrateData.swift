@@ -200,7 +200,7 @@ class MigrateData: NSObject {
                 let description = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 4))) ?? ""
                 let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5))) ?? ""
                 
-                let bk = Bookmark.add(url: NSURL(string: url), title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2), save: true)
+                let bk = Bookmark.addForMigration(url: url, title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2))
                 relationshipHash[guid] = bk?.objectID
             }
         } else {

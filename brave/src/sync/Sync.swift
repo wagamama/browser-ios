@@ -229,10 +229,22 @@ extension Sync {
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
         
         executeBlockOnReady() {
-            self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], 0)",
+            let syncTimeKey = "SyncLastFetch"
+            let userDefaults = NSUserDefaults.standardUserDefaults()
+
+            let nextFetch = NSDate().timeIntervalSince1970
+            let lastFetch = UInt(userDefaults.doubleForKey(syncTimeKey) ?? 0)
+            
+            // Pass in `lastFetch` to get records since that time
+            self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], \(lastFetch))",
                                        completionHandler: { (result, error) in
                                         // Process merging
                                         
+                                        if error == nil {
+                                            // No error we can safely update fetched timestamp
+                                            userDefaults.setDouble(nextFetch, forKey: syncTimeKey)
+                                            userDefaults.synchronize()
+                                        }
                                         
                                         print(error)
                                         completion?(error)
@@ -241,6 +253,33 @@ extension Sync {
     }
 
     func resolvedSyncRecords(data: JSON) {
+        guard
+            let objects = data["arg2"].asArray,
+            let syncRecords = SyncRoot.syncObject(objects)
+            else { return }
+        
+        for fetchedRoot in syncRecords {
+            if fetchedRoot.objectData != "bookmark" { return }
+            
+            guard
+                let fetchedId = fetchedRoot.objectId,
+                let singleBookmark = Bookmark.get(syncUUIDs: [fetchedId])?.first
+                else { return }
+            
+            let action = SyncActions.init(rawValue: fetchedRoot.action ?? -1)
+            if action == SyncActions.delete {
+                // Remove record
+                print("Deleting record!")
+                Bookmark.remove(bookmark: singleBookmark)
+                continue
+            }
+            
+            // check diff
+            let temp = singleBookmark.asSyncBookmark(deviceId: "", action: 0)
+            print("Attemptin to update: \(temp) -- with -- \(fetchedRoot.dictionaryRepresentation())")
+            
+        }
+        
         print("not implemented: resolveSyncRecords() \(data)")
     }
 
@@ -286,7 +325,7 @@ extension Sync {
             
             // TODO: Validate count, should never be more than one!
             
-            var singleBookmark = bookmarks?.first
+            var singleBookmark: Bookmark? = bookmarks?.first
             if singleBookmark == nil {
                 // Add, not found
 
@@ -298,7 +337,7 @@ extension Sync {
                     
                     // TODO: Needs favicon
                     // TODO: Create better `add` method to accept sync bookmark
-                    singleBookmark = Bookmark.add(url: location, title: site.title, customTitle: site.customTitle, syncUUID: fetchedId, created: site.creationTime, lastAccessed: site.lastAccessedTime, parentFolder: nil, isFolder: bookmark.isFolder ?? false, save: true)
+                    singleBookmark = Bookmark.add(rootObject: fetchedBookmark, save: true)
                     counterForAdditions += 1
                 }
             } else {

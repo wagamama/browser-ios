@@ -89,17 +89,10 @@ class Bookmark: NSManagedObject {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
-    class func add(url url: NSURL?,
-                       title: String?,
-                       customTitle: String?,
-                       // Optionals
-                       // If no syncUUID is sent, this record will set id and attempt to sync with server
-                       syncUUID: [Int]? = nil,
-                       created: Int? = nil,
-                       lastAccessed: Int? = nil,
-                       parentFolder:NSManagedObjectID? = nil,
-                       isFolder: Bool = false,
-                       save: Bool = true) -> Bookmark? {
+    class func add(rootObject root: SyncRoot, save: Bool = false) -> Bookmark? {
+        let bookmark = root.bookmark
+        let site = bookmark?.site
+        let url = NSURL(string: site?.location ?? "")
         
         if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
             return nil
@@ -107,22 +100,22 @@ class Bookmark: NSManagedObject {
         
         let bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         bk.url = url?.absoluteString
-        bk.title = title
-        bk.customTitle = customTitle // TODO: Check against empty titles
-        bk.isFolder = isFolder
+        bk.title = site?.title
+        bk.customTitle = site?.customTitle // TODO: Check against empty titles
+        bk.isFolder = bookmark?.isFolder ?? false
         
-        if let created = created {
+        if let created = site?.creationTime {
             bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
         } else {
             bk.created = NSDate()
         }
         
-        if let visited = lastAccessed {
+        if let visited = site?.lastAccessedTime {
             bk.lastVisited = NSDate(timeIntervalSince1970:(Double(visited) / 1000.0))
         } else {
             bk.lastVisited = NSDate()
         }
-
+        
         func set(uuid uuid: [Int]?) -> Bool {
             if let syncUUID = uuid {
                 bk.syncUUID = syncUUID
@@ -132,7 +125,7 @@ class Bookmark: NSManagedObject {
             return false
         }
         
-        if !set(uuid: syncUUID) {
+        if !set(uuid: root.objectId) {
             // Need async creation of UUID
             Niceware.shared.uniqueBytes(count: 16) {
                 (result, error) in
@@ -148,20 +141,63 @@ class Bookmark: NSManagedObject {
                 Sync.singleton.sendSyncRecords(.bookmark, recordJson: bk.asSyncBookmark(deviceId: "0", action: 0))
             }
         }
-
+        
         if let url = url {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
         }
-        if let id = parentFolder {
-            bk.parentFolder = DataController.moc.objectWithID(id) as? Bookmark
-        }
-
-        if save && syncUUID != nil {
+        
+        // TODO: This is an array :/
+//        if let id = bookmark?.parentFolderObjectId?.first {
+//            bk.parentFolder = DataController.moc.objectWithID(id) as? Bookmark
+//        }
+        
+        if save && bk.syncUUID != nil {
             // If no syncUUI is available, it will be saved after id is set
             DataController.saveContext()
         }
         
         return bk
+    }
+    
+    // TODO: DELETE
+    class func add(url url: String?,
+                       title: String?,
+                       parentFolder:NSManagedObjectID? = nil,
+                       isFolder:Bool = false) -> Bookmark? {
+        
+        let site = SyncSite()
+        site.title = title
+        site.location = url
+        
+        let bookmark = SyncBookmark()
+        bookmark.isFolder = isFolder
+        bookmark.parentFolderObjectId = [parentFolder]
+        bookmark.site = site
+        
+        let root = SyncRoot()
+        root.bookmark = bookmark
+        
+        return self.add(rootObject: root)
+    }
+    
+    // Should only ever be used for migration from old db
+    class func addForMigration(url url: String?, title: String, customTitle: String, parentFolder: NSManagedObjectID?, isFolder: Bool?) -> Bookmark? {
+        // isFolder = true
+        
+        let site = SyncSite()
+        site.title = title
+        site.customTitle = customTitle
+        site.location = url
+        
+        let bookmark = SyncBookmark()
+        bookmark.isFolder = isFolder
+        bookmark.parentFolderObjectId = [parentFolder]
+        bookmark.site = site
+        
+        let root = SyncRoot()
+        root.bookmark = bookmark
+        
+        return self.add(rootObject: root, save: true)
     }
 
     class func contains(url url: NSURL, completionOnMain completion: ((Bool)->Void)) {
@@ -248,6 +284,13 @@ class Bookmark: NSManagedObject {
             return true
         }
         return false
+    }
+    
+    class func remove(bookmark bookmark: Bookmark, save: Bool = true) {
+        DataController.moc.deleteObject(bookmark)
+        if save {
+            DataController.saveContext()
+        }
     }
 
     class func frecencyQuery(context: NSManagedObjectContext) -> [Bookmark] {
