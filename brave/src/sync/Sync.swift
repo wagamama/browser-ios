@@ -184,7 +184,7 @@ class Sync: JSInjector {
             self.fetch()
             
             // Fetch timer to run on regular basis
-//            fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
+            fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
         }
         return ready
     }
