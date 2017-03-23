@@ -39,6 +39,8 @@ class Sync: JSInjector {
     var webView: WKWebView!
 
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
+    
+    private var fetchTimer: NSTimer?
 
     // TODO: Move to a better place
     private let prefNameId = "device-id-js-array"
@@ -180,8 +182,11 @@ class Sync: JSInjector {
             Static.isReady = true
             NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
             
-            // TODO: Start fetch recusive
+            // Perform first fetch manually
             self.fetch()
+            
+            // Fetch timer to run on regular basis
+            fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
         }
         return ready
     }
