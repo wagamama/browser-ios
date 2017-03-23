@@ -137,8 +137,9 @@ class Bookmark: NSManagedObject {
                     DataController.saveContext()
                 }
                 
-                // Sync
-                Sync.singleton.sendSyncRecords(.bookmark, recordJson: bk.asSyncBookmark(deviceId: "0", action: 0))
+                if Sync.singleton.isInSyncGroup {
+                    Sync.singleton.sendSyncRecords(.bookmark, recordJson: bk.asSyncBookmark(deviceId: "0", action: 0))
+                }
             }
         }
         

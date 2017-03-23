@@ -41,6 +41,10 @@ class Sync: JSInjector {
 
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
     
+    var isInSyncGroup: Bool {
+        return syncSeed != nil
+    }
+    
     private var fetchTimer: NSTimer?
 
     // TODO: Move to a better place
@@ -130,16 +134,6 @@ class Sync: JSInjector {
         set(value) {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameId)
         }
-    }
-    
-    /// Seed as 16 unique words
-    var seedAsPassphrase: Array<String> {
-        return [""]
-    }
-    
-    /// Seed byte array, 2 indeces for each word
-    var seedAsBytes: String {
-        return ""
     }
 
     // TODO: Move to keychain
