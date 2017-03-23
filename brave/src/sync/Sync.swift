@@ -187,14 +187,16 @@ class Sync: JSInjector {
 // MARK: Native-initiated Message category
 extension Sync {
     // TODO: Rename
-    func sendSyncRecords(recordType: SyncRecordType, recordJson: JSON) {
+    func sendSyncRecords(recordType: SyncRecordType, bookmarks: [Bookmark]) {
         
         executeBlockOnReady() {
-            let jsonParser = recordJson.toString()
+            
+            // Convert objects to JSON and stitch together
+            let json = bookmarks.map { $0.asSyncBookmark(deviceId: "0", action: 0).toString() }.joinWithSeparator(",")
             
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
-            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',[\(jsonParser)])"
+            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',[\(json)])"
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
                                         print(result)

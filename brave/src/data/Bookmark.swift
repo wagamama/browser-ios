@@ -138,7 +138,7 @@ class Bookmark: NSManagedObject {
                 }
                 
                 if Sync.shared.isInSyncGroup {
-                    Sync.shared.sendSyncRecords(.bookmark, recordJson: bk.asSyncBookmark(deviceId: "0", action: 0))
+                    Sync.shared.sendSyncRecords(.bookmark, bookmarks: [bk])
                 }
             }
         }
