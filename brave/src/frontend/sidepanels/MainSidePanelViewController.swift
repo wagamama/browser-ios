@@ -134,7 +134,7 @@ class MainSidePanelViewController : SidePanelBaseViewController {
                 folderId = currentFolder.objectID
             }
 
-            browserViewController?.addBookmark(url, title: tab.title, parentFolder: folderId)
+            browserViewController?.addBookmark(url.absoluteString, title: tab.title, parentFolder: folderId)
         }
     }
 
