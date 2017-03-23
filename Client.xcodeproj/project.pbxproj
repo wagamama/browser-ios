@@ -189,6 +189,9 @@
 		5D27859A1E70D7EF0066EC15 /* JSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2785991E70D7EF0066EC15 /* JSInjector.swift */; };
 		5D2785BE1E71D7050066EC15 /* NicewareTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D27858C1E70CC660066EC15 /* NicewareTest.swift */; };
 		5D2785C71E7218620066EC15 /* JSInjectorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2785C61E7218620066EC15 /* JSInjectorTest.swift */; };
+		5D2AE6F81E83F3EC00BC274C /* SyncBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */; };
+		5D2AE6F91E83F3EC00BC274C /* SyncRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */; };
+		5D2AE6FA1E83F3EC00BC274C /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */; };
 		5D2B07EB1E6733B900244C39 /* niceware.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D2B07EA1E6733B900244C39 /* niceware.js */; };
 		5D71B69B1E6885E00073621F /* Niceware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D71B69A1E6885E00073621F /* Niceware.swift */; };
 		5DCC5D701E7C2F0100054BBD /* SwiftJSConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */; };
@@ -981,6 +984,9 @@
 		5D27858C1E70CC660066EC15 /* NicewareTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NicewareTest.swift; sourceTree = "<group>"; };
 		5D2785991E70D7EF0066EC15 /* JSInjector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSInjector.swift; sourceTree = "<group>"; };
 		5D2785C61E7218620066EC15 /* JSInjectorTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JSInjectorTest.swift; path = ../../src/sync/JSInjectorTest.swift; sourceTree = "<group>"; };
+		5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncBookmark.swift; sourceTree = "<group>"; };
+		5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRoot.swift; sourceTree = "<group>"; };
+		5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
 		5D2B07EA1E6733B900244C39 /* niceware.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = niceware.js; path = Carthage/Checkouts/niceware/browser/niceware.js; sourceTree = SOURCE_ROOT; };
 		5D71B69A1E6885E00073621F /* Niceware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Niceware.swift; sourceTree = "<group>"; };
 		5D84AB2CBD701CBBDC40620C /* ReadingListAuthenticator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReadingListAuthenticator.swift; path = ./ReadingList/ReadingListAuthenticator.swift; sourceTree = "<group>"; };
@@ -2047,6 +2053,16 @@
 			name = PodFiles;
 			sourceTree = "<group>";
 		};
+		5D2AE6ED1E83F3D200BC274C /* fetched models */ = {
+			isa = PBXGroup;
+			children = (
+				5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */,
+				5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */,
+				5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */,
+			);
+			name = "fetched models";
+			sourceTree = "<group>";
+		};
 		6289C23DD299B40CB6212A38 /* en.lproj */ = {
 			isa = PBXGroup;
 			children = (
@@ -2864,6 +2880,7 @@
 				EBDB7D461E14231900D744C7 /* Sync.swift */,
 				5D71B69A1E6885E00073621F /* Niceware.swift */,
 				5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */,
+				5D2AE6ED1E83F3D200BC274C /* fetched models */,
 			);
 			name = sync;
 			path = brave/src/sync;
@@ -3924,6 +3941,7 @@
 				0336F9B2BC7FF14F45DB681F /* db_impl.cc in Sources */,
 				DF0324E386DF0AAF40CEE51A /* db_iter.cc in Sources */,
 				E89DEAF4A642EA060CAC3883 /* dbformat.cc in Sources */,
+				5D2AE6FA1E83F3EC00BC274C /* SyncSite.swift in Sources */,
 				A6A180ED09280A17C5C11B72 /* dumpfile.cc in Sources */,
 				252BFD86BA8B20F6B485D561 /* filename.cc in Sources */,
 				7823B137D3AA2D991BC8DC5C /* log_reader.cc in Sources */,
@@ -3968,11 +3986,13 @@
 				D974018CF8F1728469457616 /* status.cc in Sources */,
 				8C1EF9076148B5DE1EEC4A0B /* testharness.cc in Sources */,
 				5F05A9BDFA985F96C2CFCA35 /* testutil.cc in Sources */,
+				5D2AE6F81E83F3EC00BC274C /* SyncBookmark.swift in Sources */,
 				23699E7ECA45D2C23FFEB992 /* NSData+GZIP.m in Sources */,
 				736EF030429F5288A4EDE179 /* NSFileManager+Tar.m in Sources */,
 				676AF6C41649B4E23DA21306 /* BraveApp.swift in Sources */,
 				08BC96A6EFBA13BBE99C9A0F /* BraveUtil.swift in Sources */,
 				CF1FD6B869DAC754B459302B /* BraveBrowserBottomToolbar.swift in Sources */,
+				5D2AE6F91E83F3EC00BC274C /* SyncRoot.swift in Sources */,
 				B559CDC0AF8A6D35DE545B6A /* BraveBrowserViewController.swift in Sources */,
 				CBE8F9770BF74CCB68E0807A /* BraveMainWindow.swift in Sources */,
 				184619D873835F18B9731D1E /* BraveScrollController.swift in Sources */,
