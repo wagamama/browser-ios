@@ -22,16 +22,35 @@ class SyncPairCameraViewController: UIViewController {
         cameraView.layer.cornerRadius = 4
         cameraView.layer.masksToBounds = true
         cameraView.scanCallback = { data in
+            
             debugPrint("Check data \(data)")
             // TODO: Check data against sync api
-            
-            if true {
+
+            // TODO: Functional, but needs some cleanup
+            struct Scanner { static var Lock = false }
+            if let bytes = Niceware.shared.splitBytes(fromJoinedBytes: data) {
+                if (Scanner.Lock) {
+                    // Have internal, so camera error does not show
+                    return
+                }
+                
+                // If multiple calls get in here due to race conditions it isn't a big deal
+                
+                Scanner.Lock = true
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), { 
+                    Scanner.Lock = false
+                })
+                
                 self.cameraView.cameraOverlaySucess()
-            }
-            else {
+                
+                Sync.singleton.initializeSync(bytes)
+                
+                // TODO: Navigate away
+            } else {
                 self.cameraView.cameraOverlayError()
             }
         }
+        
         cameraView.authorizedCallback = { authorized in
             if authorized {
                 postAsyncToMain(0) {
