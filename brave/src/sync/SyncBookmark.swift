@@ -22,6 +22,10 @@ public final class SyncBookmark {
     public var parentFolderObjectId: [Any]?
     public var site: SyncSite?
     
+    public convenience init() {
+        self.init(json: nil)
+    }
+    
     // MARK: SwiftyJSON Initializers
     /// Initiates the instance based on the object.
     ///
@@ -34,10 +38,10 @@ public final class SyncBookmark {
     /// Initiates the instance based on the JSON that was passed.
     ///
     /// - parameter json: JSON object from SwiftyJSON.
-    public required init(json: JSON) {
-        isFolder = json[SerializationKeys.isFolder].asBool
+    public required init(json: JSON?) {
+        isFolder = json?[SerializationKeys.isFolder].asBool
 //        if let items = json[SerializationKeys.parentFolderObjectId].asArray { parentFolderObjectId = items.map { $0.whateverType } }
-        site = SyncSite(json: json[SerializationKeys.site])
+        site = SyncSite(json: json?[SerializationKeys.site])
     }
     
     /// Generates description of the object in the form of a NSDictionary.

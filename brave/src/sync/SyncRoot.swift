@@ -30,6 +30,10 @@ public final class SyncRoot {
 //        return self.objectId?.map({ $0.description }).joinWithSeparator(",")
 //    }()
     
+    public convenience init() {
+        self.init(json: nil)
+    }
+    
     // MARK: SwiftyJSON Initializers
     /// Initiates the instance based on the object.
     ///
@@ -42,13 +46,13 @@ public final class SyncRoot {
     /// Initiates the instance based on the JSON that was passed.
     ///
     /// - parameter json: JSON object from SwiftyJSON.
-    public required init(json: JSON) {
+    public required init(json: JSON?) {
         // objectId can come in two different formats
-        if let items = json[SerializationKeys.objectId].asArray { objectId = items.map { $0.asInt ?? 0 } }
-        if let items = json[SerializationKeys.deviceId].asArray { deviceId = items.map { $0.asInt ?? 0 } }
-        action = json[SerializationKeys.action].asInt
-        bookmark = SyncBookmark(json: json[SerializationKeys.bookmark])
-        objectData = json[SerializationKeys.objectData].asString
+        if let items = json?[SerializationKeys.objectId].asArray { objectId = items.map { $0.asInt ?? 0 } }
+        if let items = json?[SerializationKeys.deviceId].asArray { deviceId = items.map { $0.asInt ?? 0 } }
+        action = json?[SerializationKeys.action].asInt
+        bookmark = SyncBookmark(json: json?[SerializationKeys.bookmark])
+        objectData = json?[SerializationKeys.objectData].asString
     }
     
     /// Generates description of the object in the form of a NSDictionary.

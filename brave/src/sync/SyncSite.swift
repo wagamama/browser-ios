@@ -28,6 +28,10 @@ public final class SyncSite {
     public var creationTime: Int?
     public var lastAccessedTime: Int?
     
+    public convenience init() {
+        self.init(json: nil)
+    }
+    
     // MARK: SwiftyJSON Initializers
     /// Initiates the instance based on the object.
     ///
@@ -40,13 +44,13 @@ public final class SyncSite {
     /// Initiates the instance based on the JSON that was passed.
     ///
     /// - parameter json: JSON object from SwiftyJSON.
-    public required init(json: JSON) {
-        customTitle = json[SerializationKeys.customTitle].asString
-        title = json[SerializationKeys.title].asString
-        favicon = json[SerializationKeys.favicon].asString
-        location = json[SerializationKeys.location].asString
-        creationTime = json[SerializationKeys.creationTime].asInt
-        lastAccessedTime = json[SerializationKeys.lastAccessedTime].asInt
+    public required init(json: JSON?) {
+        customTitle = json?[SerializationKeys.customTitle].asString
+        title = json?[SerializationKeys.title].asString
+        favicon = json?[SerializationKeys.favicon].asString
+        location = json?[SerializationKeys.location].asString
+        creationTime = json?[SerializationKeys.creationTime].asInt
+        lastAccessedTime = json?[SerializationKeys.lastAccessedTime].asInt
     }
     
     /// Generates description of the object in the form of a NSDictionary.
