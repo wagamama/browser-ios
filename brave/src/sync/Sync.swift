@@ -201,24 +201,8 @@ extension Sync {
         executeBlockOnReady() {
             let jsonParser = recordJson.toString()
             
-            // TODO: Remove
-            // JSON Example
-//            var jsonParser2 = "[{ action: \(SyncActions.create.rawValue),"
-//            jsonParser2 += "deviceId: [ 0 ]," +
-//                "objectId: [ 171, 177, 210, 122, 73, 79, 129, 2, 30, 151, 125, 139, 226, 96, 92, 144 ]," +
-//                "bookmark:" +
-//                "{ site:" +
-//                "{ location: 'https://www.google.com/'," +
-//                "title: 'Google'," +
-//                "customTitle: ''," +
-//                "lastAccessedTime: 1486066976216," +
-//                "creationTime: 4 }," +
-//                "isFolder: false," +
-//            "parentFolderObjectId: undefined } }]"
-            
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
-//            let arg1 = recordType.reduce("[") { $0 + "'\($1.rawValue)'," } + "]"
             let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',[\(jsonParser)])"
             print(evaluate)
             self.webView.evaluateJavaScript(evaluate,
