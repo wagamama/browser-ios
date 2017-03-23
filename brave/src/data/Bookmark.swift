@@ -275,6 +275,21 @@ class Bookmark: NSManagedObject {
         }
         return [Bookmark]()
     }
+    
+    static func getAllBookmarks() -> [Bookmark] {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Bookmark.entity(DataController.moc)
+        
+        do {
+            if let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [Bookmark]()
+    }
 
     class func remove(forUrl url: NSURL, save: Bool = true) -> Bool {
         if let bm = get(forUrl: url, context: DataController.moc) as? Bookmark {

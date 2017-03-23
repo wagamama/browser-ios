@@ -186,11 +186,23 @@ class Sync: JSInjector {
             Static.isReady = true
             NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
             
-            // Perform first fetch manually
-            self.fetch()
+            func startFetching() {
+                // Perform first fetch manually
+                self.fetch()
+                
+                // Fetch timer to run on regular basis
+                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
+            }
             
-            // Fetch timer to run on regular basis
-            fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
+            if fetchTimestamp == 0 {
+                // Sync local bookmarks, then proceed with fetching
+                // Pull all local bookmarks
+                self.sendSyncRecords(.bookmark, bookmarks: Bookmark.getAllBookmarks()) { error in
+                    startFetching()
+                }
+            } else {
+                startFetching()
+            }
         }
         return ready
     }
@@ -199,7 +211,7 @@ class Sync: JSInjector {
 // MARK: Native-initiated Message category
 extension Sync {
     // TODO: Rename
-    func sendSyncRecords(recordType: SyncRecordType, bookmarks: [Bookmark]) {
+    func sendSyncRecords(recordType: SyncRecordType, bookmarks: [Bookmark], completion: (NSError? -> Void)? = nil) {
         
         executeBlockOnReady() {
             
@@ -215,6 +227,12 @@ extension Sync {
                                         if error != nil {
                                             print(error)
                                         }
+                                        
+                                        if error == nil {
+                                            // TODO: Mark all bookmarks as synced?
+                                        }
+                                        
+                                        completion?(error)
             })
         }
     }
