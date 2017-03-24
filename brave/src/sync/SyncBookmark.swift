@@ -19,7 +19,7 @@ public final class SyncBookmark {
     
     // MARK: Properties
     public var isFolder: Bool? = false
-    public var parentFolderObjectId: [Any]?
+    public var parentFolderObjectId: [Int]?
     public var site: SyncSite?
     
     public convenience init() {
@@ -40,7 +40,7 @@ public final class SyncBookmark {
     /// - parameter json: JSON object from SwiftyJSON.
     public required init(json: JSON?) {
         isFolder = json?[SerializationKeys.isFolder].asBool
-//        if let items = json[SerializationKeys.parentFolderObjectId].asArray { parentFolderObjectId = items.map { $0.whateverType } }
+        if let items = json?[SerializationKeys.parentFolderObjectId].asArray { parentFolderObjectId = items.map { $0.asInt ?? 0 } }
         site = SyncSite(json: json?[SerializationKeys.site])
     }
     
@@ -50,7 +50,7 @@ public final class SyncBookmark {
     public func dictionaryRepresentation() -> [String: AnyObject] {
         var dictionary: [String: AnyObject] = [:]
         dictionary[SerializationKeys.isFolder] = isFolder
-//        if let value = parentFolderObjectId { dictionary[SerializationKeys.parentFolderObjectId] = value }
+        if let value = parentFolderObjectId { dictionary[SerializationKeys.parentFolderObjectId] = value }
         if let value = site { dictionary[SerializationKeys.site] = value.dictionaryRepresentation() }
         return dictionary
     }
