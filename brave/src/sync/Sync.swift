@@ -191,7 +191,7 @@ class Sync: JSInjector {
                 self.fetch()
                 
                 // Fetch timer to run on regular basis
-                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, repeats: true) { _ in self.fetch() }
+                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
             }
             
             if fetchTimestamp == 0 {
@@ -205,6 +205,12 @@ class Sync: JSInjector {
             }
         }
         return ready
+    }
+    
+    // Required since fetch is wrapped in extension and timer hates that.
+    // This can be removed and fetch called directly via scheduledTimerBlock
+    func fetchWrapper() {
+        self.fetch()
     }
  }
 
