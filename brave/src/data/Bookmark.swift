@@ -51,6 +51,13 @@ class Bookmark: NSManagedObject {
         }
     }
     
+    var displayTitle: String? {
+        if let custom = customTitle where !custom.isEmpty {
+            return customTitle
+        }
+        return title
+    }
+    
     override func awakeFromInsert() {
         super.awakeFromInsert()
         created = NSDate()
