@@ -27,7 +27,7 @@ class HomePanels {
 
         HomePanelDescriptor(
             makeViewController: { profile in
-                let bookmarks = BookmarksPanel()
+                let bookmarks = BookmarksPanel(folder: nil)
 
                 let controller = UINavigationController(rootViewController: bookmarks)
                 controller.setNavigationBarHidden(true, animated: false)

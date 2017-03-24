@@ -6,7 +6,7 @@ import Shared
 
 class MainSidePanelViewController : SidePanelBaseViewController {
 
-    let bookmarksPanel = BookmarksPanel()
+    let bookmarksPanel = BookmarksPanel(folder: nil)
     private var bookmarksNavController:UINavigationController!
     
     let history = HistoryPanel()

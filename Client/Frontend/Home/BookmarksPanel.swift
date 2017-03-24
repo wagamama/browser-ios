@@ -217,6 +217,15 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         self.tableView.registerClass(BookmarkFolderTableViewCell.self, forCellReuseIdentifier: BookmarkFolderCellIdentifier)
         self.tableView.registerClass(BookmarkFolderTableViewHeader.self, forHeaderFooterViewReuseIdentifier: BookmarkFolderHeaderViewIdentifier)
     }
+    
+    convenience init(folder: Bookmark?) {
+        self.init()
+        
+        self.currentFolder = folder
+        self.title = folder?.displayTitle ?? Strings.Bookmarks
+        self.frc = Bookmark.frc(parentFolder: folder)
+        self.frc!.delegate = self
+    }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -228,10 +237,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        frc = Bookmark.frc(parentFolder: currentFolder)
-        frc!.delegate = self
-
+    
         tableView.allowsSelectionDuringEditing = true
         
         let navBar = self.navigationController?.navigationBar
@@ -259,7 +265,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         tableView.snp_makeConstraints { make in
             make.bottom.equalTo(self.view).inset(UIEdgeInsetsMake(0, 0, toolbarHeight, 0))
         }
-
+        
         reloadData()
     }
 
@@ -324,11 +330,11 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
         var targetButton:UIBarButtonItem!
         
-        if currentFolder == nil { //on root, this button allows adding subfolders
+//        if currentFolder == nil { //on root, this button allows adding subfolders
             targetButton = addFolderButton
-        } else { //on a subfolder, this button allows removing the current folder (if empty)
-            targetButton = removeFolderButton
-        }
+//        } else { //on a subfolder, this button allows removing the current folder (if empty)
+//            targetButton = removeFolderButton
+//        }
         
         addRemoveFolderButton.title = targetButton.title
         addRemoveFolderButton.style = targetButton.style
@@ -408,7 +414,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         alert.addAction(cancelAction)
 
         alert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "<folder name>"
+            textField.placeholder = "Folder name"
             textField.secureTextEntry = false
             NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.notificationReceived(_:)), name: UITextFieldTextDidChangeNotification, object: textField)
         })
@@ -617,13 +623,9 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             }
             else {
                 print("Selected folder")
-                let nextController = BookmarksPanel()
-                nextController.currentFolder = bookmark
+                let nextController = BookmarksPanel(folder: bookmark)
                 nextController.homePanelDelegate = self.homePanelDelegate
                 
-                //on subfolders, the folderpicker is the same as the root
-                let backButton = UIBarButtonItem(title: "", style: UIBarButtonItemStyle.Plain, target: self.navigationController, action: nil)
-                self.navigationItem.leftBarButtonItem = backButton
                 self.navigationController?.pushViewController(nextController, animated: true)
             }
         }
