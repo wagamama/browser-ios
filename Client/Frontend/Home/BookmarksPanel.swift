@@ -549,6 +549,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             } else if let image = image {
                 cell.imageView?.image = image
                 restrictImageSize()
+            } else {
+                cell.imageView?.image = nil
             }
         }
 
