@@ -42,9 +42,12 @@ class Bookmark: NSManagedObject {
     var syncParentUUID: [Int]? {
         get { return syncUUID(fromString: syncParentDisplayUUID) }
         set(value) {
+            // Save actual instance variable
             syncParentDisplayUUID = Bookmark.syncDisplay(fromUUID: value)
-            
-            // TODO: Perform lookup to attach parent
+
+            // Attach parent, only works if parent exists.
+            let parent = Bookmark.get(parentSyncUUID: value)
+            parentFolder = parent
         }
     }
     
@@ -302,6 +305,14 @@ extension Bookmark {
         
         let searchableUUIDs = syncUUIDs.map { Bookmark.syncDisplay(fromUUID: $0) }.flatMap { $0 }
         return get(predicate: NSPredicate(format: "syncDisplayUUID IN %@", searchableUUIDs ))
+    }
+    
+    static func get(parentSyncUUID parentUUID: [Int]?) -> Bookmark? {
+        guard let searchableUUID = Bookmark.syncDisplay(fromUUID: parentUUID) else {
+            return nil
+        }
+        
+        return get(predicate: NSPredicate(format: "syncDisplayUUID == %@", searchableUUID))?.first
     }
     
     static func getFolders(bookmark: Bookmark?) -> [Bookmark] {
