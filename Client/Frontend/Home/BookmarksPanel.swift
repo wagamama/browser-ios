@@ -559,22 +559,19 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 cell.imageView?.image = nil
             }
         }
+        
+        // Same logic
+        let fontSize: CGFloat = 14.0
+        cell.textLabel?.text = item.displayTitle ?? item.url
+        //
 
         if !item.isFolder {
             configCell(icon: item.domain?.favicon, longPressForContextMenu: true)
-
-            cell.textLabel?.font = UIFont.systemFontOfSize(14)
-            if let title = item.title where !title.isEmpty {
-                cell.textLabel?.text = item.title
-            } else {
-                cell.textLabel?.text = item.url
-            }
-
+            cell.textLabel?.font = UIFont.systemFontOfSize(fontSize)
             cell.accessoryType = .None
         } else {
             configCell(image: UIImage(named: "bookmarks_folder_hollow"))
-            cell.textLabel?.font = UIFont.boldSystemFontOfSize(14)
-            cell.textLabel?.text = item.title
+            cell.textLabel?.font = UIFont.boldSystemFontOfSize(fontSize)
             cell.accessoryType = .DisclosureIndicator
         }
     }
