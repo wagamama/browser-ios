@@ -163,10 +163,9 @@ class Bookmark: NSManagedObject {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
         }
         
-        // TODO: This is an array :/
-//        if let id = bookmark?.parentFolderObjectId?.first {
-//            bk.parentFolder = DataController.moc.objectWithID(id) as? Bookmark
-//        }
+        if let parentFolderObjectId = bookmark?.parentFolderObjectId {
+            bk.syncParentUUID = parentFolderObjectId
+        }
         
         if save && bk.syncUUID != nil {
             // If no syncUUI is available, it will be saved after id is set
@@ -179,7 +178,7 @@ class Bookmark: NSManagedObject {
     // TODO: DELETE
     class func add(url url: String?,
                        title: String?,
-                       parentFolder:NSManagedObjectID? = nil,
+                       parentFolder:Bookmark? = nil,
                        isFolder:Bool = false) -> Bookmark? {
         
         let site = SyncSite()
@@ -188,7 +187,7 @@ class Bookmark: NSManagedObject {
         
         let bookmark = SyncBookmark()
         bookmark.isFolder = isFolder
-        bookmark.parentFolderObjectId = [parentFolder]
+        bookmark.parentFolderObjectId = parentFolder?.syncParentUUID
         bookmark.site = site
         
         let root = SyncRoot()
@@ -197,6 +196,7 @@ class Bookmark: NSManagedObject {
         return self.add(rootObject: root)
     }
     
+    // TODO: Migration syncUUIDS still needs to be solved
     // Should only ever be used for migration from old db
     class func addForMigration(url url: String?, title: String, customTitle: String, parentFolder: NSManagedObjectID?, isFolder: Bool?) -> Bookmark? {
         // isFolder = true
@@ -208,7 +208,7 @@ class Bookmark: NSManagedObject {
         
         let bookmark = SyncBookmark()
         bookmark.isFolder = isFolder
-        bookmark.parentFolderObjectId = [parentFolder]
+//        bookmark.parentFolderObjectId = [parentFolder]
         bookmark.site = site
         
         let root = SyncRoot()
