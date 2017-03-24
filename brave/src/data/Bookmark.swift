@@ -141,6 +141,14 @@ class Bookmark: NSManagedObject {
             return false
         }
         
+        if let url = url {
+            bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
+        }
+        
+        if let parentFolderObjectId = bookmark?.parentFolderObjectId {
+            bk.syncParentUUID = parentFolderObjectId
+        }
+        
         if !set(uuid: root.objectId) {
             // Need async creation of UUID
             Niceware.shared.uniqueBytes(count: 16) {
@@ -157,17 +165,7 @@ class Bookmark: NSManagedObject {
                     Sync.shared.sendSyncRecords(.bookmark, bookmarks: [bk])
                 }
             }
-        }
-        
-        if let url = url {
-            bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
-        }
-        
-        if let parentFolderObjectId = bookmark?.parentFolderObjectId {
-            bk.syncParentUUID = parentFolderObjectId
-        }
-        
-        if save && bk.syncUUID != nil {
+        } else if save {
             // If no syncUUI is available, it will be saved after id is set
             DataController.saveContext()
         }
