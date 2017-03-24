@@ -17,7 +17,8 @@ class Bookmark: NSManagedObject {
     @NSManaged var created: NSDate?
     @NSManaged var order: Int16
     @NSManaged var tags: [String]?
-    @NSManaged var syncUUID: [Int]?
+    
+    /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
     /// CD does not allow (easily) searching on transformable properties, could use binary, but easier to just have two
     //  As syncUUID should never change
     @NSManaged var syncDisplayUUID: String?
@@ -31,6 +32,16 @@ class Bookmark: NSManagedObject {
     // are displayed in a table and waiting for a favicon, you can change markDirty, and the favicon will update
     @NSManaged var markDirty: Int16
 
+    // Is conveted to better store in CD
+    var syncUUID: [Int]? {
+        get {
+            return syncDisplayUUID?.componentsSeparatedByString(",").map { Int($0) }.flatMap { $0 }
+        }
+        set(value) {
+            syncDisplayUUID = Bookmark.syncDisplay(fromUUID: value)
+        }
+    }
+    
     override func awakeFromInsert() {
         super.awakeFromInsert()
         created = NSDate()
@@ -119,7 +130,6 @@ class Bookmark: NSManagedObject {
         func set(uuid uuid: [Int]?) -> Bool {
             if let syncUUID = uuid {
                 bk.syncUUID = syncUUID
-                bk.syncDisplayUUID = syncUUID.description
                 return true
             }
             return false
@@ -248,7 +258,8 @@ class Bookmark: NSManagedObject {
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
         // Cannot search on transformable CD objects so using display
-        fetchRequest.predicate = NSPredicate(format: "syncDisplayUUID IN %@", syncUUIDs.map { $0.description} )
+        let searchableUUIDs = syncUUIDs.map { Bookmark.syncDisplay(fromUUID: $0) }.flatMap { $0 }
+        fetchRequest.predicate = NSPredicate(format: "syncDisplayUUID IN %@", searchableUUIDs )
         
         if let results = try? DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
             return results
@@ -327,5 +338,9 @@ class Bookmark: NSManagedObject {
         }
         return [Bookmark]()
     }
-
+    
+    private static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
+        return uuid?.map{ $0.description }.joinWithSeparator(",")
+    }
 }
+
