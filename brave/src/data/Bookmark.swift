@@ -221,6 +221,39 @@ class Bookmark: NSManagedObject {
         }
     }
 
+    class func frecencyQuery(context: NSManagedObjectContext) -> [Bookmark] {
+        assert(!NSThread.isMainThread())
+
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.fetchLimit = 5
+        fetchRequest.entity = Bookmark.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "lastVisited > %@", History.ThisWeek)
+
+        do {
+            if let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark] {
+                return results
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return [Bookmark]()
+    }
+    
+    
+    /// UUID -> DisplayUUID
+    private static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
+        return uuid?.map{ $0.description }.joinWithSeparator(",")
+    }
+    
+    /// DisplayUUID -> UUID
+    private func syncUUID(fromString string: String?) -> [Int]? {
+        return string?.componentsSeparatedByString(",").map { Int($0) }.flatMap { $0 }
+    }
+}
+
+// Getters
+extension Bookmark {
     private static func get(forUrl url: NSURL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
         guard let str = url.absoluteDisplayString() else { return nil }
         let fetchRequest = NSFetchRequest()
@@ -251,7 +284,7 @@ class Bookmark: NSManagedObject {
         }
         
         // TODO: filter a unique set of syncUUIDs
-
+        
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
         // Cannot search on transformable CD objects so using display
@@ -264,7 +297,7 @@ class Bookmark: NSManagedObject {
         
         return nil
     }
-
+    
     static func getFolders(bookmark: Bookmark?) -> [Bookmark] {
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
@@ -298,7 +331,10 @@ class Bookmark: NSManagedObject {
         }
         return [Bookmark]()
     }
+}
 
+// Removals
+extension Bookmark {
     class func remove(forUrl url: NSURL, save: Bool = true) -> Bool {
         if let bm = get(forUrl: url, context: DataController.moc) as? Bookmark {
             DataController.moc.deleteObject(bm)
@@ -315,36 +351,6 @@ class Bookmark: NSManagedObject {
         if save {
             DataController.saveContext()
         }
-    }
-
-    class func frecencyQuery(context: NSManagedObjectContext) -> [Bookmark] {
-        assert(!NSThread.isMainThread())
-
-        let fetchRequest = NSFetchRequest()
-        fetchRequest.fetchLimit = 5
-        fetchRequest.entity = Bookmark.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "lastVisited > %@", History.ThisWeek)
-
-        do {
-            if let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return [Bookmark]()
-    }
-    
-    
-    /// UUID -> DisplayUUID
-    private static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
-        return uuid?.map{ $0.description }.joinWithSeparator(",")
-    }
-    
-    /// DisplayUUID -> UUID
-    private func syncUUID(fromString string: String?) -> [Int]? {
-        return string?.componentsSeparatedByString(",").map { Int($0) }.flatMap { $0 }
     }
 }
 
