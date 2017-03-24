@@ -133,14 +133,6 @@ class Bookmark: NSManagedObject {
             bk.lastVisited = NSDate()
         }
         
-        func set(uuid uuid: [Int]?) -> Bool {
-            if let syncUUID = uuid {
-                bk.syncUUID = syncUUID
-                return true
-            }
-            return false
-        }
-        
         if let url = url {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
         }
@@ -149,13 +141,14 @@ class Bookmark: NSManagedObject {
             bk.syncParentUUID = parentFolderObjectId
         }
         
-        if !set(uuid: root.objectId) {
+        bk.syncUUID = root.objectId
+        
+        if bk.syncUUID == nil {
             // Need async creation of UUID
             Niceware.shared.uniqueBytes(count: 16) {
                 (result, error) in
-                // TODO: Must centralize this logic
                 
-                set(uuid: result)
+                bk.syncUUID = result
                 
                 if save {
                     DataController.saveContext()
