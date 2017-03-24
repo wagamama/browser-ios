@@ -1,9 +1,4 @@
-//
-//  SyncSite.swift
-//
-//  Created by Joel Reis on 3/23/17
-//  Copyright (c) . All rights reserved.
-//
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
 import Shared
@@ -32,7 +27,6 @@ public final class SyncSite {
         self.init(json: nil)
     }
     
-    // MARK: SwiftyJSON Initializers
     /// Initiates the instance based on the object.
     ///
     /// - parameter object: The object of either Dictionary or Array kind that was passed.
