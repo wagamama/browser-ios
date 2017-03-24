@@ -293,21 +293,37 @@ extension Sync {
             if fetchedRoot.objectData != "bookmark" { return }
             
             guard
-                let fetchedId = fetchedRoot.objectId,
-                let singleBookmark = Bookmark.get(syncUUIDs: [fetchedId])?.first
+                let fetchedId = fetchedRoot.objectId
                 else { return }
+            
+            let singleBookmark = Bookmark.get(syncUUIDs: [fetchedId])?.first
             
             let action = SyncActions.init(rawValue: fetchedRoot.action ?? -1)
             if action == SyncActions.delete {
+                // TODO: Remove check and just let delete handle this
+                guard let singleBookmark = singleBookmark else {
+                    // Record already exists
+                    return
+                }
+                
                 // Remove record
                 print("Deleting record!")
                 Bookmark.remove(bookmark: singleBookmark)
                 continue
+            } else if action == SyncActions.create {
+                
+                if singleBookmark != nil {
+                    // Error! Should not exist and call create
+                }
+                    
+                // TODO: Needs favicon
+                // TODO: Create better `add` method to accept sync bookmark
+                Bookmark.add(rootObject: fetchedRoot, save: true)
             }
             
             // check diff
-            let temp = singleBookmark.asSyncBookmark(deviceId: "", action: 0)
-            print("Attemptin to update: \(temp) -- with -- \(fetchedRoot.dictionaryRepresentation())")
+//            let temp = singleBookmark.asSyncBookmark(deviceId: "", action: 0)
+//            print("Attemptin to update: \(temp) -- with -- \(fetchedRoot.dictionaryRepresentation())")
             
         }
         
@@ -340,8 +356,6 @@ extension Sync {
         // Root "AnyObject" here should either be [String:AnyObject] or the string literal "null"
         var matchedBookmarks = [[AnyObject]]()
         
-        var counterForAdditions = 0
-        var counterForExisting = 0
         for fetchedBookmark in syncRecords {
             guard let fetchedId = fetchedBookmark.objectId else {
                 continue
@@ -352,44 +366,25 @@ extension Sync {
             let bookmarks = Bookmark.get(syncUUIDs: [fetchedId])
             
             // TODO: Validate count, should never be more than one!
-            
-            var singleBookmark: Bookmark? = bookmarks?.first
-            if singleBookmark == nil {
-                // Add, not found
 
-                if fetchedBookmark.objectData == "bookmark",
-                    let bookmark = fetchedBookmark.bookmark,
-                    let site = bookmark.site {
-                    
-                    let location = NSURL(string: site.location ?? "")
-                    
-                    // TODO: Needs favicon
-                    // TODO: Create better `add` method to accept sync bookmark
-                    singleBookmark = Bookmark.add(rootObject: fetchedBookmark, save: true)
-                    counterForAdditions += 1
-                }
-            } else {
-                counterForExisting += 1
+            
+            var localSide: AnyObject = "null"
+            if let bm = bookmarks?.first?.asSyncBookmark(deviceId: syncDeviceId ?? "0", action: 0) {
+                localSide = SyncRoot(json: bm).dictionaryRepresentation()
             }
             
-            guard let bm = singleBookmark?.asSyncBookmark(deviceId: syncDeviceId ?? "0", action: 0) else {
-                return
-            }
             
-            matchedBookmarks.append([fetchedBookmark.dictionaryRepresentation(), SyncRoot(json: bm).dictionaryRepresentation()])
+            matchedBookmarks.append([fetchedBookmark.dictionaryRepresentation(), localSide])
         }
         
-        print("Added \(counterForAdditions) new bookmarks\nFound \(counterForExisting) existing bookmarks")
         
         // TODO: Check if parsing not required
-        guard let serializedData = NSJSONSerialization.jsObject(withNative: matchedBookmarks, escaped: true) else {
+        guard let serializedData = NSJSONSerialization.jsObject(withNative: matchedBookmarks, escaped: false) else {
             // Huge error
             return
         }
         
-        let jsonParser = "JSON.parse(\"\(serializedData)\")"
-        
-        self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(jsonParser))",
+        self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(serializedData))",
             completionHandler: { (result, error) in
                 print(error)
         })

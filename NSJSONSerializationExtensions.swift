@@ -32,6 +32,8 @@ extension NSJSONSerialization {
             encoded = encoded?.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
         }
         
+        encoded = encoded?.stringByReplacingOccurrencesOfString("\"null\"", withString: "null")
+        
         return encoded
     }
 }
