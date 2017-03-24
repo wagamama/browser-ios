@@ -286,11 +286,8 @@ extension Sync {
         }
     }
 
-    func resolvedSyncRecords(data: JSON) {
-        guard
-            let objects = data["arg2"].asArray,
-            let syncRecords = SyncRoot.syncObject(objects)
-            else { return }
+    func resolvedSyncRecords(data: [SyncRoot]?) {
+        guard let syncRecords = data else { return }
         
         for fetchedRoot in syncRecords {
             if fetchedRoot.objectData != "bookmark" { return }
@@ -334,12 +331,9 @@ extension Sync {
 // MARK: Server To Native Message category
 extension Sync {
 
-    func getExistingObjects(data: JSON) {
+    func getExistingObjects(data: [SyncRoot]?) {
         //  as? [[String: AnyObject]]
-        guard
-            let objects = data["arg2"].asArray,
-            let syncRecords = SyncRoot.syncObject(objects)
-            else { return }
+        guard let syncRecords = data else { return }
         
         /* Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
         
@@ -430,11 +424,14 @@ extension Sync: WKScriptMessageHandler {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         //print("😎 \(message.name) \(message.body)")
         
-        let data = JSON(string: message.body as? String ?? "")
-        guard let messageName = data["message"].asString  else {
+        let syncResponse = SyncResponse(object: message.body)
+        guard let messageName = syncResponse.message else {
             assert(false)
             return
         }
+        
+        let data = JSON(string: message.body as? String ?? "")
+
 
         switch messageName {
         case "get-init-data":
@@ -443,12 +440,15 @@ extension Sync: WKScriptMessageHandler {
         case "got-init-data":
             gotInitData()
         case "save-init-data" :
+            // A bit hacky, but this method's data is not very uniform
+            // (e.g. arg2 is [Int])
+            let data = JSON(string: message.body as? String ?? "")
             saveInitData(data)
         case "get-existing-objects":
             // TODO: Should just return records, and immediately call resolve-sync-records
-            getExistingObjects(data)
+            getExistingObjects(syncResponse.rootElements)
         case "resolved-sync-records":
-            resolvedSyncRecords(data)
+            resolvedSyncRecords(syncResponse.rootElements)
         case "sync-debug":
             print("---- Sync Debug: \(data)")
         case "sync-ready":
