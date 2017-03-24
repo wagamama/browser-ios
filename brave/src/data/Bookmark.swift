@@ -19,9 +19,10 @@ class Bookmark: NSManagedObject {
     @NSManaged var tags: [String]?
     
     /// Should not be set directly, due to specific formatting required, use `syncUUID` instead
-    /// CD does not allow (easily) searching on transformable properties, could use binary, but easier to just have two
-    //  As syncUUID should never change
+    /// CD does not allow (easily) searching on transformable properties, could use binary, but would still require tranformtion
+    //  syncUUID should never change
     @NSManaged var syncDisplayUUID: String?
+    @NSManaged var syncParentDisplayUUID: String?
 
     @NSManaged var parentFolder: Bookmark?
     @NSManaged var children: Set<Bookmark>?
@@ -34,11 +35,16 @@ class Bookmark: NSManagedObject {
 
     // Is conveted to better store in CD
     var syncUUID: [Int]? {
-        get {
-            return syncDisplayUUID?.componentsSeparatedByString(",").map { Int($0) }.flatMap { $0 }
-        }
+        get { return syncUUID(fromString: syncDisplayUUID) }
+        set(value) { syncDisplayUUID = Bookmark.syncDisplay(fromUUID: value) }
+    }
+    
+    var syncParentUUID: [Int]? {
+        get { return syncUUID(fromString: syncParentDisplayUUID) }
         set(value) {
-            syncDisplayUUID = Bookmark.syncDisplay(fromUUID: value)
+            syncParentDisplayUUID = Bookmark.syncDisplay(fromUUID: value)
+            
+            // TODO: Perform lookup to attach parent
         }
     }
     
@@ -339,8 +345,15 @@ class Bookmark: NSManagedObject {
         return [Bookmark]()
     }
     
+    
+    /// UUID -> DisplayUUID
     private static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
         return uuid?.map{ $0.description }.joinWithSeparator(",")
+    }
+    
+    /// DisplayUUID -> UUID
+    private func syncUUID(fromString string: String?) -> [Int]? {
+        return string?.componentsSeparatedByString(",").map { Int($0) }.flatMap { $0 }
     }
 }
 
