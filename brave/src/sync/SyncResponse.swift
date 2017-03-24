@@ -4,45 +4,45 @@ import Foundation
 import Shared
 
 public final class SyncResponse {
-
-  // MARK: Declaration for string constants to be used to decode and also serialize.
-  private struct SerializationKeys {
-    static let arg2 = "arg2"
-    static let message = "message"
-    static let arg1 = "arg1"
-  }
-
-  // MARK: Properties
-  public var rootElements: [SyncRoot]? // arg2
-  public var message: String?
-  public var arg1: String?
-
-  /// Initiates the instance based on the object.
-  ///
-  /// - parameter object: The object of either Dictionary or Array kind that was passed.
-  /// - returns: An initialized instance of the class.
-  public convenience init(object: AnyObject) {
-    self.init(json: JSON(object))
-  }
-
-  /// Initiates the instance based on the JSON that was passed.
-  ///
-  /// - parameter json: JSON object from SwiftyJSON.
-  public required init(json: JSON?) {
-    if let items = json?[SerializationKeys.arg2].asArray { rootElements = items.map { SyncRoot(json: $0) } }
-    message = json?[SerializationKeys.message].asString
-    arg1 = json?[SerializationKeys.arg1].asString
-  }
-
-  /// Generates description of the object in the form of a NSDictionary.
-  ///
-  /// - returns: A Key value pair containing all valid values in the object.
-  public func dictionaryRepresentation() -> [String: Any] {
-    var dictionary: [String: Any] = [:]
-    if let value = rootElements { dictionary[SerializationKeys.arg2] = value.map { $0.dictionaryRepresentation() } }
-    if let value = message { dictionary[SerializationKeys.message] = value }
-    if let value = arg1 { dictionary[SerializationKeys.arg1] = value }
-    return dictionary
-  }
-
+    
+    // MARK: Declaration for string constants to be used to decode and also serialize.
+    private struct SerializationKeys {
+        static let arg2 = "arg2"
+        static let message = "message"
+        static let arg1 = "arg1"
+    }
+    
+    // MARK: Properties
+    public var rootElements: [SyncRoot]? // arg2
+    public var message: String?
+    public var arg1: String?
+    
+    /// Initiates the instance based on the object.
+    ///
+    /// - parameter object: The object of either Dictionary or Array kind that was passed.
+    /// - returns: An initialized instance of the class.
+    public convenience init(object: AnyObject) {
+        self.init(json: JSON(string: object as? String ?? ""))
+    }
+    
+    /// Initiates the instance based on the JSON that was passed.
+    ///
+    /// - parameter json: JSON object from SwiftyJSON.
+    public required init(json: JSON?) {
+        if let items = json?[SerializationKeys.arg2].asArray { rootElements = items.map { SyncRoot(json: $0) } }
+        message = json?[SerializationKeys.message].asString
+        arg1 = json?[SerializationKeys.arg1].asString
+    }
+    
+    /// Generates description of the object in the form of a NSDictionary.
+    ///
+    /// - returns: A Key value pair containing all valid values in the object.
+    public func dictionaryRepresentation() -> [String: Any] {
+        var dictionary: [String: Any] = [:]
+        if let value = rootElements { dictionary[SerializationKeys.arg2] = value.map { $0.dictionaryRepresentation() } }
+        if let value = message { dictionary[SerializationKeys.message] = value }
+        if let value = arg1 { dictionary[SerializationKeys.arg1] = value }
+        return dictionary
+    }
+    
 }
