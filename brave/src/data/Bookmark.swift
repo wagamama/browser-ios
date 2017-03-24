@@ -189,7 +189,7 @@ class Bookmark: NSManagedObject {
         
         let bookmark = SyncBookmark()
         bookmark.isFolder = isFolder
-        bookmark.parentFolderObjectId = parentFolder?.syncParentUUID
+        bookmark.parentFolderObjectId = isFolder ? parentFolder?.syncUUID : parentFolder?.syncParentUUID
         bookmark.site = site
         
         let root = SyncRoot()
