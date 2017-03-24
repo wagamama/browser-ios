@@ -219,6 +219,11 @@ extension Sync {
     // TODO: Rename
     func sendSyncRecords(recordType: SyncRecordType, bookmarks: [Bookmark], completion: (NSError? -> Void)? = nil) {
         
+        if bookmarks.isEmpty {
+            completion?(nil)
+            return
+        }
+        
         executeBlockOnReady() {
             
             // Convert objects to JSON and stitch together
