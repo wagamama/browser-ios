@@ -176,6 +176,20 @@ class Bookmark: NSManagedObject {
                 }
             }
         } else if save {
+            
+            // For folders that are saved _with_ a syncUUID, there may be child bookmarks
+            //  (e.g. sync sent down bookmark before parent folder)
+            if bk.isFolder {
+                // Find all children and attach them
+                if let children = Bookmark.getChildren(forFolderUUID: bk.syncUUID) {
+                    
+                    // TODO: Setup via bk.children property instead
+                    children.forEach { $0.parentFolder = bk }
+//                    print(children)
+//                    bk.children = NSSet(array: children) as? Set<Bookmark>
+                }
+            }
+            
             // If no syncUUI is available, it will be saved after id is set
             DataController.saveContext()
         }
@@ -269,6 +283,7 @@ class Bookmark: NSManagedObject {
     }
 }
 
+// TODO: Document well
 // Getters
 extension Bookmark {
     private static func get(forUrl url: NSURL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
@@ -319,6 +334,14 @@ extension Bookmark {
         
         let searchableUUIDs = syncUUIDs.map { Bookmark.syncDisplay(fromUUID: $0) }.flatMap { $0 }
         return get(predicate: NSPredicate(format: "syncDisplayUUID IN %@", searchableUUIDs ))
+    }
+    
+    static func getChildren(forFolderUUID syncUUID: [Int]?) -> [Bookmark]? {
+        guard let searchableUUID = Bookmark.syncDisplay(fromUUID: syncUUID) else {
+            return nil
+        }
+        
+        return get(predicate: NSPredicate(format: "syncParentDisplayUUID == %@", searchableUUID))
     }
     
     static func get(parentSyncUUID parentUUID: [Int]?) -> Bookmark? {
