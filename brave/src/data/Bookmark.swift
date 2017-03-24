@@ -277,6 +277,21 @@ extension Bookmark {
         return nil
     }
     
+    private static func get(predicate predicate: NSPredicate?) -> [Bookmark]? {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = Bookmark.entity(DataController.moc)
+        fetchRequest.predicate = predicate
+        
+        do {
+            return try DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark]
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        
+        return nil
+    }
+    
     static func get(syncUUIDs syncUUIDs: [[Int]]?) -> [Bookmark]? {
         
         guard let syncUUIDs = syncUUIDs else {
@@ -285,51 +300,24 @@ extension Bookmark {
         
         // TODO: filter a unique set of syncUUIDs
         
-        let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = Bookmark.entity(DataController.moc)
-        // Cannot search on transformable CD objects so using display
         let searchableUUIDs = syncUUIDs.map { Bookmark.syncDisplay(fromUUID: $0) }.flatMap { $0 }
-        fetchRequest.predicate = NSPredicate(format: "syncDisplayUUID IN %@", searchableUUIDs )
-        
-        if let results = try? DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
-            return results
-        }
-        
-        return nil
+        return get(predicate: NSPredicate(format: "syncDisplayUUID IN %@", searchableUUIDs ))
     }
     
     static func getFolders(bookmark: Bookmark?) -> [Bookmark] {
-        let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = Bookmark.entity(DataController.moc)
+    
+        var predicate: NSPredicate?
         if let parent = bookmark?.parentFolder {
-            fetchRequest.predicate = NSPredicate(format: "isFolder == true and parentFolder == %@", parent)
+            predicate = NSPredicate(format: "isFolder == true and parentFolder == %@", parent)
         } else {
-            fetchRequest.predicate = NSPredicate(format: "isFolder == true and parentFolder.@count = 0")
+            predicate = NSPredicate(format: "isFolder == true and parentFolder.@count = 0")
         }
-        do {
-            if let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return [Bookmark]()
+        
+        return get(predicate: predicate) ?? [Bookmark]()
     }
     
     static func getAllBookmarks() -> [Bookmark] {
-        let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = Bookmark.entity(DataController.moc)
-        
-        do {
-            if let results = try DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark] {
-                return results
-            }
-        } catch {
-            let fetchError = error as NSError
-            print(fetchError)
-        }
-        return [Bookmark]()
+        return get(predicate: nil) ?? [Bookmark]()
     }
 }
 
