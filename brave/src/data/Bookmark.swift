@@ -57,6 +57,7 @@ class Bookmark: NSManagedObject {
         lastVisited = created
     }
     
+    // TODO: This entire method needs to go, to fragile with strings
     // TODO: Better use of `deviceId`
     // TODO: Use `action` enum
     func asSyncBookmark(deviceId deviceId: String, action: Int) -> JSON {
