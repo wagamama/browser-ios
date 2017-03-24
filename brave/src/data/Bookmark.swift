@@ -55,7 +55,13 @@ class Bookmark: NSManagedObject {
         if let custom = customTitle where !custom.isEmpty {
             return customTitle
         }
-        return title
+        
+        if let t = title where !t.isEmpty {
+            return title
+        }
+        
+        // Want to return nil so less checking on frontend
+        return nil
     }
     
     override func awakeFromInsert() {
