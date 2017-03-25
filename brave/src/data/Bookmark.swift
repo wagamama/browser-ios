@@ -123,6 +123,7 @@ class Bookmark: NSManagedObject {
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
 
+    // TODO: Name change, since this also handles updating records
     class func add(rootObject root: SyncRoot, save: Bool = false) -> Bookmark? {
         let bookmark = root.bookmark
         let site = bookmark?.site
@@ -131,8 +132,16 @@ class Bookmark: NSManagedObject {
         if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
             return nil
         }
+     
+        var bk: Bookmark!
+        if let id = root.objectId, let foundBK = Bookmark.get(syncUUIDs: [id])?.first {
+            // Found a pre-existing bookmark, cannot add duplicate
+            // Turn into 'update' record instead
+            bk = foundBK
+        } else {
+            bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
+        }
         
-        let bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         bk.url = url?.absoluteString
         bk.title = site?.title
         bk.customTitle = site?.customTitle // TODO: Check against empty titles
@@ -140,13 +149,13 @@ class Bookmark: NSManagedObject {
         
         if let created = site?.creationTime {
             bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
-        } else {
+        } else if bk.created == nil {
             bk.created = NSDate()
         }
         
         if let visited = site?.lastAccessedTime {
             bk.lastVisited = NSDate(timeIntervalSince1970:(Double(visited) / 1000.0))
-        } else {
+        } else if bk.lastVisited == nil {
             bk.lastVisited = NSDate()
         }
         

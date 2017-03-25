@@ -310,7 +310,7 @@ extension Sync {
                 print("Deleting record!")
                 Bookmark.remove(bookmark: singleBookmark)
                 continue
-            } else if action == SyncActions.create {
+            } else if action == SyncActions.create || action == SyncActions.update {
                 
                 if singleBookmark != nil {
                     // Error! Should not exist and call create
