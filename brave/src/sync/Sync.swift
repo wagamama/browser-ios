@@ -93,6 +93,11 @@ class Sync: JSInjector {
         initializeSync()
     }
     
+    func leaveSyncGroup() {
+        syncSeed = nil
+        // TODO: Send network removal
+    }
+    
     /// Sets up sync to actually start pulling/pushing data. This method can only be called once
     /// seed (optional): The user seed, in the form of string hex values. Must be even number : ["00", "ee", "4a", "42"]
     /// Notice:: seed will be ignored if the keychain already has one, a user must disconnect from existing sync group prior to joining a new one

@@ -193,7 +193,15 @@ class RemoveDeviceSetting: Setting {
     }
     
     override func onClick(navigationController: UINavigationController?) {
-        // TODO: Remove device from Sync.
+        
+        let alert = UIAlertController(title: "Remove this Device?", message: "This device will be disconnected from sync group and no longer receive or send sync data. All existing data will remain on device.", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive) { action in
+            Sync.shared.leaveSyncGroup()
+            navigationController?.popToRootViewControllerAnimated(true)
+        })
+        
+        navigationController?.presentViewController(alert, animated: true, completion: nil)
     }
 }
 
