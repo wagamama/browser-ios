@@ -155,6 +155,12 @@ class Sync: JSInjector {
                 //  must set syncSeed to ni prior to replacing it
                 return
             }
+            
+            if value == nil {
+                // Delete device too
+                syncDeviceId = nil
+            }
+            
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
         }
     }
