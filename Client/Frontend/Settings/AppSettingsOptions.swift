@@ -166,11 +166,14 @@ class SyncDevicesSetting: Setting {
     }
     
     override func onClick(navigationController: UINavigationController?) {
-        let viewController = SyncWelcomeViewController()
-        navigationController?.pushViewController(viewController, animated: true)
-//        let settingsTableViewController = SyncSettingsViewController(style: .Grouped)
-//        settingsTableViewController.profile = getApp().profile
-//        navigationController?.pushViewController(settingsTableViewController, animated: true)
+        
+        if Sync.shared.isInSyncGroup {
+            let settingsTableViewController = SyncSettingsViewController(style: .Grouped)
+            settingsTableViewController.profile = getApp().profile
+            navigationController?.pushViewController(settingsTableViewController, animated: true)
+        } else {
+            navigationController?.pushViewController(SyncWelcomeViewController(), animated: true)
+        }
     }
 }
 
