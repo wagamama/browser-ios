@@ -11,6 +11,9 @@ class SyncPairCameraViewController: UIViewController {
     var cameraAccessButton: UIButton!
     var enterWordsButton: UIButton!
     
+    var loadingView: UIView!
+    let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -34,18 +37,21 @@ class SyncPairCameraViewController: UIViewController {
                     return
                 }
                 
-                // If multiple calls get in here due to race conditions it isn't a big deal
-                
                 Scanner.Lock = true
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(1.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), { 
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(2.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
                     Scanner.Lock = false
+                    
+                    self.navigationController?.popToRootViewControllerAnimated(true)
                 })
                 
-                self.cameraView.cameraOverlaySucess()
+                // If multiple calls get in here due to race conditions it isn't a big deal
                 
                 Sync.shared.initializeSync(bytes)
+                self.cameraView.cameraOverlaySucess()
                 
-                // TODO: Navigate away
+                // Will be removed on pop
+                self.loadingView.hidden = false
+                
             } else {
                 self.cameraView.cameraOverlayError()
             }
@@ -94,6 +100,14 @@ class SyncPairCameraViewController: UIViewController {
         enterWordsButton.addTarget(self, action: #selector(SEL_enterWords), forControlEvents: .TouchUpInside)
         view.addSubview(enterWordsButton)
         
+        loadingSpinner.startAnimating()
+        
+        loadingView = UIView()
+        loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
+        loadingView.hidden = true
+        loadingView.addSubview(loadingSpinner)
+        view.addSubview(loadingView)
+        
         edgesForExtendedLayout = .None
         
         cameraView.snp_makeConstraints { (make) in
@@ -123,6 +137,14 @@ class SyncPairCameraViewController: UIViewController {
         enterWordsButton.snp_makeConstraints { (make) in
             make.top.equalTo(self.cameraAccessButton.snp_bottom).offset(8)
             make.centerX.equalTo(self.view)
+        }
+        
+        loadingView.snp_makeConstraints { make in
+            make.margins.equalTo(cameraView.snp_margins)
+        }
+        
+        loadingSpinner.snp_makeConstraints { make in
+            make.center.equalTo(loadingSpinner.superview!)
         }
     }
     
