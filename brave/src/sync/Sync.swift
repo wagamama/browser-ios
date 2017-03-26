@@ -134,12 +134,13 @@ class Sync: JSInjector {
         print(#function)
     }
 
-    private var syncDeviceId: String? {
+    private var syncDeviceId: [Int]? {
         get {
-            return jsArray(userDefaultKey: prefNameId)
+            let deviceId = NSUserDefaults.standardUserDefaults().integerForKey(prefNameId)
+            return [deviceId]
         }
         set(value) {
-            NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameId)
+            NSUserDefaults.standardUserDefaults().setValue(value?.first ?? nil, forKey: prefNameId)
         }
     }
 
@@ -232,7 +233,7 @@ extension Sync {
         executeBlockOnReady() {
             
             // Convert objects to JSON and stitch together
-            let json = bookmarks.map { $0.asSyncBookmark(deviceId: "0", action: 0).toString() }.joinWithSeparator(",")
+            let json = bookmarks.map { $0.asSyncBookmark(deviceId: self.syncDeviceId, action: 0).toString() }.joinWithSeparator(",")
             
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
@@ -254,7 +255,8 @@ extension Sync {
     }
 
     func gotInitData() {
-        let args = "(null, \(syncSeed ?? "null"), \(syncDeviceId ?? "null"), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
+        let deviceId: AnyObject = syncDeviceId ?? "null"
+        let args = "(null, \(syncSeed ?? "null"), \(deviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
                                    completionHandler: { (result, error) in
@@ -374,7 +376,7 @@ extension Sync {
 
             
             var localSide: AnyObject = "null"
-            if let bm = bookmarks?.first?.asSyncBookmark(deviceId: syncDeviceId ?? "0", action: 0) {
+            if let bm = bookmarks?.first?.asSyncBookmark(deviceId: syncDeviceId, action: 0) {
                 localSide = SyncRoot(json: bm).dictionaryRepresentation()
             }
             
@@ -407,12 +409,9 @@ extension Sync {
             }
             syncSeed = "\(seedArray)"
 
-            if let idDict = data["arg2"].asDictionary {
-                if let id = idDict["0"] {
-                    syncDeviceId = "[\(id)]"
-                    print(id)
-                }
-            }
+            if let deviceArray = data["arg2"].asArray { syncDeviceId = deviceArray.map { $0.asInt ?? 0 } }
+            
+            
         } else {
             print("Seed expected.")
         }

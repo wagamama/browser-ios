@@ -73,7 +73,7 @@ class Bookmark: NSManagedObject {
     // TODO: This entire method needs to go, to fragile with strings
     // TODO: Better use of `deviceId`
     // TODO: Use `action` enum
-    func asSyncBookmark(deviceId deviceId: String, action: Int) -> JSON {
+    func asSyncBookmark(deviceId deviceId: [Int]?, action: Int) -> JSON {
         
         // TODO: Could convert to 'actual' SyncBookmark record if handled objectId properly
         
@@ -91,7 +91,7 @@ class Bookmark: NSManagedObject {
         
         let nativeObject: [String: AnyObject] = [
             "objectData": "bookmark",
-            "deviceId": [0], // TODO: Actually set
+            "deviceId": deviceId ?? "null",
             "objectId": syncUUID ?? "null",
             "action": action,
             "bookmark": [
