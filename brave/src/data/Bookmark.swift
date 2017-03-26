@@ -89,16 +89,18 @@ class Bookmark: NSManagedObject {
             "title": title ?? ""
         ]
         
+        let bookmark: [String: AnyObject] = [
+            "isFolder": Int(isFolder),
+            "parentFolderObjectId": syncParentUUID ?? "null",
+            "site": site
+        ]
+        
         let nativeObject: [String: AnyObject] = [
             "objectData": "bookmark",
             "deviceId": deviceId ?? "null",
             "objectId": syncUUID ?? "null",
             "action": action,
-            "bookmark": [
-                "isFolder": Int(isFolder),
-//                "parentFolderObjectId": "undefined", // TODO: Fix
-                "site": site
-            ]
+            "bookmark": bookmark
         ]
         
         return JSON(nativeObject)
