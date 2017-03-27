@@ -52,13 +52,13 @@ class Sync: JSInjector {
     private let prefNameSeed = "seed-js-array"
     private let prefFetchTimestamp = "sync-fetch-timestamp"
     
-    #if DEBUG
-    private let isDebug = true
-    private let serverUrl = "https://sync-staging.brave.com"
-    #else
+//    #if DEBUG
+//    private let isDebug = true
+//    private let serverUrl = "https://sync-staging.brave.com"
+//    #else
     private let isDebug = false
     private let serverUrl = "https://sync.brave.com"
-    #endif
+//    #endif
 
     private let apiVersion = 0
 
@@ -136,8 +136,11 @@ class Sync: JSInjector {
 
     private var syncDeviceId: [Int]? {
         get {
-            let deviceId = NSUserDefaults.standardUserDefaults().integerForKey(prefNameId)
-            return [deviceId]
+            let deviceId = NSUserDefaults.standardUserDefaults().valueForKey(prefNameId)
+            if let id = deviceId as? Int {
+                return [id]
+            }
+            return nil
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setValue(value?.first ?? nil, forKey: prefNameId)
@@ -403,7 +406,9 @@ extension Sync {
         })
     }
 
+    // Only called when the server has info for client to save
     func saveInitData(data: JSON) {
+        // Sync Seed
         if let seedDict = data["arg1"].asDictionary {
             
             // TODO: Use js util converter
@@ -415,12 +420,18 @@ extension Sync {
             }
             syncSeed = "\(seedArray)"
 
-            if let deviceArray = data["arg2"].asArray { syncDeviceId = deviceArray.map { $0.asInt ?? 0 } }
-            
-            
-        } else {
+        } else if syncSeed == nil {
+            // Failure
             print("Seed expected.")
         }
+        
+        // Device Id
+        if let deviceArray = data["arg2"].asArray where deviceArray.count > 0 {
+            syncDeviceId = deviceArray.map { $0.asInt ?? 0 }
+        } else if syncDeviceId == nil {
+            print("Device Id expected!")
+        }
+
     }
 
 }
