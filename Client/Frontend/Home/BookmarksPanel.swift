@@ -388,8 +388,8 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             return
         }
 
-        DataController.moc.deleteObject(currentFolder)
-        DataController.saveContext()
+        // TODO: Needs to be recursive
+        Bookmark.remove(bookmark: currentFolder)
 
         self.navigationController?.popViewControllerAnimated(true)
     }
@@ -661,8 +661,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
         let delete = UITableViewRowAction(style: UITableViewRowActionStyle.Destructive, title: Strings.Delete, handler: { (action, indexPath) in
 
-            DataController.moc.deleteObject(item)
-            DataController.saveContext()
+            Bookmark.remove(bookmark: item, save: true)
 
             // updates the bookmark state
             getApp().browserViewController.updateURLBarDisplayURL(tab: nil)

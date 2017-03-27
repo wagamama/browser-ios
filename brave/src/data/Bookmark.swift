@@ -397,16 +397,16 @@ extension Bookmark {
 extension Bookmark {
     class func remove(forUrl url: NSURL, save: Bool = true) -> Bool {
         if let bm = get(forUrl: url, context: DataController.moc) as? Bookmark {
-            DataController.moc.deleteObject(bm)
-            if save {
-                DataController.saveContext()
-            }
+            self.remove(bookmark: bm, save: save)
             return true
         }
         return false
     }
     
     class func remove(bookmark bookmark: Bookmark, save: Bool = true) {
+        // Must happen before, otherwise bookmark is gone
+        Sync.shared.sendSyncRecords(.bookmark, action: .delete, bookmarks: [bookmark])
+
         DataController.moc.deleteObject(bookmark)
         if save {
             DataController.saveContext()
