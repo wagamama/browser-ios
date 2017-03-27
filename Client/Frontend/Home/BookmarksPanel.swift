@@ -145,10 +145,13 @@ class BookmarkEditingViewController: FormViewController {
             row.title = Strings.Name
             row.value = bookmark.displayTitle
             self.titleRow = row
-        }.onChange { row in
-            self.bookmark.customTitle = row.value
-            DataController.saveContext()
-        }
+        }.onCellHighlightChanged({ (cell, row) in
+            if self.bookmark.customTitle != row.value && row.value != self.bookmark.displayTitle {
+                // Only update when the result has changed
+                self.bookmark.customTitle = row.value
+                Bookmark.add(url: nil, title: nil, customTitle: row.value, parentFolder: nil, usingBookmark: self.bookmark)
+            }
+        })
 
         form +++ nameSection
         
@@ -180,11 +183,15 @@ class BookmarkEditingViewController: FormViewController {
                 var initial = FolderPickerRow()
                 initial.folder = bookmark.parentFolder
                 row.value = initial
-            }.onChange { row in
+            }.onCellHighlightChanged { (cell, row) in
+
+            }.onChange({ row in
+                // TODO: This needs to be fixed, called far too often
                 let r = row.value! as FolderPickerRow
-                self.bookmark.parentFolder = r.folder
-                DataController.saveContext()
-            }
+                if self.bookmark.parentFolder != r.folder {
+                    Bookmark.add(url: nil, title: nil, customTitle: nil, parentFolder: r.folder, usingBookmark: self.bookmark)
+                }
+            })
         }
     }
 }
@@ -424,7 +431,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     func addFolder(alert: UIAlertAction!, alertController: UIAlertController) {
         guard let folderName = alertController.textFields?[0].text else { return }
-        Bookmark.add(url: nil, title: nil,  customTitle: folderName, parentFolder: currentFolder, isFolder: true)
+        Bookmark.add(url: nil, title: nil, customTitle: folderName, parentFolder: currentFolder, isFolder: true)
     }
     
     func onEditBookmarksButton() {

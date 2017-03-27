@@ -212,7 +212,7 @@ class Sync: JSInjector {
             if fetchTimestamp == 0 {
                 // Sync local bookmarks, then proceed with fetching
                 // Pull all local bookmarks
-                self.sendSyncRecords(.bookmark, bookmarks: Bookmark.getAllBookmarks()) { error in
+                self.sendSyncRecords(.bookmark, action: .create, bookmarks: Bookmark.getAllBookmarks()) { error in
                     startFetching()
                 }
             } else {
@@ -232,9 +232,14 @@ class Sync: JSInjector {
 // MARK: Native-initiated Message category
 extension Sync {
     // TODO: Rename
-    func sendSyncRecords(recordType: SyncRecordType, bookmarks: [Bookmark], completion: (NSError? -> Void)? = nil) {
+    func sendSyncRecords(recordType: SyncRecordType, action: SyncActions, bookmarks: [Bookmark], completion: (NSError? -> Void)? = nil) {
         
         if bookmarks.isEmpty {
+            completion?(nil)
+            return
+        }
+        
+        if !isInSyncGroup {
             completion?(nil)
             return
         }
@@ -242,7 +247,7 @@ extension Sync {
         executeBlockOnReady() {
             
             let syncRecords = bookmarks.map {
-                SyncRoot(bookmark: $0, deviceId: self.syncDeviceId, action: SyncActions.create.rawValue).dictionaryRepresentation()
+                SyncRoot(bookmark: $0, deviceId: self.syncDeviceId, action: action.rawValue).dictionaryRepresentation()
             }
             
             guard let json = NSJSONSerialization.jsObject(withNative: syncRecords, escaped: false) else {

@@ -126,17 +126,14 @@ class Bookmark: NSManagedObject {
     }
 
     // TODO: Name change, since this also handles updating records
-    class func add(rootObject root: SyncRoot, save: Bool = false) -> Bookmark? {
+    class func add(rootObject root: SyncRoot, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil, usingBookmark bm: Bookmark? = nil) -> Bookmark? {
         let bookmark = root.bookmark
         let site = bookmark?.site
-        let url = NSURL(string: site?.location ?? "")
-        
-        if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
-            return nil
-        }
      
         var bk: Bookmark!
-        if let id = root.objectId, let foundBK = Bookmark.get(syncUUIDs: [id])?.first {
+        if bm != nil {
+            bk = bm
+        } else if let id = root.objectId, let foundBK = Bookmark.get(syncUUIDs: [id])?.first {
             // Found a pre-existing bookmark, cannot add duplicate
             // Turn into 'update' record instead
             bk = foundBK
@@ -144,10 +141,18 @@ class Bookmark: NSManagedObject {
             bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         }
         
-        bk.url = url?.absoluteString
-        bk.title = site?.title
-        bk.customTitle = site?.customTitle // TODO: Check against empty titles
-        bk.isFolder = bookmark?.isFolder ?? false
+        
+        let url = NSURL(string: site?.location ?? bk.url ?? "")
+        if url?.absoluteString?.startsWith(WebServer.sharedInstance.base) ?? false {
+            return nil
+        }
+        
+        // Use new values, fallback to previous values
+        bk.url = url?.absoluteString ?? bk.url
+        bk.title = site?.title ?? bk.title
+        bk.customTitle = site?.customTitle ?? bk.customTitle // TODO: Check against empty titles
+        bk.isFolder = bookmark?.isFolder ?? bk.isFolder ?? false
+        bk.syncUUID = root.objectId ?? bk.syncUUID
         
         if let created = site?.creationTime {
             bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
@@ -165,11 +170,9 @@ class Bookmark: NSManagedObject {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
         }
         
-        if let parentFolderObjectId = bookmark?.parentFolderObjectId {
-            bk.syncParentUUID = parentFolderObjectId
-        }
-        
-        bk.syncUUID = root.objectId
+        // Must assign both, in cae parentFolder does not exist, need syncParentUUID to attach later
+        bk.parentFolder = parentFolder
+        bk.syncParentUUID = bookmark?.parentFolderObjectId ?? bk.syncParentUUID
         
         if bk.syncUUID == nil {
             // Need async creation of UUID
@@ -182,12 +185,14 @@ class Bookmark: NSManagedObject {
                     DataController.saveContext()
                 }
                 
-                if Sync.shared.isInSyncGroup {
-                    Sync.shared.sendSyncRecords(.bookmark, bookmarks: [bk])
+                // TODO: Should probably check against global config, since this is new
+                if sendToSync {
+                    Sync.shared.sendSyncRecords(.bookmark, action: .create, bookmarks: [bk])
                 }
             }
         } else if save {
             
+            // TODO: Optimize (e.g. updating)
             // For folders that are saved _with_ a syncUUID, there may be child bookmarks
             //  (e.g. sync sent down bookmark before parent folder)
             if bk.isFolder {
@@ -199,6 +204,11 @@ class Bookmark: NSManagedObject {
 //                    print(children)
 //                    bk.children = NSSet(array: children) as? Set<Bookmark>
                 }
+            }
+            
+            // Submit to server
+            if sendToSync {
+                Sync.shared.sendSyncRecords(.bookmark, action: .update, bookmarks: [bk])
             }
             
             // If no syncUUI is available, it will be saved after id is set
@@ -213,7 +223,8 @@ class Bookmark: NSManagedObject {
                        title: String?,
                        customTitle: String? = nil, // Folders only use customTitle
                        parentFolder:Bookmark? = nil,
-                       isFolder:Bool = false) -> Bookmark? {
+                       isFolder:Bool = false,
+                       usingBookmark bm: Bookmark? = nil) -> Bookmark? {
         
         let site = SyncSite()
         site.title = title
@@ -222,13 +233,13 @@ class Bookmark: NSManagedObject {
         
         let bookmark = SyncBookmark()
         bookmark.isFolder = isFolder
-        bookmark.parentFolderObjectId = isFolder ? parentFolder?.syncUUID : parentFolder?.syncParentUUID
+        bookmark.parentFolderObjectId = parentFolder?.syncUUID
         bookmark.site = site
         
         let root = SyncRoot()
         root.bookmark = bookmark
         
-        return self.add(rootObject: root)
+        return self.add(rootObject: root, save: true, sendToSync: true, parentFolder: parentFolder, usingBookmark: bm)
     }
     
     // TODO: Migration syncUUIDS still needs to be solved
