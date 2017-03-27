@@ -241,12 +241,18 @@ extension Sync {
         
         executeBlockOnReady() {
             
-            // Convert objects to JSON and stitch together
-            let json = bookmarks.map { $0.asSyncBookmark(deviceId: self.syncDeviceId, action: 0).toString() }.joinWithSeparator(",")
+            let syncRecords = bookmarks.map {
+                SyncRoot(bookmark: $0, deviceId: self.syncDeviceId, action: SyncActions.create.rawValue).dictionaryRepresentation()
+            }
             
+            guard let json = NSJSONSerialization.jsObject(withNative: syncRecords, escaped: false) else {
+                // Huge error
+                return
+            }
+
             /* browser -> webview, sends this to the webview with the data that needs to be synced to the sync server.
              @param {string} categoryName, @param {Array.<Object>} records */
-            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',[\(json)])"
+            let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(json))"
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
                                         print(result)

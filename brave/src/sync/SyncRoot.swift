@@ -33,6 +33,33 @@ public final class SyncRoot {
         self.init(json: JSON(object))
     }
     
+    convenience init(bookmark bm: Bookmark?, deviceId: [Int]?, action: Int?) {
+        self.init(json: nil)
+        
+        let unixCreated = Int((bm?.created?.timeIntervalSince1970 ?? 0) * 1000)
+        let unixAccessed = Int((bm?.lastVisited?.timeIntervalSince1970 ?? 0) * 1000)
+        
+        let site = SyncSite()
+        site.title = bm?.title
+        site.customTitle = bm?.customTitle
+        site.location = bm?.url
+        site.creationTime = unixCreated
+        site.lastAccessedTime = unixAccessed
+        // TODO: Does this work?
+        site.favicon = bm?.domain?.favicon?.url
+        
+        let bookmark = SyncBookmark()
+        bookmark.isFolder = bm?.isFolder
+        bookmark.parentFolderObjectId = bm?.syncParentUUID
+        bookmark.site = site
+        
+        self.objectId = bm?.syncUUID
+        self.deviceId = deviceId
+        self.action = action
+        self.objectData = SyncRecordType.bookmark.rawValue
+        self.bookmark = bookmark
+    }
+    
     /// Initiates the instance based on the JSON that was passed.
     ///
     /// - parameter json: JSON object from SwiftyJSON.
