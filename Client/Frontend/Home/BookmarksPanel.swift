@@ -424,7 +424,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     func addFolder(alert: UIAlertAction!, alertController: UIAlertController) {
         guard let folderName = alertController.textFields?[0].text else { return }
-        Bookmark.add(url: nil, title: folderName, parentFolder: currentFolder, isFolder: true)
+        Bookmark.add(url: nil, title: nil,  customTitle: folderName, parentFolder: currentFolder, isFolder: true)
     }
     
     func onEditBookmarksButton() {

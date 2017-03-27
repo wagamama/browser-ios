@@ -211,11 +211,13 @@ class Bookmark: NSManagedObject {
     // TODO: DELETE
     class func add(url url: String?,
                        title: String?,
+                       customTitle: String? = nil, // Folders only use customTitle
                        parentFolder:Bookmark? = nil,
                        isFolder:Bool = false) -> Bookmark? {
         
         let site = SyncSite()
         site.title = title
+        site.customTitle = customTitle
         site.location = url
         
         let bookmark = SyncBookmark()
