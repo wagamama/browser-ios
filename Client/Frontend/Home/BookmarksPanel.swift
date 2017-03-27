@@ -146,7 +146,7 @@ class BookmarkEditingViewController: FormViewController {
             row.value = bookmark.displayTitle
             self.titleRow = row
         }.onChange { row in
-            self.bookmark.title = row.value
+            self.bookmark.customTitle = row.value
             DataController.saveContext()
         }
 
