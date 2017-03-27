@@ -123,6 +123,13 @@ class SyncWelcomeViewController: UIViewController {
     }
     
     func SEL_newToSync() {
+        // Temporary
+        let alert = UIAlertController(title: "Not ready", message: "This feature has not been implemented yet.", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+        return
+        // //
+        
         let view = SyncAddDeviceViewController()
         navigationController?.pushViewController(view, animated: true)
     }
