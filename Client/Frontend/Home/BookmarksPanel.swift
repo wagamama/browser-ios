@@ -143,7 +143,7 @@ class BookmarkEditingViewController: FormViewController {
         nameSection <<< TextRow() { row in
             row.tag = BOOKMARK_TITLE_ROW_TAG
             row.title = Strings.Name
-            row.value = bookmark.title
+            row.value = bookmark.displayTitle
             self.titleRow = row
         }.onChange { row in
             self.bookmark.title = row.value
@@ -168,7 +168,7 @@ class BookmarkEditingViewController: FormViewController {
                 row.tag = BOOKMARK_FOLDER_ROW_TAG
                 row.title = Strings.Folder
                 row.displayValueFor = { (rowValue: FolderPickerRow?) in
-                    return (rowValue?.folder?.title) ?? "Root Folder"
+                    return (rowValue?.folder?.displayTitle) ?? "Root Folder"
                 }
 
                 row.options = [FolderPickerRow()] + folders.map { (item) -> FolderPickerRow in
