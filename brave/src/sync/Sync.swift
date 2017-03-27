@@ -261,7 +261,7 @@ extension Sync {
     }
 
     func gotInitData() {
-        let deviceId: AnyObject = syncDeviceId ?? "null"
+        let deviceId = syncDeviceId?.description ?? "null"
         let args = "(null, \(syncSeed ?? "null"), \(deviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
