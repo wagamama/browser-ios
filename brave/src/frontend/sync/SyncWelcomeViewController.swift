@@ -43,7 +43,7 @@ class SyncWelcomeViewController: UIViewController {
         descriptionLabel.text = Strings.BraveSyncWelcome
         view.addSubview(descriptionLabel)
         
-        newToSyncButton = UIButton()
+        newToSyncButton = UIButton(type: .RoundedRect)
         newToSyncButton.setTitle(Strings.NewSyncCode, forState: .Normal)
         newToSyncButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         newToSyncButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
@@ -52,7 +52,7 @@ class SyncWelcomeViewController: UIViewController {
         newToSyncButton.addTarget(self, action: #selector(SEL_newToSync), forControlEvents: .TouchUpInside)
         view.addSubview(newToSyncButton)
         
-        existingUserButton = UIButton()
+        existingUserButton = UIButton(type: .RoundedRect)
         existingUserButton.setTitle(Strings.ScanSyncCode, forState: .Normal)
         existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         existingUserButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)

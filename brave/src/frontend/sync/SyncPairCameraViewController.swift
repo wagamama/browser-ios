@@ -84,7 +84,7 @@ class SyncPairCameraViewController: UIViewController {
         descriptionLabel.text = Strings.SyncToDeviceDescription
         view.addSubview(descriptionLabel)
         
-        cameraAccessButton = UIButton()
+        cameraAccessButton = UIButton(type: .RoundedRect)
         cameraAccessButton.setTitle(Strings.GrantCameraAccess, forState: .Normal)
         cameraAccessButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         cameraAccessButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
@@ -93,7 +93,7 @@ class SyncPairCameraViewController: UIViewController {
         cameraAccessButton.addTarget(self, action: #selector(SEL_cameraAccess), forControlEvents: .TouchUpInside)
         view.addSubview(cameraAccessButton)
         
-        enterWordsButton = UIButton()
+        enterWordsButton = UIButton(type: .RoundedRect)
         enterWordsButton.setTitle(Strings.EnterCodeWords, forState: .Normal)
         enterWordsButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         enterWordsButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
