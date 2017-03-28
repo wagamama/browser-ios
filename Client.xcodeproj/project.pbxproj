@@ -188,7 +188,6 @@
 		5CFC706D1D9D9F30008A7B7A /* BraveTermsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFC706C1D9D9F30008A7B7A /* BraveTermsViewController.swift */; };
 		5D27859A1E70D7EF0066EC15 /* JSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2785991E70D7EF0066EC15 /* JSInjector.swift */; };
 		5D2785BE1E71D7050066EC15 /* NicewareTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D27858C1E70CC660066EC15 /* NicewareTest.swift */; };
-		5D2785C71E7218620066EC15 /* JSInjectorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2785C61E7218620066EC15 /* JSInjectorTest.swift */; };
 		5D2AE6F81E83F3EC00BC274C /* SyncBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */; };
 		5D2AE6F91E83F3EC00BC274C /* SyncRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */; };
 		5D2AE6FA1E83F3EC00BC274C /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */; };
@@ -984,7 +983,6 @@
 		5D09BD4576555D874B5D0D4A /* db_impl.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = db_impl.h; path = ./brave/ThirdParty/leveldb/db/db_impl.h; sourceTree = "<group>"; };
 		5D27858C1E70CC660066EC15 /* NicewareTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NicewareTest.swift; sourceTree = "<group>"; };
 		5D2785991E70D7EF0066EC15 /* JSInjector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSInjector.swift; sourceTree = "<group>"; };
-		5D2785C61E7218620066EC15 /* JSInjectorTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JSInjectorTest.swift; path = ../../src/sync/JSInjectorTest.swift; sourceTree = "<group>"; };
 		5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncBookmark.swift; sourceTree = "<group>"; };
 		5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRoot.swift; sourceTree = "<group>"; };
 		5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
@@ -2833,7 +2831,6 @@
 			children = (
 				EBD312CF1E4967FE0077934D /* SyncTest.swift */,
 				5D27858C1E70CC660066EC15 /* NicewareTest.swift */,
-				5D2785C61E7218620066EC15 /* JSInjectorTest.swift */,
 				EB8E3D651DF78237006EA0D1 /* FingerprintProtectionTest.swift */,
 				EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */,
 				EB36616E1D9C3CEC00445C92 /* HttpsEverywhereTest.swift */,
@@ -3925,7 +3922,6 @@
 			files = (
 				EBD312D01E4967FE0077934D /* SyncTest.swift in Sources */,
 				EB62B8021DB59EF9006FD479 /* WebViewLoadTest.swift in Sources */,
-				5D2785C71E7218620066EC15 /* JSInjectorTest.swift in Sources */,
 				5D2785BE1E71D7050066EC15 /* NicewareTest.swift in Sources */,
 				EB8E3D661DF78237006EA0D1 /* FingerprintProtectionTest.swift in Sources */,
 				EB3661761D9C3CEC00445C92 /* HttpsEverywhereTest.swift in Sources */,
