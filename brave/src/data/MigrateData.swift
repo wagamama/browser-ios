@@ -203,6 +203,7 @@ class MigrateData: NSObject {
                 let bk = Bookmark.addForMigration(url: url, title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2))
                 relationshipHash[guid] = bk?.objectID
             }
+            DataController.saveContext()
         } else {
             let errmsg = String(UTF8String: sqlite3_errmsg(db))
             debugPrint("SELECT statement could not be prepared \(errmsg)")
