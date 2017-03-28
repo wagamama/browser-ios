@@ -52,13 +52,13 @@ class Sync: JSInjector {
     private let prefNameSeed = "seed-js-array"
     private let prefFetchTimestamp = "sync-fetch-timestamp"
     
-//    #if DEBUG
-//    private let isDebug = true
-//    private let serverUrl = "https://sync-staging.brave.com"
-//    #else
+    #if DEBUG
+    private let isDebug = true
+    private let serverUrl = "https://sync-staging.brave.com"
+    #else
     private let isDebug = false
     private let serverUrl = "https://sync.brave.com"
-//    #endif
+    #endif
 
     private let apiVersion = 0
 
