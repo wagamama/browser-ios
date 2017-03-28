@@ -34,7 +34,7 @@ class SyncTest: XCTestCase {
                 "creationTime: 4 }," +
                 "isFolder: false," +
                 "parentFolderObjectId: undefined } }]"
-        sync.sendSyncRecords(.bookmark, recordJson: bm)
+//        sync.sendSyncRecords(.bookmark, recordJson: bm)
 
         sleep(5)
         
