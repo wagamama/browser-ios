@@ -2,6 +2,7 @@
 
 import UIKit
 import WebKit
+import Shared
 
 class Niceware: JSInjector {
 
@@ -59,7 +60,14 @@ class Niceware: JSInjector {
             self.nicewareWebView.evaluateJavaScript(jsToExecute, completionHandler: {
                 (result, error) in
                 
-                let words = NSJSONSerialization.swiftObject(withJSON: result)?["data"] as? [String]
+                let jsonArray = JSON(string: result as? String ?? "").asArray
+                let words = jsonArray?.map { $0.asString }.flatMap { $0 }
+                
+                if words?.count != bytes.count / 2 {
+                    completion(nil, nil)
+                    return
+                }
+                
                 completion(words, error)
             })
         }
