@@ -201,6 +201,9 @@ class MigrateData: NSObject {
                 let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5))) ?? ""
                 
                 let bk = Bookmark.addForMigration(url: url, title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2))
+                if let baseUrl = NSURL(string: url)?.baseURL {
+                    bk?.domain = Domain.getOrCreateForUrl(baseUrl, context: DataController.moc)
+                }
                 relationshipHash[guid] = bk?.objectID
             }
             DataController.saveContext()
@@ -247,13 +250,14 @@ class MigrateData: NSObject {
     }
     
     private func removeOldDb(completed: (success: Bool) -> Void) {
-        do {
-            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
-            completed(success: true)
-        } catch {
-            debugPrint("Cannot clear profile data: \(error)")
-            completed(success: false)
-        }
+//        do {
+//            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
+//            completed(success: true)
+//        } catch {
+//            debugPrint("Cannot clear profile data: \(error)")
+//            completed(success: false)
+//        }
+        completed(success: false)
     }
     
     private func checkCompleted() {
