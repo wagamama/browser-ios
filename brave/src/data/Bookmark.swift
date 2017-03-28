@@ -244,7 +244,7 @@ class Bookmark: NSManagedObject {
     
     // TODO: Migration syncUUIDS still needs to be solved
     // Should only ever be used for migration from old db
-    class func addForMigration(url url: String?, title: String, customTitle: String, parentFolder: NSManagedObjectID?, isFolder: Bool?) -> Bookmark? {
+    class func addForMigration(url url: String?, title: String, customTitle: String, parentFolder: Bookmark?, isFolder: Bool?) -> Bookmark? {
         // isFolder = true
         
         let site = SyncSite()
