@@ -162,6 +162,7 @@ class Sync: JSInjector {
             if value == nil {
                 // Delete device too
                 syncDeviceId = nil
+                fetchTimestamp = 0
             }
             
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
