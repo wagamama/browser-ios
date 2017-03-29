@@ -462,9 +462,6 @@ extension Sync: WKScriptMessageHandler {
             assert(false)
             return
         }
-        
-        let data = JSON(string: message.body as? String ?? "")
-
 
         switch messageName {
         case "get-init-data":
@@ -483,6 +480,7 @@ extension Sync: WKScriptMessageHandler {
         case "resolved-sync-records":
             resolvedSyncRecords(syncResponse.rootElements)
         case "sync-debug":
+            let data = JSON(string: message.body as? String ?? "")
             print("---- Sync Debug: \(data)")
         case "sync-ready":
             isSyncFullyInitialized.syncReady = true
