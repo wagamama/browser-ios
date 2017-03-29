@@ -144,6 +144,7 @@ class Sync: JSInjector {
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setValue(value?.first ?? nil, forKey: prefNameId)
+            NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
 
@@ -166,6 +167,7 @@ class Sync: JSInjector {
             }
             
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
+            NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
     
