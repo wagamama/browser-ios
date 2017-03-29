@@ -261,9 +261,11 @@ class MigrateData: NSObject {
                 let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0))) ?? ""
                 let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
                 let history = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2))) ?? ""
-                let historyData = history.stringByReplacingOccurrencesOfString("[", withString: "").stringByReplacingOccurrencesOfString("]", withString: "").stringByReplacingOccurrencesOfString("\"", withString: "")
+                let historyData = history.stringByReplacingOccurrencesOfString("[", withString: "").stringByReplacingOccurrencesOfString("]", withString: "").stringByReplacingOccurrencesOfString("\"", withString: "").stringByReplacingOccurrencesOfString("\\", withString: "")
                 let historyList: [String] = historyData.characters.split{$0 == ","}.map(String.init)
                 let tab = SavedTab(title: title, url: url, isSelected: false, order: order, screenshot: nil, history: historyList, historyIndex: Int16(historyList.count-1))
+                
+                debugPrint("History restored [\(historyList)]")
                 
                 TabMO.add(tab, context: DataController.moc)
                 order = order + 1
@@ -282,13 +284,13 @@ class MigrateData: NSObject {
     }
     
     private func removeOldDb(completed: (success: Bool) -> Void) {
-//        do {
-//            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
-//            completed(success: true)
-//        } catch {
-//            debugPrint("Cannot clear profile data: \(error)")
-//            completed(success: false)
-//        }
+        do {
+            try NSFileManager.defaultManager().removeItemAtPath(self.files.rootPath as String)
+            completed(success: true)
+        } catch {
+            debugPrint("Cannot clear profile data: \(error)")
+            completed(success: false)
+        }
         completed(success: false)
     }
     
