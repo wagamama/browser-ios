@@ -70,40 +70,8 @@ class Bookmark: NSManagedObject {
         lastVisited = created
     }
     
-    // TODO: This entire method needs to go, to fragile with strings
-    // TODO: Better use of `deviceId`
-    // TODO: Use `action` enum
-    func asSyncBookmark(deviceId deviceId: [Int]?, action: Int) -> JSON {
-        
-        // TODO: Could convert to 'actual' SyncBookmark record if handled objectId properly
-        
-        let unixCreated = Int((created?.timeIntervalSince1970 ?? 0) * 1000)
-        let unixAccessed = Int((lastVisited?.timeIntervalSince1970 ?? 0) * 1000)
-        
-        let site = [
-            "creationTime": unixCreated,
-            "customTitle": customTitle ?? "",
-            "favicon": domain?.favicon?.url ?? "",
-            "lastAccessedTime": unixAccessed,
-            "location": url ?? "",
-            "title": title ?? ""
-        ]
-        
-        let bookmark: [String: AnyObject] = [
-            "isFolder": Int(isFolder),
-            "parentFolderObjectId": syncParentUUID ?? "null",
-            "site": site
-        ]
-        
-        let nativeObject: [String: AnyObject] = [
-            "objectData": "bookmark",
-            "deviceId": deviceId ?? "null",
-            "objectId": syncUUID ?? "null",
-            "action": action,
-            "bookmark": bookmark
-        ]
-        
-        return JSON(nativeObject)
+    func asDictionary(deviceId deviceId: [Int]?, action: Int?) -> [String: AnyObject] {
+        return SyncRoot(bookmark: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
 
     static func entity(context:NSManagedObjectContext) -> NSEntityDescription {

@@ -353,11 +353,6 @@ extension Sync {
                 // TODO: Create better `add` method to accept sync bookmark
                 Bookmark.add(rootObject: fetchedRoot, save: true)
             }
-            
-            // check diff
-//            let temp = singleBookmark.asSyncBookmark(deviceId: "", action: 0)
-//            print("Attemptin to update: \(temp) -- with -- \(fetchedRoot.dictionaryRepresentation())")
-            
         }
         
         print("not implemented: resolveSyncRecords() \(data)")
@@ -400,12 +395,10 @@ extension Sync {
             
             // TODO: Validate count, should never be more than one!
 
-            
             var localSide: AnyObject = "null"
-            if let bm = bookmarks?.first?.asSyncBookmark(deviceId: syncDeviceId, action: 0) {
-                localSide = SyncRoot(json: bm).dictionaryRepresentation()
+            if let bm = bookmarks?.first {
+                localSide = bm.asDictionary(deviceId: syncDeviceId, action: fetchedBookmark.action)
             }
-            
             
             matchedBookmarks.append([fetchedBookmark.dictionaryRepresentation(), localSide])
         }
