@@ -305,6 +305,9 @@ extension Sync {
                                        completionHandler: { (result, error) in
                                         // Process merging
                                         
+                                        // Could move fetch time stamp change into getExisting.
+                                        //  This would lead to duplicate calls with the same timestamp, but if there are no changes.
+                                        //  Should really be problematic, if fetching seems inconsistent, relocate
                                         if error == nil {
                                             // No error we can safely update fetched timestamp
                                             self.fetchTimestamp = nextFetch
