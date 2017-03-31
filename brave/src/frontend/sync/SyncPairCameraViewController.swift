@@ -40,20 +40,27 @@ class SyncPairCameraViewController: UIViewController {
                 debugPrint("Check data \(data)")
                 
                 Scanner.Lock = true
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(2.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+                self.cameraView.cameraOverlaySucess()
+                
+                // Will be removed on pop
+                self.loadingView.hidden = false
+                
+                // forced timeout
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(6.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
                     Scanner.Lock = false
-                    
+                    self.loadingView.hidden = true
+                    self.cameraView.cameraOverlayError()
+                })
+                
+                NSNotificationCenter.defaultCenter().addObserverForName(NotificationSyncReady, object: nil, queue: NSOperationQueue.mainQueue(), usingBlock: {
+                    notification in
                     self.navigationController?.popToRootViewControllerAnimated(true)
                 })
                 
                 // If multiple calls get in here due to race conditions it isn't a big deal
                 
                 Sync.shared.initializeSync(bytes)
-                self.cameraView.cameraOverlaySucess()
-                
-                // Will be removed on pop
-                self.loadingView.hidden = false
-                
+
             } else {
                 self.cameraView.cameraOverlayError()
             }
