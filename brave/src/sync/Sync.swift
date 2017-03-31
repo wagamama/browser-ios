@@ -144,6 +144,7 @@ class Sync: JSInjector {
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setValue(value?.first ?? nil, forKey: prefNameId)
+            NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
 
@@ -162,9 +163,11 @@ class Sync: JSInjector {
             if value == nil {
                 // Delete device too
                 syncDeviceId = nil
+                fetchTimestamp = 0
             }
             
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
+            NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
     
@@ -302,6 +305,9 @@ extension Sync {
                                        completionHandler: { (result, error) in
                                         // Process merging
                                         
+                                        // Could move fetch time stamp change into getExisting.
+                                        //  This would lead to duplicate calls with the same timestamp, but if there are no changes.
+                                        //  Should really be problematic, if fetching seems inconsistent, relocate
                                         if error == nil {
                                             // No error we can safely update fetched timestamp
                                             self.fetchTimestamp = nextFetch
@@ -347,11 +353,6 @@ extension Sync {
                 // TODO: Create better `add` method to accept sync bookmark
                 Bookmark.add(rootObject: fetchedRoot, save: true)
             }
-            
-            // check diff
-//            let temp = singleBookmark.asSyncBookmark(deviceId: "", action: 0)
-//            print("Attemptin to update: \(temp) -- with -- \(fetchedRoot.dictionaryRepresentation())")
-            
         }
         
         print("not implemented: resolveSyncRecords() \(data)")
@@ -394,12 +395,10 @@ extension Sync {
             
             // TODO: Validate count, should never be more than one!
 
-            
             var localSide: AnyObject = "null"
-            if let bm = bookmarks?.first?.asSyncBookmark(deviceId: syncDeviceId, action: 0) {
-                localSide = SyncRoot(json: bm).dictionaryRepresentation()
+            if let bm = bookmarks?.first {
+                localSide = bm.asDictionary(deviceId: syncDeviceId, action: fetchedBookmark.action)
             }
-            
             
             matchedBookmarks.append([fetchedBookmark.dictionaryRepresentation(), localSide])
         }
@@ -456,9 +455,6 @@ extension Sync: WKScriptMessageHandler {
             assert(false)
             return
         }
-        
-        let data = JSON(string: message.body as? String ?? "")
-
 
         switch messageName {
         case "get-init-data":
@@ -477,6 +473,7 @@ extension Sync: WKScriptMessageHandler {
         case "resolved-sync-records":
             resolvedSyncRecords(syncResponse.rootElements)
         case "sync-debug":
+            let data = JSON(string: message.body as? String ?? "")
             print("---- Sync Debug: \(data)")
         case "sync-ready":
             isSyncFullyInitialized.syncReady = true

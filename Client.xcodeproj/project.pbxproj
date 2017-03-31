@@ -194,7 +194,6 @@
 		5D2B07EB1E6733B900244C39 /* niceware.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D2B07EA1E6733B900244C39 /* niceware.js */; };
 		5D71B69B1E6885E00073621F /* Niceware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D71B69A1E6885E00073621F /* Niceware.swift */; };
 		5DB199151E859F9100A851B6 /* SyncResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DB199141E859F9100A851B6 /* SyncResponse.swift */; };
-		5DCC5D701E7C2F0100054BBD /* SwiftJSConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */; };
 		5DCC5D841E7C50B300054BBD /* NSJSONSerializationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */; };
 		5E5E76550DFB4EB71194132F /* LICENSE in Sources */ = {isa = PBXBuildFile; fileRef = 36C647DC00749BCC944D6EC6 /* LICENSE */; };
 		5E6571D452F3C000461D2481 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F94204C0EC007236424A86 /* AppDelegate.swift */; };
@@ -991,7 +990,6 @@
 		5D84AB2CBD701CBBDC40620C /* ReadingListAuthenticator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReadingListAuthenticator.swift; path = ./ReadingList/ReadingListAuthenticator.swift; sourceTree = "<group>"; };
 		5DB199141E859F9100A851B6 /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
 		5DC93C70E9DA3485A2FD2BD3 /* Error.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Error.swift; path = ./ThirdParty/Result/Error.swift; sourceTree = "<group>"; };
-		5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftJSConverter.swift; sourceTree = "<group>"; };
 		5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSJSONSerializationExtensions.swift; sourceTree = "<group>"; };
 		5E2DD2C9767F04D79BD241B0 /* port_posix.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = port_posix.h; path = ./brave/ThirdParty/leveldb/port/port_posix.h; sourceTree = "<group>"; };
 		5ED8720B8C08231F6A2FC090 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsTableViewController.swift; path = ./Client/Frontend/Settings/SettingsTableViewController.swift; sourceTree = "<group>"; };
@@ -2879,7 +2877,6 @@
 				5D2785991E70D7EF0066EC15 /* JSInjector.swift */,
 				EBDB7D461E14231900D744C7 /* Sync.swift */,
 				5D71B69A1E6885E00073621F /* Niceware.swift */,
-				5DCC5D6F1E7C2F0100054BBD /* SwiftJSConverter.swift */,
 				5D2AE6ED1E83F3D200BC274C /* fetched models */,
 			);
 			name = sync;
@@ -3970,7 +3967,6 @@
 				9E08BE0D0C19A5DA7BA7BB52 /* two_level_iterator.cc in Sources */,
 				25EC5AB01633FAA4720D56C3 /* arena.cc in Sources */,
 				5C44C0DE1E3EE47B00B1FD81 /* History.swift in Sources */,
-				5DCC5D701E7C2F0100054BBD /* SwiftJSConverter.swift in Sources */,
 				9936A9499C3DD474BF33C5A7 /* bloom.cc in Sources */,
 				66D96438D7A6745AE7673C3E /* cache.cc in Sources */,
 				015649F978DE96490BACE063 /* coding.cc in Sources */,
