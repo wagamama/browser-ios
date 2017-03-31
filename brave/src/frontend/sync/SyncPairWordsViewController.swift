@@ -111,6 +111,13 @@ class SyncPairWordsViewController: UIViewController {
             navigationItem.rightBarButtonItem?.enabled = !isLoading
         }
         
+        let codes = self.codewordsView.codeWords()
+
+        // Maybe temporary validation, sync server has issues without this validation
+        if codes.count < 16 {
+            alert(title: "Not Enough Words", message: "Please enter all of the words and try again.")
+        }
+        
         self.view.endEditing(true)
         loading()
         
@@ -119,8 +126,6 @@ class SyncPairWordsViewController: UIViewController {
             loading(false)
             alert()
         })
-        
-        let codes = self.codewordsView.codeWords()
         
         Niceware.shared.bytes(fromPassphrase: codes) { (result, error) in
             if result?.count == 0 || error != nil {
