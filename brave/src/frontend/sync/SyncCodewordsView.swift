@@ -11,8 +11,6 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
     
     let DefaultBorderColor = UIColor(rgb: 0x696969).CGColor
     
-    var previousFirstResponder: UITextField?
-    
     var doneKeyCallback: (() -> Void)?
     
     convenience init(data: [String]) {
@@ -98,30 +96,25 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         frame = f
     }
     
-    func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
-        if let wasResponder = previousFirstResponder {
-            wasResponder.layer.borderWidth = DefaultBorderWidth
-            wasResponder.backgroundColor = DefaultBackgroundColor
-        }
-        
+    func textFieldDidBeginEditing(textField: UITextField) {
         textField.layer.borderWidth = SelectedBorderWidth
         textField.backgroundColor = SelectedBackgroundColor
         
-        // Keep.
-        previousFirstResponder = textField
-        
-        return true
+        // Clear text, much easier to retype then attempt to edit inline
+        textField.text = nil
+    }
+    
+    func textFieldDidEndEditing(textField: UITextField) {
+        textField.layer.borderWidth = DefaultBorderWidth
+        textField.backgroundColor = DefaultBackgroundColor
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         if textField.tag < fields.count - 1 {
             let field = fields[textField.tag + 1]
-            field.layer.borderWidth = SelectedBorderWidth
-            field.backgroundColor = SelectedBackgroundColor
             field.becomeFirstResponder()
-        }
-        else if let callback = doneKeyCallback {
-            callback()
+        } else {
+            doneKeyCallback?()
         }
         return true
     }
