@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import CoreData
 
 private let log = Logger.browserLogger
 
@@ -208,19 +209,20 @@ class TabManager : NSObject {
 
     func addTabForDesktopSite() -> Browser {
         let tab = Browser(configuration: self.configuration, isPrivate: PrivateBrowsing.singleton.isOn)
+        tab.tabID = TabMO.freshTab()
         configureTab(tab, request: nil, zombie: false, useDesktopUserAgent: true)
         selectTab(tab)
         return tab
     }
 
     func addTabAndSelect(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil, isPrivate: Bool) -> Browser? {
-        guard let tab = addTab(request, configuration: configuration, isPrivate: isPrivate) else { return nil }
+        guard let tab = addTab(request, configuration: configuration, isPrivate: isPrivate, id: TabMO.freshTab()) else { return nil }
         selectTab(tab)
         return tab
     }
 
     func addTabAndSelect(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil) -> Browser? {
-        guard let tab = addTab(request, configuration: configuration) else { return nil }
+        guard let tab = addTab(request, configuration: configuration, id: TabMO.freshTab()) else { return nil }
         selectTab(tab)
         return tab
     }
@@ -235,7 +237,7 @@ class TabManager : NSObject {
 
         var tab: Browser!
         for url in urls {
-            tab = self.addTab(NSURLRequest(URL: url), configuration: nil, zombie: zombie)
+            tab = self.addTab(NSURLRequest(URL: url), configuration: nil, zombie: zombie, id: TabMO.freshTab())
         }
 
         // Select the most recent.
@@ -287,7 +289,7 @@ class TabManager : NSObject {
         }
     }
 
-    func addTab(request: NSURLRequest? = nil, configuration: WKWebViewConfiguration? = nil, zombie: Bool = false, isPrivate:Bool = false) -> Browser? {
+    func addTab(request: NSURLRequest? = nil, configuration: WKWebViewConfiguration? = nil, zombie: Bool = false, isPrivate:Bool = false, id: String? = nil) -> Browser? {
         debugNoteIfNotMainThread()
         if (!NSThread.isMainThread()) { // No logical reason this should be off-main, don't add a tab.
             return nil
@@ -295,6 +297,9 @@ class TabManager : NSObject {
         objc_sync_enter(self); defer { objc_sync_exit(self) }
 
         let tab = Browser(configuration: self.configuration, isPrivate: isPrivate)
+        if id != nil {
+            tab.tabID = id
+        }
         configureTab(tab, request: request, zombie: zombie)
         return tab
     }
@@ -350,7 +355,10 @@ class TabManager : NSObject {
         }
         tabs.removeTab(tab)
 
-
+        if let tabID = tab.tabID {
+            TabMO.removeTab(tabID)
+        }
+        
         // There's still some time between this and the webView being destroyed.
         // We don't want to pick up any stray events.
         tab.webView?.navigationDelegate = nil
@@ -362,14 +370,13 @@ class TabManager : NSObject {
 
         // Make sure we never reach 0 normal tabs
         if tabs.displayedTabsForCurrentPrivateMode.count == 0 && createTabIfNoneLeft {
-            let tab = addTab(isPrivate: PrivateBrowsing.singleton.isOn)
+            let tab = addTab(isPrivate: PrivateBrowsing.singleton.isOn, id: TabMO.freshTab())
             selectTab(tab)
         }
         
         if createTabIfNoneLeft && selectedTab == nil {
             selectTab(tabs.displayedTabsForCurrentPrivateMode.first)
         }
-
         preserveTabs()
     }
 

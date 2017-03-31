@@ -560,8 +560,10 @@ class TabTrayController: UIViewController {
         // until after its insert animation finishes.
         self.collectionView.performBatchUpdates({ _ in
             var tab: Browser?
-            tab = self.tabManager.addTab(request, isPrivate: self.privateMode)
-
+            let tabID = TabMO.freshTab()
+            tab = self.tabManager.addTab(request, isPrivate: self.privateMode, id: tabID)
+            tab?.tabID = tabID
+            
             if let tab = tab {
                 self.tabManager.selectTab(tab)
             }
