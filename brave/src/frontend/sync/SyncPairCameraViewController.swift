@@ -26,7 +26,7 @@ class SyncPairCameraViewController: UIViewController {
         cameraView.layer.masksToBounds = true
         cameraView.scanCallback = { data in
             
-            debugPrint("Check data \(data)")
+            
             // TODO: Check data against sync api
 
             // TODO: Functional, but needs some cleanup
@@ -36,6 +36,8 @@ class SyncPairCameraViewController: UIViewController {
                     // Have internal, so camera error does not show
                     return
                 }
+                
+                debugPrint("Check data \(data)")
                 
                 Scanner.Lock = true
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(2.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
@@ -154,15 +156,7 @@ class SyncPairCameraViewController: UIViewController {
     }
     
     func SEL_enterWords() {
-        // Temporary
-        let alert = UIAlertController(title: "Not ready", message: "This feature has not been implemented yet.", preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
-        return
-        // //
-        
-        let view = SyncPairWordsViewController()
-        navigationController?.pushViewController(view, animated: true)
+        navigationController?.pushViewController(SyncPairWordsViewController(), animated: true)
     }
 }
 
