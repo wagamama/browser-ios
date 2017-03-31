@@ -39,6 +39,8 @@ class Sync: JSInjector {
     /// This must be public so it can be added into the view hierarchy 
     var webView: WKWebView!
 
+    // Should not be accessed directly
+    private var syncReadyLock = false
     var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
     
     var isInSyncGroup: Bool {
@@ -161,9 +163,11 @@ class Sync: JSInjector {
             }
             
             if value == nil {
-                // Delete device too
+                // Clean up group specific items
                 syncDeviceId = nil
                 fetchTimestamp = 0
+                syncReadyLock = false
+                isSyncFullyInitialized = (false, false, false, false, false, false, false)
             }
             
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
@@ -189,19 +193,17 @@ class Sync: JSInjector {
         return nil
     }
 
+    
     func checkIsSyncReady() -> Bool {
-        struct Static {
-            static var isReady = false
-        }
         
-        if Static.isReady {
+        if syncReadyLock {
             return true
         }
 
         let mirror = Mirror(reflecting: isSyncFullyInitialized)
         let ready = mirror.children.reduce(true) { $0 && $1.1 as! Bool }
         if ready {
-            Static.isReady = true
+            syncReadyLock = true
             NSNotificationCenter.defaultCenter().postNotificationName(NotificationSyncReady, object: nil)
             
             func startFetching() {
