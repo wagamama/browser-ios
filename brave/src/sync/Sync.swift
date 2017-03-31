@@ -168,6 +168,9 @@ class Sync: JSInjector {
                 fetchTimestamp = 0
                 syncReadyLock = false
                 isSyncFullyInitialized = (false, false, false, false, false, false, false)
+                
+                fetchTimer?.invalidate()
+                fetchTimer = nil
             }
             
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
