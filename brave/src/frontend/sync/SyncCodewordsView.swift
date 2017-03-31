@@ -118,4 +118,20 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         }
         return true
     }
+    
+    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+        
+        guard let text = textField.text else {
+            return true
+        }
+        
+        // Filter out whitespace and apply change to current text
+        let result = (text as NSString).stringByReplacingCharactersInRange(range, withString: string.withoutSpaces)
+        
+        // Manually apple text to have better control over what is being entered
+        //  Could use this for custom autocomplete for pre-defined keywords
+        textField.text = result
+        
+        return false
+    }
 }
