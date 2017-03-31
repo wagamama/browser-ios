@@ -14,11 +14,21 @@ class SyncPairCameraViewController: UIViewController {
     var loadingView: UIView!
     let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
     
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = Strings.Pair
         view.backgroundColor = SyncBackgroundColor
+        
+        // Start observing, this will handle child vc popping too for successful sync (e.g. pair words)
+        NSNotificationCenter.defaultCenter().addObserverForName(NotificationSyncReady, object: nil, queue: NSOperationQueue.mainQueue(), usingBlock: {
+            notification in
+            self.navigationController?.popToRootViewControllerAnimated(true)
+        })
         
         cameraView = SyncCameraView()
         cameraView.backgroundColor = UIColor.blackColor()
@@ -50,11 +60,6 @@ class SyncPairCameraViewController: UIViewController {
                     Scanner.Lock = false
                     self.loadingView.hidden = true
                     self.cameraView.cameraOverlayError()
-                })
-                
-                NSNotificationCenter.defaultCenter().addObserverForName(NotificationSyncReady, object: nil, queue: NSOperationQueue.mainQueue(), usingBlock: {
-                    notification in
-                    self.navigationController?.popToRootViewControllerAnimated(true)
                 })
                 
                 // If multiple calls get in here due to race conditions it isn't a big deal
