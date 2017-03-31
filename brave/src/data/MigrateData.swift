@@ -263,7 +263,7 @@ class MigrateData: NSObject {
                 let history = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 2))) ?? ""
                 let historyData = history.stringByReplacingOccurrencesOfString("[", withString: "").stringByReplacingOccurrencesOfString("]", withString: "").stringByReplacingOccurrencesOfString("\"", withString: "").stringByReplacingOccurrencesOfString("\\", withString: "")
                 let historyList: [String] = historyData.characters.split{$0 == ","}.map(String.init)
-                let tab = SavedTab(title: title, url: url, isSelected: false, order: order, screenshot: nil, history: historyList, historyIndex: Int16(historyList.count-1))
+                let tab = SavedTab(id: TabMO.freshTab(), title: title, url: url, isSelected: false, order: order, screenshot: nil, history: historyList, historyIndex: Int16(historyList.count-1))
                 
                 debugPrint("History restored [\(historyList)]")
                 

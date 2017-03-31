@@ -4,7 +4,7 @@ import UIKit
 import CoreData
 import Foundation
 
-typealias SavedTab = (title: String, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?, history: [String], historyIndex: Int16)
+typealias SavedTab = (id: String, title: String, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?, history: [String], historyIndex: Int16)
 
 extension TabManager {
     class func tabsToRestore() -> [TabMO] {
@@ -30,18 +30,17 @@ extension TabManager {
                 urls += (backList + [currentItem] + forwardList).map { $0.URL.absoluteString ?? "" }
                 currentPage = -forwardList.count
             }
-
-            _tabs.append((tab.title ?? "", tab.url!.absoluteString!, self.selectedTab === tab, Int16(i), tab.screenshot.image, urls, Int16(currentPage)))
-            i += 1
+            if let id = tab.tabID {
+                _tabs.append((id, tab.title ?? "", tab.url!.absoluteString!, self.selectedTab === tab, Int16(i), tab.screenshot.image, urls, Int16(currentPage)))
+                i += 1
+            }
         }
 
         let context = DataController.shared.workerContext()
         context.performBlock {
-            TabMO.getAll(context).forEach { context.deleteObject($0) }
             for t in _tabs {
                 TabMO.add(t, context: context)
             }
-            
             DataController.saveContext(context)
         }
     }
@@ -50,14 +49,14 @@ extension TabManager {
         var tabToSelect: Browser?
         let savedTabs = TabMO.getAll(DataController.moc)
         for savedTab in savedTabs {
-            guard let tab = addTab(nil, configuration: nil, zombie: true, isPrivate: false) else { return }
+            guard let tab = addTab(nil, configuration: nil, zombie: true, isPrivate: false, id: savedTab.syncUUID) else { return }
             tab.setScreenshot(savedTab.screenshotImage)
             if savedTab.isSelected {
                 tabToSelect = tab
             }
             tab.lastTitle = savedTab.title
-            if let w = tab.webView {
-                let data = SavedTab(title: savedTab.title ?? "", url: savedTab.url ?? "", isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history:savedTab.urlHistorySnapshot as! [String], historyIndex: savedTab.urlHistoryCurrentIndex)
+            if let w = tab.webView, let history = savedTab.urlHistorySnapshot as? [String], let tabID = savedTab.syncUUID {
+                let data = SavedTab(id: tabID, title: savedTab.title ?? "", url: savedTab.url ?? "", isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)
                 tab.restore(w, restorationData: data)
             }
         }
@@ -80,11 +79,13 @@ class TabMO: NSManagedObject {
     
     @NSManaged var title: String?
     @NSManaged var url: String?
+    @NSManaged var syncUUID: String?
     @NSManaged var order: Int16
     @NSManaged var urlHistorySnapshot: NSArray? // array of strings for urls
     @NSManaged var urlHistoryCurrentIndex: Int16
     @NSManaged var screenshot: NSData?
     @NSManaged var isSelected: Bool
+    @NSManaged var isClosed: Bool
 
     var screenshotImage: UIImage?
 
@@ -99,19 +100,31 @@ class TabMO: NSManagedObject {
     static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
         return NSEntityDescription.entityForName("TabMO", inManagedObjectContext: context)!
     }
-
-    class func add(tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO {
+    
+    class func freshTab() -> String {
+        let context = DataController.moc
         let tab = TabMO(entity: TabMO.entity(context), insertIntoManagedObjectContext: context)
-        if let s = tabInfo.screenshot {
-            tab.screenshot = UIImageJPEGRepresentation(s, 1)
+        // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
+        tab.syncUUID = NSUUID().UUIDString
+        DataController.saveContext(context)
+        return tab.syncUUID!
+    }
+
+    class func add(tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO? {
+        var tab: TabMO? = getByID(tabInfo.id, context: context)
+        if tab == nil {
+            return nil
         }
-        tab.url = tabInfo.url
-        tab.order = tabInfo.order
-        tab.title = tabInfo.title
-        tab.urlHistorySnapshot = tabInfo.history
-        tab.urlHistoryCurrentIndex = tabInfo.historyIndex
-        tab.isSelected = tabInfo.isSelected
-        return tab
+        if let s = tabInfo.screenshot {
+            tab?.screenshot = UIImageJPEGRepresentation(s, 1)
+        }
+        tab?.url = tabInfo.url
+        tab?.order = tabInfo.order
+        tab?.title = tabInfo.title
+        tab?.urlHistorySnapshot = tabInfo.history
+        tab?.urlHistoryCurrentIndex = tabInfo.historyIndex
+        tab?.isSelected = tabInfo.isSelected
+        return tab!
     }
 
     class func getAll(context: NSManagedObjectContext) -> [TabMO] {
@@ -125,5 +138,29 @@ class TabMO: NSManagedObject {
             print(fetchError)
         }
         return [TabMO]()
+    }
+    
+    class func getByID(id: String, context: NSManagedObjectContext) -> TabMO? {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.entity = TabMO.entity(context)
+        fetchRequest.predicate = NSPredicate(format: "syncUUID == %@", id)
+        var result: TabMO? = nil
+        do {
+            let results = try context.executeFetchRequest(fetchRequest) as? [TabMO]
+            if let item = results?.first {
+                result = item
+            }
+        } catch {
+            let fetchError = error as NSError
+            print(fetchError)
+        }
+        return result
+    }
+    
+    class func removeTab(id: String) {
+        if let tab: TabMO = getByID(id, context: DataController.moc) {
+            DataController.moc.deleteObject(tab)
+            DataController.saveContext()
+        }
     }
 }

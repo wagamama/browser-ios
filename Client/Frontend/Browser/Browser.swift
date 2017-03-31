@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import CoreData
 
 import XCGLogger
 
@@ -119,6 +120,8 @@ class Browser: NSObject, BrowserWebViewDelegate {
     var lastRequest: NSURLRequest? = nil
     var restoring: Bool = false
     var pendingScreenshot = false
+    
+    var tabID: String?
 
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
