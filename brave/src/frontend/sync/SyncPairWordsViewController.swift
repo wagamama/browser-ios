@@ -74,10 +74,28 @@ class SyncPairWordsViewController: UIViewController {
     
     func checkCodes() {
         debugPrint("check codes")
-        var codes: [String] = []
-        for field in self.codewordsView.fields {
-            codes.append(field.text ?? "")
+        
+        func alert(title title: String? = nil, message: String? = nil) {
+            let title = title ?? "Unable to Connect"
+            let message = message ?? "Unable to connect with entered words. Please check the entered words and try again."
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+            alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
         }
-        // TODO: check codes.
+        
+        let codes = self.codewordsView.codeWords()
+        
+        Niceware.shared.bytes(fromPassphrase: codes) { (result, error) in
+            if result?.count == 0 || error != nil {
+                var errorText = error?.userInfo["WKJavaScriptExceptionMessage"] as? String
+                if let er = errorText where er.contains("Invalid word") {
+                    errorText = er + "\n Please recheck spelling"
+                }
+                alert(title: nil, message: errorText)
+                return
+            }
+            
+            Sync.shared.initializeSync(result)
+        }
     }
 }

@@ -27,7 +27,7 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
             field.textColor = UIColor.blackColor()
             field.keyboardAppearance = .Dark
             field.autocapitalizationType = .None
-            field.autocorrectionType = .Yes
+            field.autocorrectionType = .No
             field.returnKeyType = i < 15 ? .Continue : .Done
             field.text = data.count > i ? data[i] : ""
             field.backgroundColor = DefaultBackgroundColor
@@ -53,6 +53,10 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func codeWords() -> [String] {
+        return fields.map { $0.text?.withoutSpaces }.filter { $0?.characters.count > 0 }.flatMap { $0 }
     }
     
     override func layoutSubviews() {
