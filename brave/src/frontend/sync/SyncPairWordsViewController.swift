@@ -9,6 +9,13 @@ class SyncPairWordsViewController: UIViewController {
     var helpLabel: UILabel!
     var codewordsView: SyncCodewordsView!
     
+    var loadingView: UIView!
+    let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+    
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -35,6 +42,14 @@ class SyncPairWordsViewController: UIViewController {
         helpLabel.text = Strings.EnterCodeWordsBelow
         view.addSubview(helpLabel)
         
+        loadingSpinner.startAnimating()
+        
+        loadingView = UIView()
+        loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
+        loadingView.hidden = true
+        loadingView.addSubview(loadingSpinner)
+        view.addSubview(loadingView)
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: #selector(SEL_done))
         
         edgesForExtendedLayout = .None
@@ -53,6 +68,14 @@ class SyncPairWordsViewController: UIViewController {
         
         codewordsView.snp_makeConstraints { (make) in
             make.edges.equalTo(self.containerView).inset(UIEdgeInsetsMake(44, 0, 0, 0))
+        }
+        
+        loadingView.snp_makeConstraints { (make) in
+            make.edges.equalTo(loadingView.superview!)
+        }
+        
+        loadingSpinner.snp_makeConstraints { (make) in
+            make.center.equalTo(loadingView)
         }
     }
     
@@ -77,11 +100,25 @@ class SyncPairWordsViewController: UIViewController {
         
         func alert(title title: String? = nil, message: String? = nil) {
             let title = title ?? "Unable to Connect"
-            let message = message ?? "Unable to connect with entered words. Please check the entered words and try again."
+            let message = message ?? "Unable to join sync group. Please check the entered words and try again."
             let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
         }
+        
+        func loading(isLoading: Bool = true) {
+            self.loadingView.hidden = !isLoading
+            navigationItem.rightBarButtonItem?.enabled = !isLoading
+        }
+        
+        self.view.endEditing(true)
+        loading()
+        
+        // forced timeout
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(25.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+            loading(false)
+            alert()
+        })
         
         let codes = self.codewordsView.codeWords()
         
@@ -91,7 +128,9 @@ class SyncPairWordsViewController: UIViewController {
                 if let er = errorText where er.contains("Invalid word") {
                     errorText = er + "\n Please recheck spelling"
                 }
-                alert(title: nil, message: errorText)
+                
+                alert(message: errorText)
+                loading(false)
                 return
             }
             
