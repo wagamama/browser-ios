@@ -31,7 +31,9 @@ extension TabManager {
                 currentPage = -forwardList.count
             }
             if let id = tab.tabID {
-                _tabs.append((id, tab.title ?? "", tab.url!.absoluteString!, self.selectedTab === tab, Int16(i), tab.screenshot.image, urls, Int16(currentPage)))
+                let data = SavedTab(id, tab.title ?? "", tab.url!.absoluteString!, self.selectedTab === tab, Int16(i), tab.screenshot.image, urls, Int16(currentPage))
+                _tabs.append(data)
+                debugPrint(data)
                 i += 1
             }
         }
@@ -58,6 +60,8 @@ extension TabManager {
             if let w = tab.webView, let history = savedTab.urlHistorySnapshot as? [String], let tabID = savedTab.syncUUID {
                 let data = SavedTab(id: tabID, title: savedTab.title ?? "", url: savedTab.url ?? "", isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)
                 tab.restore(w, restorationData: data)
+                
+                debugPrint(data)
             }
         }
         if tabToSelect == nil {
