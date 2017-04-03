@@ -155,6 +155,7 @@ class BookmarkEditingViewController: FormViewController {
 
         form +++ nameSection
         
+        // Only show URL option for bookmarks, not folders
         if !isEditingFolder {
             nameSection <<< LabelRow() { row in
                 row.tag = BOOKMARK_URL_ROW_TAG
@@ -165,38 +166,39 @@ class BookmarkEditingViewController: FormViewController {
                 self.bookmark.url = row.value
                 DataController.saveContext()
             }
-
-            form +++ Section(Strings.Location)
-            <<< PickerInlineRow<FolderPickerRow>() { (row : PickerInlineRow<FolderPickerRow>) -> Void in
-                row.tag = BOOKMARK_FOLDER_ROW_TAG
-                row.title = Strings.Folder
-                row.displayValueFor = { (rowValue: FolderPickerRow?) in
-                    if let folder = rowValue?.folder?.title {
-                        return "/\(folder)"
-                    }
-                    return "/"
-                }
-
-                row.options = [FolderPickerRow()] + folders.map { (item) -> FolderPickerRow in
-                    var fpr = FolderPickerRow()
-                    fpr.folder = item
-                    return fpr
-                }
-
-                var initial = FolderPickerRow()
-                initial.folder = bookmark.parentFolder
-                row.value = initial
-            }.onCellHighlightChanged { (cell, row) in
-
-            }.onChange({ row in
-                // TODO: This needs to be fixed, called far too often
-                let r = row.value! as FolderPickerRow
-                if self.bookmark.parentFolder != r.folder {
-                    self.bookmark.syncParentUUID = r.folder?.syncUUID
-                    DataController.saveContext()
-                }
-            })
         }
+
+        // Relocating folders or bookmarks into subfolders
+        form +++ Section(Strings.Location)
+        <<< PickerInlineRow<FolderPickerRow>() { (row : PickerInlineRow<FolderPickerRow>) -> Void in
+            row.tag = BOOKMARK_FOLDER_ROW_TAG
+            row.title = Strings.Folder
+            row.displayValueFor = { (rowValue: FolderPickerRow?) in
+                if let folder = rowValue?.folder?.title {
+                    return "/\(folder)"
+                }
+                return "/"
+            }
+
+            row.options = [FolderPickerRow()] + folders.map { (item) -> FolderPickerRow in
+                var fpr = FolderPickerRow()
+                fpr.folder = item
+                return fpr
+            }
+
+            var initial = FolderPickerRow()
+            initial.folder = bookmark.parentFolder
+            row.value = initial
+        }.onCellHighlightChanged { (cell, row) in
+
+        }.onChange({ row in
+            // TODO: This needs to be fixed, called far too often
+            let r = row.value! as FolderPickerRow
+            if self.bookmark.parentFolder != r.folder {
+                self.bookmark.syncParentUUID = r.folder?.syncUUID
+                DataController.saveContext()
+            }
+        })
     }
 }
 
