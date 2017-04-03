@@ -174,7 +174,7 @@ class BookmarkEditingViewController: FormViewController {
             row.tag = BOOKMARK_FOLDER_ROW_TAG
             row.title = Strings.Folder
             row.displayValueFor = { (rowValue: FolderPickerRow?) in
-                if let folder = rowValue?.folder?.title {
+                if let folder = rowValue?.folder?.displayTitle {
                     return "/\(folder)"
                 }
                 return "/"
