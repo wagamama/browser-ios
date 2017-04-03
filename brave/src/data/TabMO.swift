@@ -16,15 +16,21 @@ extension TabManager {
         var _tabs = [SavedTab]()
         var i = 0
         for tab in tabs.internalTabList {
-            if tab.isPrivate || tab.url?.absoluteString == nil {
+            if tab.isPrivate || tab.url?.absoluteString == nil || tab.tabID == nil {
                 continue
+            }
+            
+            // Ignore session restore data.
+            if let url = tab.url?.absoluteString {
+                if url.containsString("localhost") {
+                    continue
+                }
             }
 
             var urls = [String]()
             var currentPage = 0
             if let currentItem = tab.webView?.backForwardList.currentItem {
                 // Freshly created web views won't have any history entries at all.
-
                 let backList = tab.webView?.backForwardList.backList ?? []
                 let forwardList = tab.webView?.backForwardList.forwardList ?? []
                 urls += (backList + [currentItem] + forwardList).map { $0.URL.absoluteString ?? "" }
@@ -33,7 +39,6 @@ extension TabManager {
             if let id = tab.tabID {
                 let data = SavedTab(id, tab.title ?? "", tab.url!.absoluteString!, self.selectedTab === tab, Int16(i), tab.screenshot.image, urls, Int16(currentPage))
                 _tabs.append(data)
-                debugPrint(data)
                 i += 1
             }
         }
@@ -51,7 +56,17 @@ extension TabManager {
         var tabToSelect: Browser?
         let savedTabs = TabMO.getAll(DataController.moc)
         for savedTab in savedTabs {
+            if savedTab.url == nil {
+                if let id = savedTab.syncUUID {
+                    TabMO.removeTab(id)
+                }
+                continue
+            }
+            
             guard let tab = addTab(nil, configuration: nil, zombie: true, isPrivate: false, id: savedTab.syncUUID) else { return }
+            
+            debugPrint(savedTab)
+            
             tab.setScreenshot(savedTab.screenshotImage)
             if savedTab.isSelected {
                 tabToSelect = tab
@@ -60,8 +75,6 @@ extension TabManager {
             if let w = tab.webView, let history = savedTab.urlHistorySnapshot as? [String], let tabID = savedTab.syncUUID {
                 let data = SavedTab(id: tabID, title: savedTab.title ?? "", url: savedTab.url ?? "", isSelected: savedTab.isSelected, order: savedTab.order, screenshot: nil, history: history, historyIndex: savedTab.urlHistoryCurrentIndex)
                 tab.restore(w, restorationData: data)
-                
-                debugPrint(data)
             }
         }
         if tabToSelect == nil {
@@ -115,7 +128,7 @@ class TabMO: NSManagedObject {
     }
 
     class func add(tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO? {
-        var tab: TabMO? = getByID(tabInfo.id, context: context)
+        let tab: TabMO? = getByID(tabInfo.id, context: context)
         if tab == nil {
             return nil
         }

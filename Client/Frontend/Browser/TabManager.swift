@@ -377,6 +377,7 @@ class TabManager : NSObject {
         if createTabIfNoneLeft && selectedTab == nil {
             selectTab(tabs.displayedTabsForCurrentPrivateMode.first)
         }
+        
         preserveTabs()
     }
 
@@ -401,7 +402,6 @@ class TabManager : NSObject {
         for tab in tabs.internalTabList {
             self.removeTab(tab, flushToDisk: false, notify: true, createTabIfNoneLeft: false)
         }
-        preserveTabs()
     }
 
     func getTabForURL(url: NSURL) -> Browser? {

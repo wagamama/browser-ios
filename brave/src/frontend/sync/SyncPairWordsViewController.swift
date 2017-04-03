@@ -5,6 +5,7 @@ import Shared
 
 class SyncPairWordsViewController: UIViewController {
     
+    var scrollView: UIScrollView!
     var containerView: UIView!
     var helpLabel: UILabel!
     var codewordsView: SyncCodewordsView!
@@ -22,13 +23,16 @@ class SyncPairWordsViewController: UIViewController {
         title = Strings.Pair
         view.backgroundColor = SyncBackgroundColor
         
+        scrollView = UIScrollView()
+        view.addSubview(scrollView)
+        
         containerView = UIView()
         containerView.backgroundColor = UIColor.whiteColor()
         containerView.layer.shadowColor = UIColor(rgb: 0xC8C7CC).CGColor
         containerView.layer.shadowRadius = 0
         containerView.layer.shadowOpacity = 1.0
         containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
-        view.addSubview(containerView)
+        scrollView.addSubview(containerView)
         
         codewordsView = SyncCodewordsView(data: [])
         codewordsView.doneKeyCallback = {
@@ -40,7 +44,7 @@ class SyncPairWordsViewController: UIViewController {
         helpLabel.font = UIFont.systemFontOfSize(15, weight: UIFontWeightRegular)
         helpLabel.textColor = UIColor(rgb: 0x696969)
         helpLabel.text = Strings.EnterCodeWordsBelow
-        view.addSubview(helpLabel)
+        scrollView.addSubview(helpLabel)
         
         loadingSpinner.startAnimating()
         
@@ -53,6 +57,10 @@ class SyncPairWordsViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: #selector(SEL_done))
         
         edgesForExtendedLayout = .None
+        
+        scrollView.snp_makeConstraints { (make) in
+            make.edges.equalTo(self.view)
+        }
         
         containerView.snp_makeConstraints { (make) in
             make.top.equalTo(self.view)

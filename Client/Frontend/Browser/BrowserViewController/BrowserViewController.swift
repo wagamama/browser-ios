@@ -475,7 +475,7 @@ class BrowserViewController: UIViewController {
         log.debug("BVC viewDidAppear.")
 
 #if !DISABLE_INTRO_SCREEN
-        presentIntroViewController()
+        // presentIntroViewController()
 #endif
 
         log.debug("BVC intro presented.")
