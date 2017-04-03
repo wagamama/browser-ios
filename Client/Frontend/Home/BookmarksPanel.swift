@@ -149,7 +149,7 @@ class BookmarkEditingViewController: FormViewController {
             if self.bookmark.customTitle != row.value && row.value != self.bookmark.displayTitle {
                 // Only update when the result has changed
                 self.bookmark.customTitle = row.value
-                Bookmark.add(url: nil, title: nil, customTitle: row.value, parentFolder: nil, usingBookmark: self.bookmark)
+                DataController.saveContext()
             }
         })
 
@@ -192,7 +192,8 @@ class BookmarkEditingViewController: FormViewController {
                 // TODO: This needs to be fixed, called far too often
                 let r = row.value! as FolderPickerRow
                 if self.bookmark.parentFolder != r.folder {
-                    Bookmark.add(url: nil, title: nil, customTitle: nil, parentFolder: r.folder, usingBookmark: self.bookmark)
+                    self.bookmark.syncParentUUID = r.folder?.syncUUID
+                    DataController.saveContext()
                 }
             })
         }
