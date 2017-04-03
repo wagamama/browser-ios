@@ -104,7 +104,7 @@ class BookmarkEditingViewController: FormViewController {
     let BOOKMARK_FOLDER_ROW_TAG:String = "BOOKMARK_FOLDER_ROW_TAG"
 
     var titleRow:TextRow!
-    var urlRow:LabelRow!
+    var urlRow:TextRow!
     
     init(bookmarksPanel: BookmarksPanel, indexPath: NSIndexPath, bookmark: Bookmark) {
         super.init(nibName: nil, bundle: nil)
@@ -157,7 +157,7 @@ class BookmarkEditingViewController: FormViewController {
         
         // Only show URL option for bookmarks, not folders
         if !isEditingFolder {
-            nameSection <<< LabelRow() { row in
+            nameSection <<< TextRow() { row in
                 row.tag = BOOKMARK_URL_ROW_TAG
                 row.title = Strings.URL
                 row.value = bookmark.url
