@@ -23,9 +23,9 @@ class Bookmark: NSManagedObject {
     //  syncUUID should never change
     @NSManaged var syncDisplayUUID: String?
     @NSManaged var syncParentDisplayUUID: String?
-
     @NSManaged var parentFolder: Bookmark?
     @NSManaged var children: Set<Bookmark>?
+    
     @NSManaged var domain: Domain?
 
     // To trigger fetchedResultsController to update, change this value.
@@ -94,14 +94,12 @@ class Bookmark: NSManagedObject {
     }
 
     // TODO: Name change, since this also handles updating records
-    class func add(rootObject root: SyncRoot, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil, usingBookmark bm: Bookmark? = nil) -> Bookmark? {
+    class func add(rootObject root: SyncRoot, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil) -> Bookmark? {
         let bookmark = root.bookmark
         let site = bookmark?.site
      
         var bk: Bookmark!
-        if bm != nil {
-            bk = bm
-        } else if let id = root.objectId, let foundBK = Bookmark.get(syncUUIDs: [id])?.first {
+        if let id = root.objectId, let foundBK = Bookmark.get(syncUUIDs: [id])?.first {
             // Found a pre-existing bookmark, cannot add duplicate
             // Turn into 'update' record instead
             bk = foundBK
@@ -191,8 +189,7 @@ class Bookmark: NSManagedObject {
                        title: String?,
                        customTitle: String? = nil, // Folders only use customTitle
                        parentFolder:Bookmark? = nil,
-                       isFolder:Bool = false,
-                       usingBookmark bm: Bookmark? = nil) -> Bookmark? {
+                       isFolder:Bool = false) -> Bookmark? {
         
         let site = SyncSite()
         site.title = title
@@ -207,7 +204,7 @@ class Bookmark: NSManagedObject {
         let root = SyncRoot()
         root.bookmark = bookmark
         
-        return self.add(rootObject: root, save: true, sendToSync: true, parentFolder: parentFolder, usingBookmark: bm)
+        return self.add(rootObject: root, save: true, sendToSync: true, parentFolder: parentFolder)
     }
     
     // TODO: Migration syncUUIDS still needs to be solved
