@@ -169,7 +169,7 @@ class BookmarkEditingViewController: FormViewController {
         }
 
         // Currently no way to edit bookmark/folder locations
-        // See "future commit" for removal of this logic
+        // See de9e1cc for removal of this logic
     }
 }
 
