@@ -969,18 +969,6 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
             tabManager.selectedTab?.webView?.evaluateJavaScript("history.replaceState({}, '', '#panel=\(panel)')", completionHandler: nil)
         }
     }
-
-    func homePanelViewControllerDidRequestToCreateAccount(homePanelViewController: HomePanelViewController) {
-        #if !BRAVE
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
-        #endif
-    }
-
-    func homePanelViewControllerDidRequestToSignIn(homePanelViewController: HomePanelViewController) {
-        #if !BRAVE
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
-        #endif
-    }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {
@@ -1061,39 +1049,6 @@ extension BrowserViewController: IntroViewControllerDelegate {
             }
         }
     }
-
-    #if !BRAVE
-    func presentSignInViewController() {
-        // Show the settings page if we have already signed in. If we haven't then show the signin page
-        let vcToPresent: UIViewController
-        if profile.hasAccount() {
-            let settingsTableViewController = AppSettingsTableViewController()
-            settingsTableViewController.profile = profile
-            settingsTableViewController.tabManager = tabManager
-            vcToPresent = settingsTableViewController
-        } else {
-            let signInVC = FxAContentViewController()
-            signInVC.delegate = self
-            signInVC.url = profile.accountConfiguration.signInURL
-            signInVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: #selector(BrowserViewController.dismissSignInViewController))
-            vcToPresent = signInVC
-        }
-
-        let settingsNavigationController = SettingsNavigationController(rootViewController: vcToPresent)
-		settingsNavigationController.modalPresentationStyle = .FormSheet
-        self.presentViewController(settingsNavigationController, animated: true, completion: nil)
-    }
-
-    func dismissSignInViewController() {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-
-    func introViewControllerDidRequestToLogin(introViewController: IntroViewController) {
-        introViewController.dismissViewControllerAnimated(true, completion: { () -> Void in
-            self.presentSignInViewController()
-        })
-    }
-    #endif
 }
 
 extension BrowserViewController: KeyboardHelperDelegate {

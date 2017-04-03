@@ -19,8 +19,6 @@ private struct HomePanelViewControllerUX {
 protocol HomePanelViewControllerDelegate: class {
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL)
     func homePanelViewController(HomePanelViewController: HomePanelViewController, didSelectPanel panel: Int)
-    func homePanelViewControllerDidRequestToSignIn(homePanelViewController: HomePanelViewController)
-    func homePanelViewControllerDidRequestToCreateAccount(homePanelViewController: HomePanelViewController)
 }
 
 @objc
@@ -35,8 +33,6 @@ struct HomePanelUX {
 
 @objc
 protocol HomePanelDelegate: class {
-    func homePanelDidRequestToSignIn(homePanel: HomePanel)
-    func homePanelDidRequestToCreateAccount(homePanel: HomePanel)
     func homePanel(homePanel: HomePanel, didSelectURL url: NSURL)
     optional func homePanel(homePanel: HomePanel, didSelectURLString url: String, visitType: VisitType)
     optional func homePanelWillEnterEditingMode(homePanel: HomePanel)
@@ -241,14 +237,6 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
 
     func homePanel(homePanel: HomePanel, didSelectURL url: NSURL) {
         delegate?.homePanelViewController(self, didSelectURL: url)
-    }
-
-    func homePanelDidRequestToCreateAccount(homePanel: HomePanel) {
-        delegate?.homePanelViewControllerDidRequestToCreateAccount(self)
-    }
-
-    func homePanelDidRequestToSignIn(homePanel: HomePanel) {
-        delegate?.homePanelViewControllerDidRequestToSignIn(self)
     }
 
     func homePanelWillEnterEditingMode(homePanel: HomePanel) {
