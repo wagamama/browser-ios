@@ -129,7 +129,7 @@ class BraveSettingsView : AppSettingsTableViewController {
             ),
             SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults.uppercaseString), children: shieldSettingsList)]
 
-        //#if !DISABLE_INTRO_SCREEN
+        #if !DISABLE_INTRO_SCREEN
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.Support.uppercaseString), children: [
                 BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyUserAllowsTelemetry, defaultValue: true, titleText: Strings.Opt_in_to_telemetry),
@@ -137,7 +137,7 @@ class BraveSettingsView : AppSettingsTableViewController {
                 BraveSupportLinkSetting(),
                 BravePrivacyPolicySetting(), BraveTermsOfUseSetting(),
                 ])]
-        //#endif
+        #endif
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.About.uppercaseString), children: [
                 VersionSetting(settings: self),

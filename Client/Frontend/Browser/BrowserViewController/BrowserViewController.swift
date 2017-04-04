@@ -425,6 +425,7 @@ class BrowserViewController: UIViewController {
         log.debug("BVC viewWillAppear.")
         super.viewWillAppear(animated)
         log.debug("BVC super.viewWillAppear done.")
+        
 #if !DISABLE_INTRO_SCREEN
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
@@ -475,7 +476,7 @@ class BrowserViewController: UIViewController {
         log.debug("BVC viewDidAppear.")
 
 #if !DISABLE_INTRO_SCREEN
-        // presentIntroViewController()
+        presentIntroViewController()
 #endif
 
         log.debug("BVC intro presented.")
