@@ -14,6 +14,12 @@ class SyncWelcomeViewController: UIViewController {
     var newToSyncButton: UIButton!
     var existingUserButton: UIButton!
     
+    var loadingView = UIView()
+    
+    deinit {
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -59,6 +65,13 @@ class SyncWelcomeViewController: UIViewController {
         existingUserButton.addTarget(self, action: #selector(SEL_existingUser), forControlEvents: .TouchUpInside)
         view.addSubview(existingUserButton)
         
+        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+        spinner.startAnimating()
+        loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
+        loadingView.hidden = true
+        loadingView.addSubview(spinner)
+        view.addSubview(loadingView)
+        
         edgesForExtendedLayout = .None
         
         bg.snp_makeConstraints { (make) in
@@ -93,6 +106,14 @@ class SyncWelcomeViewController: UIViewController {
             make.top.equalTo(self.newToSyncButton.snp_bottom).offset(8)
             make.centerX.equalTo(self.view)
         }
+        
+        spinner.snp_makeConstraints { (make) in
+            make.center.equalTo(spinner.superview!)
+        }
+        
+        loadingView.snp_makeConstraints { (make) in
+            make.edges.equalTo(loadingView.superview!)
+        }
     }
     
     override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
@@ -123,15 +144,40 @@ class SyncWelcomeViewController: UIViewController {
     }
     
     func SEL_newToSync() {
-        // Temporary
-        let alert = UIAlertController(title: "Not ready", message: "This feature has not been implemented yet.", preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
-        return
-        // //
         
-        let view = SyncAddDeviceViewController()
-        navigationController?.pushViewController(view, animated: true)
+        func attemptPush() {
+            if navigationController?.topViewController is SyncAddDeviceViewController {
+                // Already showing
+                return
+            }
+            
+            if Sync.shared.isInSyncGroup {
+                let view = SyncAddDeviceViewController()
+                navigationController?.pushViewController(view, animated: true)
+            } else {
+                self.loadingView.hidden = true
+                let alert = UIAlertController(title: "Unsuccessful", message: "Unable to create new sync group.", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            }
+        }
+        
+        if !Sync.shared.isInSyncGroup {
+            NSNotificationCenter.defaultCenter().addObserverForName(NotificationSyncReady, object: nil, queue: NSOperationQueue.mainQueue()) {
+                _ in attemptPush()
+                attemptPush()
+                attemptPush()
+                attemptPush()
+            }
+            
+            self.loadingView.hidden = false
+            Sync.shared.initializeNewSyncGroup()
+            
+            // Forced timeout
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(25.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), attemptPush)
+        } else {
+            attemptPush()
+        }
     }
     
     func SEL_existingUser() {
