@@ -105,7 +105,8 @@ class Sync: JSInjector {
     /// Notice:: seed will be ignored if the keychain already has one, a user must disconnect from existing sync group prior to joining a new one
     func initializeSync(seed: [Int]? = nil) {
         
-        if let joinedSeed = seed where joinedSeed.count > 0 {
+        // TODO: use consant for 16
+        if let joinedSeed = seed where joinedSeed.count == 16 {
             // Always attempt seed write, setter prevents bad overwrites
             syncSeed = "\(joinedSeed)"
         }
@@ -156,6 +157,8 @@ class Sync: JSInjector {
             return jsArray(userDefaultKey: prefNameSeed)
         }
         set(value) {
+            // TODO: Move syncSeed validation here, remove elsewhere
+            
             if syncSeed != nil && value != nil {
                 // Error, cannot replace sync seed with another seed
                 //  must set syncSeed to ni prior to replacing it
@@ -424,16 +427,16 @@ extension Sync {
     // Only called when the server has info for client to save
     func saveInitData(data: JSON) {
         // Sync Seed
-        if let seedDict = data["arg1"].asDictionary {
+        if let seedJSON = data["arg1"].asArray {
+            let seed = seedJSON.map({ $0.asInt }).flatMap({ $0 })
             
-            // TODO: Use js util converter
-            var seedArray = [Int](count: 32, repeatedValue: 0)
-            for (k, v) in seedDict {
-                if let k = Int(k) where k < 32 {
-                    seedArray[k] = v.asInt!
-                }
+            // TODO: Move to constant
+            if seed.count < 16 {
+                // Error
+                return
             }
-            syncSeed = "\(seedArray)"
+            
+            syncSeed = "\(seed)"
 
         } else if syncSeed == nil {
             // Failure
