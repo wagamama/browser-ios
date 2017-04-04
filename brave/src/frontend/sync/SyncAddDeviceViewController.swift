@@ -57,12 +57,13 @@ class SyncAddDeviceViewController: UIViewController {
         descriptionLabel.text = Strings.SyncAddDeviceDescription
         view.addSubview(descriptionLabel)
         
-        doneButton = UIButton()
+        doneButton = UIButton(type: .RoundedRect)
         doneButton.setTitle(Strings.Done, forState: .Normal)
         doneButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         doneButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         doneButton.backgroundColor = BraveUX.DefaultBlue
         doneButton.layer.cornerRadius = 8
+        doneButton.addTarget(self, action: #selector(SEL_done), forControlEvents: .TouchUpInside)
         view.addSubview(doneButton)
         
         edgesForExtendedLayout = .None
@@ -134,6 +135,10 @@ class SyncAddDeviceViewController: UIViewController {
     func SEL_changeMode() {
         barcodeView.hidden = (modeControl.selectedSegmentIndex == 1)
         codewordsView.hidden = (modeControl.selectedSegmentIndex == 0)
+    }
+    
+    func SEL_done() {
+        self.navigationController?.popToRootViewControllerAnimated(true)
     }
 }
 
