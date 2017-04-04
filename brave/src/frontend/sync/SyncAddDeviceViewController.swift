@@ -153,6 +153,9 @@ class SyncAddDeviceViewController: UIViewController {
     }
     
     func SEL_done() {
+        // Re-activate pop gesture in case it was removed
+        navigationController?.interactivePopGestureRecognizer?.enabled = true
+        
         self.navigationController?.popToRootViewControllerAnimated(true)
     }
 }
