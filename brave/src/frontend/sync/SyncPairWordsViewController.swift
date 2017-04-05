@@ -125,7 +125,7 @@ class SyncPairWordsViewController: UIViewController {
         let codes = self.codewordsView.codeWords()
 
         // Maybe temporary validation, sync server has issues without this validation
-        if codes.count < 16 {
+        if codes.count < Sync.SeedByteLength / 2 {
             alert(title: "Not Enough Words", message: "Please enter all of the words and try again.")
             return
         }

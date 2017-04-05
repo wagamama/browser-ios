@@ -34,6 +34,8 @@ enum SyncActions: Int {
 }
 
 class Sync: JSInjector {
+    
+    static let SeedByteLength = 32
     static let shared = Sync()
 
     /// This must be public so it can be added into the view hierarchy 
@@ -106,7 +108,7 @@ class Sync: JSInjector {
     func initializeSync(seed: [Int]? = nil) {
         
         // TODO: use consant for 16
-        if let joinedSeed = seed where joinedSeed.count == 16 {
+        if let joinedSeed = seed where joinedSeed.count == Sync.SeedByteLength {
             // Always attempt seed write, setter prevents bad overwrites
             syncSeed = "\(joinedSeed)"
         }
@@ -424,7 +426,7 @@ extension Sync {
             let seed = seedJSON.map({ $0.asInt }).flatMap({ $0 })
             
             // TODO: Move to constant
-            if seed.count < 16 {
+            if seed.count < Sync.SeedByteLength {
                 // Error
                 return
             }
