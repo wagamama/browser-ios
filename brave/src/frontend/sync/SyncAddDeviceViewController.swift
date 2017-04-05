@@ -33,12 +33,32 @@ class SyncAddDeviceViewController: UIViewController {
         containerView.layer.shadowOffset = CGSize(width: 0, height: 0.5)
         scrollView.addSubview(containerView)
         
-        let code = "The small brown fox jumped over the blue moon then fell into a pitcher of hops"
+        guard let syncSeed = Sync.shared.syncSeedArray else {
+            // TODO: Pop and error
+            return
+        }
         
-        barcodeView = SyncBarcodeView(data: code)
+        let qrSyncSeed = Niceware.shared.joinBytes(fromCombinedBytes: syncSeed)
+        if qrSyncSeed.isEmpty {
+            // Error
+            return
+        }
+        
+        Niceware.shared.passphrase(fromBytes: syncSeed) { (words, error) in
+            guard let words = words where error == nil else {
+                return
+            }
+
+            self.barcodeView = SyncBarcodeView(data: qrSyncSeed)
+            self.codewordsView = SyncCodewordsView(data: words)
+            
+            self.setupVisuals()
+        }
+    }
+    
+    func setupVisuals() {
         containerView.addSubview(barcodeView)
         
-        codewordsView = SyncCodewordsView(data: code.componentsSeparatedByString(" "))
         codewordsView.hidden = true
         containerView.addSubview(codewordsView)
         
