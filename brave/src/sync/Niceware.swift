@@ -106,6 +106,22 @@ class Niceware: JSInjector {
         return result.isEmpty ? nil : result
     }
     
+    /// Takes a string description of an array and returns a string of hex used for Sync
+    /// fromCombinedBytes: ([123, 119, 25, 14, 85, 125])
+    /// returns: 7b77190e557d
+    func joinBytes(fromCombinedBytes bytes: [Int]?) -> String {
+        guard let bytes = bytes else {
+            return ""
+        }
+        
+        let hex = bytes.map { String($0, radix: 16, uppercase: false) }
+        
+        // Sync hex must be 2 chars, with optional leading 0
+        let fullHex = hex.map { $0.characters.count == 2 ? $0 : "0" + $0 }
+        let combinedHex = fullHex.joinWithSeparator("")
+        return combinedHex
+    }
+    
     /// Takes English words and returns associated bytes (2 bytes per word)
     /// fromPassphrase: An array of words : ["administrational", "experimental"]
     /// returns (via completion): Array of integer values : [0x00, 0xee, 0x4a, 0x42]
