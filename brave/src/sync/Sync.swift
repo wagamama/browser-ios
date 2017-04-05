@@ -154,7 +154,7 @@ class Sync: JSInjector {
     }
 
     // TODO: Move to keychain
-    private(set) var syncSeed: String? {
+    private var syncSeed: String? {
         get {
             return NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
         }
@@ -181,6 +181,12 @@ class Sync: JSInjector {
             NSUserDefaults.standardUserDefaults().setObject(value, forKey: prefNameSeed)
             NSUserDefaults.standardUserDefaults().synchronize()
         }
+    }
+    
+    var syncSeedArray: [Int]? {
+        let splitBytes = syncSeed?.componentsSeparatedByCharactersInSet(NSCharacterSet(charactersInString: "[], ")).filter { !$0.isEmpty }
+        let seed = splitBytes?.map{ Int($0) }.flatMap{ $0 }
+        return seed?.count == Sync.SeedByteLength ? seed : nil
     }
     
     private var fetchTimestamp: Double {
