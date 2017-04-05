@@ -152,16 +152,16 @@ class Sync: JSInjector {
     }
 
     // TODO: Move to keychain
-    private var syncSeed: String? {
+    private(set) var syncSeed: String? {
         get {
-            return jsArray(userDefaultKey: prefNameSeed)
+            return NSUserDefaults.standardUserDefaults().stringForKey(prefNameSeed)
         }
         set(value) {
             // TODO: Move syncSeed validation here, remove elsewhere
             
-            if syncSeed != nil && value != nil {
+            if isInSyncGroup && value != nil {
                 // Error, cannot replace sync seed with another seed
-                //  must set syncSeed to ni prior to replacing it
+                //  must set syncSeed to nil prior to replacing it
                 return
             }
             
@@ -190,16 +190,7 @@ class Sync: JSInjector {
             NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
-    
-    private func jsArray(userDefaultKey key: String) -> String? {
-        if let val = NSUserDefaults.standardUserDefaults().stringForKey(key) {
-            return "new Uint8Array(\(val))"
-        }
-        
-        return nil
-    }
 
-    
     func checkIsSyncReady() -> Bool {
         
         if syncReadyLock {
@@ -287,7 +278,9 @@ extension Sync {
 
     func gotInitData() {
         let deviceId = syncDeviceId?.description ?? "null"
-        let args = "(null, \(syncSeed ?? "null"), \(deviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
+        let syncSeed = isInSyncGroup ? "new Uint8Array(\(self.syncSeed!))" : "null"
+        
+        let args = "(null, \(syncSeed), \(deviceId), {apiVersion: '\(apiVersion)', serverUrl: '\(serverUrl)', debug:\(isDebug)})"
         print(args)
         webView.evaluateJavaScript("callbackList['got-init-data']\(args)",
                                    completionHandler: { (result, error) in
@@ -445,6 +438,7 @@ extension Sync {
         
         // Device Id
         if let deviceArray = data["arg2"].asArray where deviceArray.count > 0 {
+            // TODO: Just don't set, if bad, allow sync to recover on next init
             syncDeviceId = deviceArray.map { $0.asInt ?? 0 }
         } else if syncDeviceId == nil {
             print("Device Id expected!")
