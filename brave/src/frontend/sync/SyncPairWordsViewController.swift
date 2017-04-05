@@ -24,9 +24,11 @@ class SyncPairWordsViewController: UIViewController {
         view.backgroundColor = SyncBackgroundColor
         
         scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
         
         containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = UIColor.whiteColor()
         containerView.layer.shadowColor = UIColor(rgb: 0xC8C7CC).CGColor
         containerView.layer.shadowRadius = 0
@@ -41,6 +43,7 @@ class SyncPairWordsViewController: UIViewController {
         containerView.addSubview(codewordsView)
         
         helpLabel = UILabel()
+        helpLabel.translatesAutoresizingMaskIntoConstraints = false
         helpLabel.font = UIFont.systemFontOfSize(15, weight: UIFontWeightRegular)
         helpLabel.textColor = UIColor(rgb: 0x696969)
         helpLabel.text = Strings.EnterCodeWordsBelow
@@ -63,15 +66,15 @@ class SyncPairWordsViewController: UIViewController {
         }
         
         containerView.snp_makeConstraints { (make) in
-            make.top.equalTo(self.view)
-            make.left.equalTo(self.view)
-            make.right.equalTo(self.view)
+            make.top.equalTo(self.scrollView)
+            make.left.equalTo(self.scrollView)
+            make.right.equalTo(self.scrollView)
             make.height.equalTo(295)
         }
         
         helpLabel.snp_makeConstraints { (make) in
             make.top.equalTo(self.containerView.snp_top).offset(10)
-            make.centerX.equalTo(self.view)
+            make.centerX.equalTo(self.scrollView)
         }
         
         codewordsView.snp_makeConstraints { (make) in

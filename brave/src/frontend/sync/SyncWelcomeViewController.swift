@@ -7,6 +7,7 @@ let SyncBackgroundColor = UIColor(rgb: 0xF8F8F8)
 
 class SyncWelcomeViewController: UIViewController {
     
+    var scrollView: UIScrollView!
     var graphic: UIImageView!
     var bg: UIImageView!
     var titleLabel: UILabel!
@@ -26,44 +27,56 @@ class SyncWelcomeViewController: UIViewController {
         title = Strings.Sync
         view.backgroundColor = SyncBackgroundColor
         
+        scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.alwaysBounceVertical = true
+        view.addSubview(scrollView)
+        
         bg = UIImageView(image: UIImage(named: "sync-gradient"))
+        bg.translatesAutoresizingMaskIntoConstraints = false
         bg.contentMode = .ScaleAspectFill
-        view.addSubview(bg)
+        bg.clipsToBounds = true
+        scrollView.addSubview(bg)
         
         graphic = UIImageView(image: UIImage(named: "sync-art"))
+        graphic.translatesAutoresizingMaskIntoConstraints = false
         graphic.contentMode = .Center
-        view.addSubview(graphic)
+        scrollView.addSubview(graphic)
         
         titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.systemFontOfSize(20, weight: UIFontWeightSemibold)
         titleLabel.textColor = UIColor.blackColor()
         titleLabel.text = Strings.BraveSync
-        view.addSubview(titleLabel)
+        scrollView.addSubview(titleLabel)
         
         descriptionLabel = UILabel()
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.font = UIFont.systemFontOfSize(15, weight: UIFontWeightRegular)
         descriptionLabel.textColor = UIColor(rgb: 0x696969)
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
         descriptionLabel.textAlignment = .Center
         descriptionLabel.text = Strings.BraveSyncWelcome
-        view.addSubview(descriptionLabel)
+        scrollView.addSubview(descriptionLabel)
         
         newToSyncButton = UIButton(type: .RoundedRect)
+        newToSyncButton.translatesAutoresizingMaskIntoConstraints = false
         newToSyncButton.setTitle(Strings.NewSyncCode, forState: .Normal)
         newToSyncButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         newToSyncButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         newToSyncButton.backgroundColor = BraveUX.DefaultBlue
         newToSyncButton.layer.cornerRadius = 8
         newToSyncButton.addTarget(self, action: #selector(SEL_newToSync), forControlEvents: .TouchUpInside)
-        view.addSubview(newToSyncButton)
+        scrollView.addSubview(newToSyncButton)
         
         existingUserButton = UIButton(type: .RoundedRect)
+        existingUserButton.translatesAutoresizingMaskIntoConstraints = false
         existingUserButton.setTitle(Strings.ScanSyncCode, forState: .Normal)
         existingUserButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         existingUserButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
         existingUserButton.addTarget(self, action: #selector(SEL_existingUser), forControlEvents: .TouchUpInside)
-        view.addSubview(existingUserButton)
+        scrollView.addSubview(existingUserButton)
         
         let spinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
         spinner.startAnimating()
@@ -74,10 +87,13 @@ class SyncWelcomeViewController: UIViewController {
         
         edgesForExtendedLayout = .None
         
+        scrollView.snp_makeConstraints { (make) in
+            make.edges.equalTo(self.view)
+        }
+        
         bg.snp_makeConstraints { (make) in
-            make.top.equalTo(self.view)
-            make.left.equalTo(self.view)
-            make.right.equalTo(self.view)
+            make.top.equalTo(self.scrollView)
+            make.width.equalTo(self.scrollView)
         }
         
         graphic.snp_makeConstraints { (make) in
@@ -85,26 +101,28 @@ class SyncWelcomeViewController: UIViewController {
         }
         
         titleLabel.snp_makeConstraints { (make) in
-            make.top.equalTo(self.bg.snp_bottom).offset(40)
-            make.centerX.equalTo(self.view)
+            make.top.equalTo(self.bg.snp_bottom).offset(30)
+            make.centerX.equalTo(self.scrollView)
         }
         
         descriptionLabel.snp_makeConstraints { (make) in
             make.top.equalTo(self.titleLabel.snp_bottom).offset(7)
-            make.leftMargin.equalTo(30)
-            make.rightMargin.equalTo(-30)
+            make.left.equalTo(30)
+            make.right.equalTo(-30)
         }
         
         newToSyncButton.snp_makeConstraints { (make) in
-            make.bottom.equalTo(self.view.snp_bottom).offset(-60)
-            make.leftMargin.equalTo(16)
-            make.rightMargin.equalTo(-16)
+            make.top.equalTo(self.descriptionLabel.snp_bottom).offset(30)
+            make.centerX.equalTo(self.scrollView)
+            make.left.equalTo(16)
+            make.right.equalTo(-16)
             make.height.equalTo(50)
         }
         
         existingUserButton.snp_makeConstraints { (make) in
             make.top.equalTo(self.newToSyncButton.snp_bottom).offset(8)
-            make.centerX.equalTo(self.view)
+            make.centerX.equalTo(self.scrollView)
+            make.bottom.equalTo(-10)
         }
         
         spinner.snp_makeConstraints { (make) in
@@ -114,33 +132,6 @@ class SyncWelcomeViewController: UIViewController {
         loadingView.snp_makeConstraints { (make) in
             make.edges.equalTo(loadingView.superview!)
         }
-    }
-    
-    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
-        
-        if toInterfaceOrientation.isLandscape {
-            graphic.snp_remakeConstraints(closure: { (make) in
-                make.top.equalTo(-300)
-                make.centerX.equalTo(self.view)
-            })
-            
-            titleLabel.snp_remakeConstraints(closure: { (make) in
-                make.centerY.equalTo(self.view).offset(-60)
-                make.centerX.equalTo(self.view)
-            })
-        }
-        else {
-            graphic.snp_remakeConstraints(closure: { (make) in
-                make.edges.equalTo(self.bg).inset(UIEdgeInsetsMake(0, 19, 0, 0))
-            })
-            
-            titleLabel.snp_remakeConstraints(closure: { (make) in
-                make.top.equalTo(self.bg.snp_bottom).offset(40)
-                make.centerX.equalTo(self.view)
-            })
-        }
-        
-        self.view.setNeedsUpdateConstraints()
     }
     
     func SEL_newToSync() {

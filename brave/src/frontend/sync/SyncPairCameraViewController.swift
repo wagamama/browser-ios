@@ -5,6 +5,7 @@ import Shared
 
 class SyncPairCameraViewController: UIViewController {
     
+    var scrollView: UIScrollView!
     var cameraView: SyncCameraView!
     var titleLabel: UILabel!
     var descriptionLabel: UILabel!
@@ -30,7 +31,12 @@ class SyncPairCameraViewController: UIViewController {
             self.navigationController?.popToRootViewControllerAnimated(true)
         })
         
+        scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
         cameraView = SyncCameraView()
+        cameraView.translatesAutoresizingMaskIntoConstraints = false
         cameraView.backgroundColor = UIColor.blackColor()
         cameraView.layer.cornerRadius = 4
         cameraView.layer.masksToBounds = true
@@ -81,58 +87,67 @@ class SyncPairCameraViewController: UIViewController {
                 // TODO: Show alert.
             }
         }
-        view.addSubview(cameraView)
+        scrollView.addSubview(cameraView)
         
         titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.systemFontOfSize(20, weight: UIFontWeightSemibold)
         titleLabel.textColor = UIColor.blackColor()
         titleLabel.text = Strings.SyncToDevice
-        view.addSubview(titleLabel)
+        scrollView.addSubview(titleLabel)
         
         descriptionLabel = UILabel()
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.font = UIFont.systemFontOfSize(15, weight: UIFontWeightRegular)
         descriptionLabel.textColor = UIColor(rgb: 0x696969)
         descriptionLabel.numberOfLines = 0
         descriptionLabel.lineBreakMode = .ByWordWrapping
         descriptionLabel.textAlignment = .Center
         descriptionLabel.text = Strings.SyncToDeviceDescription
-        view.addSubview(descriptionLabel)
+        scrollView.addSubview(descriptionLabel)
         
         cameraAccessButton = UIButton(type: .RoundedRect)
+        cameraAccessButton.translatesAutoresizingMaskIntoConstraints = false
         cameraAccessButton.setTitle(Strings.GrantCameraAccess, forState: .Normal)
         cameraAccessButton.titleLabel?.font = UIFont.systemFontOfSize(17, weight: UIFontWeightBold)
         cameraAccessButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         cameraAccessButton.backgroundColor = BraveUX.DefaultBlue
         cameraAccessButton.layer.cornerRadius = 8
         cameraAccessButton.addTarget(self, action: #selector(SEL_cameraAccess), forControlEvents: .TouchUpInside)
-        view.addSubview(cameraAccessButton)
+        scrollView.addSubview(cameraAccessButton)
         
         enterWordsButton = UIButton(type: .RoundedRect)
+        enterWordsButton.translatesAutoresizingMaskIntoConstraints = false
         enterWordsButton.setTitle(Strings.EnterCodeWords, forState: .Normal)
         enterWordsButton.titleLabel?.font = UIFont.systemFontOfSize(15, weight: UIFontWeightSemibold)
         enterWordsButton.setTitleColor(UIColor(rgb: 0x696969), forState: .Normal)
         enterWordsButton.addTarget(self, action: #selector(SEL_enterWords), forControlEvents: .TouchUpInside)
-        view.addSubview(enterWordsButton)
+        scrollView.addSubview(enterWordsButton)
         
         loadingSpinner.startAnimating()
         
         loadingView = UIView()
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
         loadingView.backgroundColor = UIColor(white: 0.5, alpha: 0.5)
         loadingView.hidden = true
         loadingView.addSubview(loadingSpinner)
-        view.addSubview(loadingView)
+        scrollView.addSubview(loadingView)
         
         edgesForExtendedLayout = .None
         
+        scrollView.snp_makeConstraints { (make) in
+            make.edges.equalTo(self.view)
+        }
+        
         cameraView.snp_makeConstraints { (make) in
-            make.top.equalTo(self.view).offset(24)
+            make.top.equalTo(self.scrollView).offset(24)
             make.size.equalTo(300)
-            make.centerX.equalTo(self.view)
+            make.centerX.equalTo(self.scrollView)
         }
         
         titleLabel.snp_makeConstraints { (make) in
-            make.top.equalTo(self.cameraView.snp_bottom).offset(40)
-            make.centerX.equalTo(self.view)
+            make.top.equalTo(self.cameraView.snp_bottom).offset(30)
+            make.centerX.equalTo(self.scrollView)
         }
         
         descriptionLabel.snp_makeConstraints { (make) in
@@ -142,15 +157,17 @@ class SyncPairCameraViewController: UIViewController {
         }
         
         cameraAccessButton.snp_makeConstraints { (make) in
-            make.bottom.equalTo(self.view.snp_bottom).offset(-60)
-            make.leftMargin.equalTo(16)
-            make.rightMargin.equalTo(-16)
+            make.top.equalTo(self.descriptionLabel.snp_bottom).offset(30)
+            make.centerX.equalTo(self.scrollView)
+            make.left.equalTo(16)
+            make.right.equalTo(-16)
             make.height.equalTo(50)
         }
         
         enterWordsButton.snp_makeConstraints { (make) in
             make.top.equalTo(self.cameraAccessButton.snp_bottom).offset(8)
-            make.centerX.equalTo(self.view)
+            make.centerX.equalTo(self.scrollView)
+            make.bottom.equalTo(-10)
         }
         
         loadingView.snp_makeConstraints { make in
