@@ -48,7 +48,6 @@ class Domain: NSManagedObject {
             if let item = results?.first {
                 result = item
             } else {
-                print("👽 Creating Domain \(domainString)")
                 result = Domain(entity: Domain.entity(context), insertIntoManagedObjectContext: context)
                 result?.url = domainString
             }

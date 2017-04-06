@@ -790,7 +790,6 @@ extension BookmarksPanel : NSFetchedResultsControllerDelegate {
             }
        case .Insert:
             if let path = newIndexPath {
-                print("try insert row \((anObject as! Bookmark).url)")
                 let objectIdHash = tableView.cellForRowAtIndexPath(path)?.tag ?? 0
                 if objectIdHash != anObject.objectID.hashValue {
                     tableView.insertRowsAtIndexPaths([path], withRowAnimation: .Automatic)
