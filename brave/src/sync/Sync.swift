@@ -340,7 +340,7 @@ extension Sync {
                 print("Deleting record!")
                 Bookmark.remove(bookmark: singleBookmark)
                 continue
-            } else if action == SyncActions.create || action == SyncActions.update {
+            } else if action == SyncActions.create {
                 
                 if singleBookmark != nil {
                     // Error! Should not exist and call create
@@ -349,6 +349,8 @@ extension Sync {
                 // TODO: Needs favicon
                 // TODO: Create better `add` method to accept sync bookmark
                 Bookmark.add(rootObject: fetchedRoot, save: false)
+            } else if action == SyncActions.update {
+                singleBookmark?.update(rootObject: fetchedRoot, save: false)
             }
         }
         

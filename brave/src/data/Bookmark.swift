@@ -92,6 +92,15 @@ class Bookmark: NSManagedObject {
 
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext:DataController.moc, sectionNameKeyPath: nil, cacheName: nil)
     }
+    
+    func update(rootObject root: SyncRoot, save: Bool = false) {
+        guard let bm = root.bookmark, let site = bm.site else { return }
+        title = site.title
+        customTitle = site.customTitle
+        url = site.location
+        lastVisited = NSDate(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
+        syncParentUUID = bm.parentFolderObjectId
+    }
 
     // TODO: Name change, since this also handles updating records
     class func add(rootObject root: SyncRoot, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil) -> Bookmark? {
