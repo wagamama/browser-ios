@@ -24,8 +24,8 @@ if (!self.chrome || !self.chrome.ipc) {
     
     ipc.on = ipc.once
 
-    ipc.send = (message, arg1, arg2) => {
-        window.webkit.messageHandlers.syncToIOS_send.postMessage(JSON.stringify({message: message, arg1: arg1, arg2: arg2}, stringifyArrayCleaner));
+    ipc.send = (message, arg1, arg2, arg3) => {
+        window.webkit.messageHandlers.syncToIOS_send.postMessage(JSON.stringify({message: message, arg1: arg1, arg2: arg2, arg3: arg3}, stringifyArrayCleaner));
     }
 
     self.chrome.ipc = ipc
