@@ -100,6 +100,27 @@ class Bookmark: NSManagedObject {
         url = site.location
         lastVisited = NSDate(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
         syncParentUUID = bm.parentFolderObjectId
+        
+        if save {
+            DataController.saveContext()
+        }
+    }
+    
+    func update(customTitle customTitle: String?, url: String?, save: Bool = false) {
+        
+        // See if there has been any change
+        if self.customTitle == customTitle && self.url == url {
+            return
+        }
+        
+        self.customTitle = customTitle
+        self.url = url
+        
+        if save {
+            DataController.saveContext()
+        }
+        
+        Sync.shared.sendSyncRecords(.bookmark, action: .update, bookmarks: [self])
     }
 
     // TODO: Name change, since this also handles updating records
