@@ -36,6 +36,8 @@ enum SyncActions: Int {
 class Sync: JSInjector {
     
     static let SeedByteLength = 32
+    /// Number of records that is considered a fetch limit as opposed to full data set
+    static let RecordRateLimitCount = 985
     static let shared = Sync()
 
     /// This must be public so it can be added into the view hierarchy 
@@ -361,6 +363,11 @@ extension Sync {
         
         // After records have been written, without crash, save timestamp
         if let stamp = self.lastFetchedRecordTimestamp { self.lastSuccessfulSync = stamp }
+        
+        if syncRecords.count > Sync.RecordRateLimitCount {
+            // Do fast refresh, do not wait for timer
+            self.fetch()
+        }
     }
 
     func deleteSyncUser(data: [String: AnyObject]) {
