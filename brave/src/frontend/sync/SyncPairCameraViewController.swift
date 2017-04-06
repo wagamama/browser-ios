@@ -61,8 +61,8 @@ class SyncPairCameraViewController: UIViewController {
                 // Will be removed on pop
                 self.loadingView.hidden = false
                 
-                // forced timeout
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(6.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
+                // Forced timeout
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(25.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), {
                     Scanner.Lock = false
                     self.loadingView.hidden = true
                     self.cameraView.cameraOverlayError()
