@@ -223,7 +223,7 @@ class Sync: JSInjector {
                 self.fetch()
                 
                 // Fetch timer to run on regular basis
-                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
+                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(30.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
             }
             
             if lastFetchedRecordTimestamp == 0 {
