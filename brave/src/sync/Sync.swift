@@ -170,7 +170,8 @@ class Sync: JSInjector {
             if value == nil {
                 // Clean up group specific items
                 syncDeviceId = nil
-                fetchTimestamp = 0
+                lastFetchedRecordTimestamp = 0
+                lastSuccessfulSync = 0
                 syncReadyLock = false
                 isSyncFullyInitialized = (false, false, false, false, false, false, false)
                 
@@ -189,12 +190,16 @@ class Sync: JSInjector {
         return seed?.count == Sync.SeedByteLength ? seed : nil
     }
     
-    private var fetchTimestamp: Double {
+    // This includes just the last record that was fetched, used to store timestamp until full process has been completed
+    //  then set into defaults
+    private var lastFetchedRecordTimestamp: Int? = 0
+    // This includes the entire process: fetching, resolving, insertion/update, and save
+    private var lastSuccessfulSync: Int {
         get {
-            return NSUserDefaults.standardUserDefaults().doubleForKey(prefFetchTimestamp)
+            return NSUserDefaults.standardUserDefaults().integerForKey(prefFetchTimestamp)
         }
         set(value) {
-            NSUserDefaults.standardUserDefaults().setDouble(value, forKey: prefFetchTimestamp)
+            NSUserDefaults.standardUserDefaults().setInteger(value, forKey: prefFetchTimestamp)
             NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
@@ -219,7 +224,7 @@ class Sync: JSInjector {
                 fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
             }
             
-            if fetchTimestamp == 0 {
+            if lastFetchedRecordTimestamp == 0 {
                 // Sync local bookmarks, then proceed with fetching
                 // Pull all local bookmarks
                 self.sendSyncRecords(.bookmark, action: .create, bookmarks: Bookmark.getAllBookmarks()) { error in
@@ -305,23 +310,10 @@ extension Sync {
          @param Array.<string> categoryNames, @param {number} startAt (in seconds) **/
         
         executeBlockOnReady() {
-
-            let nextFetch = NSDate().timeIntervalSince1970
-            let lastFetch = UInt(self.fetchTimestamp)
             
             // Pass in `lastFetch` to get records since that time
-            self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], \(lastFetch))",
+            self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], \(self.lastSuccessfulSync), true)",
                                        completionHandler: { (result, error) in
-                                        // Process merging
-                                        
-                                        // Could move fetch time stamp change into getExisting.
-                                        //  This would lead to duplicate calls with the same timestamp, but if there are no changes.
-                                        //  Should really be problematic, if fetching seems inconsistent, relocate
-                                        if error == nil {
-                                            // No error we can safely update fetched timestamp
-                                            self.fetchTimestamp = nextFetch
-                                        }
-                                        
                                         print(error)
                                         completion?(error)
             })
@@ -360,11 +352,15 @@ extension Sync {
                     
                 // TODO: Needs favicon
                 // TODO: Create better `add` method to accept sync bookmark
-                Bookmark.add(rootObject: fetchedRoot, save: true)
+                Bookmark.add(rootObject: fetchedRoot, save: false)
             }
         }
         
-        print("not implemented: resolveSyncRecords() \(data)")
+        DataController.saveContext()
+        print("\(syncRecords.count) records processed")
+        
+        // After records have been written, without crash, save timestamp
+        if let stamp = self.lastFetchedRecordTimestamp { self.lastSuccessfulSync = stamp }
     }
 
     func deleteSyncUser(data: [String: AnyObject]) {
@@ -384,9 +380,9 @@ extension Sync {
 // MARK: Server To Native Message category
 extension Sync {
 
-    func getExistingObjects(data: [SyncRoot]?) {
+    func getExistingObjects(data: SyncResponse?) {
         //  as? [[String: AnyObject]]
-        guard let syncRecords = data else { return }
+        guard let syncRecords = data?.rootElements else { return }
         
         /* Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
         
@@ -419,6 +415,9 @@ extension Sync {
             return
         }
         
+        // Store the last record's timestamp, to know what timestamp to pass in next time if this one does not fail
+        self.lastFetchedRecordTimestamp = data?.lastFetchedTimestamp
+            
         self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(serializedData))",
             completionHandler: { (result, error) in
                 print(error)
@@ -478,8 +477,7 @@ extension Sync: WKScriptMessageHandler {
             let data = JSON(string: message.body as? String ?? "")
             saveInitData(data)
         case "get-existing-objects":
-            // TODO: Should just return records, and immediately call resolve-sync-records
-            getExistingObjects(syncResponse.rootElements)
+            getExistingObjects(syncResponse)
         case "resolved-sync-records":
             resolvedSyncRecords(syncResponse.rootElements)
         case "sync-debug":
