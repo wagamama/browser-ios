@@ -277,13 +277,8 @@ extension Sync {
             let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(json))"
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
-                                        print(result)
                                         if error != nil {
                                             print(error)
-                                        }
-                                        
-                                        if error == nil {
-                                            // TODO: Mark all bookmarks as synced?
                                         }
                                         
                                         completion?(error)
@@ -316,7 +311,6 @@ extension Sync {
             // Pass in `lastFetch` to get records since that time
             self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], \(self.lastSuccessfulSync), true)",
                                        completionHandler: { (result, error) in
-                                        print(error)
                                         completion?(error)
             })
         }
@@ -426,9 +420,7 @@ extension Sync {
         self.lastFetchedRecordTimestamp = data?.lastFetchedTimestamp
             
         self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(serializedData))",
-            completionHandler: { (result, error) in
-                print(error)
-        })
+            completionHandler: { (result, error) in })
     }
 
     // Only called when the server has info for client to save
