@@ -174,7 +174,6 @@
 		5C404E1B2531DC2E178F80F8 /* ReaderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F8C87651157C51F01D4D96F /* ReaderPanel.swift */; };
 		5C44C0CF1E3847A100B1FD81 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C44C0C21E38479200B1FD81 /* CoreData.framework */; };
 		5C44C0D21E384AE700B1FD81 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D11E384AE700B1FD81 /* DataController.swift */; };
-		5C44C0D51E39834600B1FD81 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */; };
 		5C44C0D71E3C08B400B1FD81 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */; };
 		5C44C0DA1E3EE42D00B1FD81 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D91E3EE42D00B1FD81 /* Domain.swift */; };
 		5C44C0DE1E3EE47B00B1FD81 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0DD1E3EE47B00B1FD81 /* History.swift */; };
@@ -192,6 +191,7 @@
 		5D2AE6F91E83F3EC00BC274C /* SyncRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */; };
 		5D2AE6FA1E83F3EC00BC274C /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */; };
 		5D2B07EB1E6733B900244C39 /* niceware.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D2B07EA1E6733B900244C39 /* niceware.js */; };
+		5D3892551E98108F00F959E6 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D3892531E98108F00F959E6 /* Model.xcdatamodeld */; };
 		5D71B69B1E6885E00073621F /* Niceware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D71B69A1E6885E00073621F /* Niceware.swift */; };
 		5DB199151E859F9100A851B6 /* SyncResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DB199141E859F9100A851B6 /* SyncResponse.swift */; };
 		5DCC5D841E7C50B300054BBD /* NSJSONSerializationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */; };
@@ -968,7 +968,6 @@
 		5C39A9721F0FECF98A48015E /* BraveBrowserViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BraveBrowserViewController.swift; path = ./brave/src/frontend/BraveBrowserViewController.swift; sourceTree = "<group>"; };
 		5C44C0C21E38479200B1FD81 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		5C44C0D11E384AE700B1FD81 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataController.swift; path = brave/src/data/DataController.swift; sourceTree = "<group>"; };
-		5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bookmark.swift; path = brave/src/data/Bookmark.swift; sourceTree = "<group>"; };
 		5C44C0D91E3EE42D00B1FD81 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Domain.swift; path = brave/src/data/Domain.swift; sourceTree = "<group>"; };
 		5C44C0DD1E3EE47B00B1FD81 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = History.swift; path = brave/src/data/History.swift; sourceTree = "<group>"; };
@@ -986,7 +985,8 @@
 		5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRoot.swift; sourceTree = "<group>"; };
 		5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
 		5D2B07EA1E6733B900244C39 /* niceware.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = niceware.js; path = Carthage/Checkouts/niceware/browser/niceware.js; sourceTree = SOURCE_ROOT; };
-		5D3891041E97C74B00F959E6 /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
+		5D3892541E98108F00F959E6 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		5D3892561E9810B400F959E6 /* Model2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model2.xcdatamodel; sourceTree = "<group>"; };
 		5D71B69A1E6885E00073621F /* Niceware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Niceware.swift; sourceTree = "<group>"; };
 		5D84AB2CBD701CBBDC40620C /* ReadingListAuthenticator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReadingListAuthenticator.swift; path = ./ReadingList/ReadingListAuthenticator.swift; sourceTree = "<group>"; };
 		5DB199141E859F9100A851B6 /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
@@ -2031,7 +2031,7 @@
 		5C44C0D01E384AB300B1FD81 /* data */ = {
 			isa = PBXGroup;
 			children = (
-				5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */,
+				5D3892531E98108F00F959E6 /* Model.xcdatamodeld */,
 				5C44C0D11E384AE700B1FD81 /* DataController.swift */,
 				5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */,
 				5C44C0D91E3EE42D00B1FD81 /* Domain.swift */,
@@ -4065,7 +4065,6 @@
 				B4C5925ABA9B07212E1596DF /* BrowserScrollController.swift in Sources */,
 				00A3303C9E57E842D703EE04 /* BrowserToolbar.swift in Sources */,
 				08A6B9B1A574E15F5AD1DDC2 /* BrowserTrayAnimators.swift in Sources */,
-				5C44C0D51E39834600B1FD81 /* Model.xcdatamodeld in Sources */,
 				58B8BB9CDCB0B95E091EA072 /* BrowserViewController+BrowserDelegate.swift in Sources */,
 				1FA81E870F3EAE5C8FB9269C /* BrowserViewController+ContextMenuHelperDelegate.swift in Sources */,
 				5C67126F8B355442E99D9EDB /* BrowserViewController+FindInPage.swift in Sources */,
@@ -4178,6 +4177,7 @@
 				C3424B76234256F7426F3A7D /* FaviconFetcher.swift in Sources */,
 				32AFA6803EED54948FC69908 /* MenuHelper.swift in Sources */,
 				8C0901558DCB4A138F977DCE /* Swizzling.m in Sources */,
+				5D3892551E98108F00F959E6 /* Model.xcdatamodeld in Sources */,
 				8201EBEC8C36EDD93D330A07 /* Try.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5158,13 +5158,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */ = {
+		5D3892531E98108F00F959E6 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				5D3891041E97C74B00F959E6 /* Model 2.xcdatamodel */,
-				5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */,
+				5D3892561E9810B400F959E6 /* Model2.xcdatamodel */,
+				5D3892541E98108F00F959E6 /* Model.xcdatamodel */,
 			);
-			currentVersion = 5D3891041E97C74B00F959E6 /* Model 2.xcdatamodel */;
+			currentVersion = 5D3892561E9810B400F959E6 /* Model2.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = brave/src/data/Model.xcdatamodeld;
 			sourceTree = "<group>";
