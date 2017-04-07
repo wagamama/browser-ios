@@ -989,6 +989,7 @@
 		5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRoot.swift; sourceTree = "<group>"; };
 		5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
 		5D2B07EA1E6733B900244C39 /* niceware.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = niceware.js; path = Carthage/Checkouts/niceware/browser/niceware.js; sourceTree = SOURCE_ROOT; };
+		5D3892281E9806F800F959E6 /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
 		5D71B69A1E6885E00073621F /* Niceware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Niceware.swift; sourceTree = "<group>"; };
 		5D84AB2CBD701CBBDC40620C /* ReadingListAuthenticator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReadingListAuthenticator.swift; path = ./ReadingList/ReadingListAuthenticator.swift; sourceTree = "<group>"; };
 		5DB199141E859F9100A851B6 /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
@@ -5168,9 +5169,10 @@
 		5C44C0D31E39834600B1FD81 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5D3892281E9806F800F959E6 /* Model 2.xcdatamodel */,
 				5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */,
 			);
-			currentVersion = 5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */;
+			currentVersion = 5D3892281E9806F800F959E6 /* Model 2.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = brave/src/data/Model.xcdatamodeld;
 			sourceTree = "<group>";

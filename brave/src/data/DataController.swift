@@ -50,9 +50,15 @@ class DataController: NSObject {
         
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         if let docURL = urls.last {
-            let storeURL = docURL.URLByAppendingPathComponent("Brave.sqlite")
+            let storeURL = docURL.URLByAppendingPathComponent("Model.sqlite")
             do {
-                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: [NSPersistentStoreFileProtectionKey : NSFileProtectionComplete])
+                let options: [String: AnyObject] = [
+                    NSPersistentStoreFileProtectionKey : NSFileProtectionComplete,
+                    NSMigratePersistentStoresAutomaticallyOption: true,
+                    NSInferMappingModelAutomaticallyOption: true
+                ]
+                
+                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: options)
             }
             catch {
                 fatalError("Error migrating store: \(error)")
