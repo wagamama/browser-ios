@@ -83,6 +83,7 @@ class TopSitesPanel: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationPrivateDataClearedHistory, object: nil)
 //        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationDynamicFontChanged, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationPrivacyModeChanged, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.handleRotation), name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -159,49 +160,51 @@ class TopSitesPanel: UIViewController {
         self.refreshTopSites(self.maxFrecencyLimit)
         self.updateEmptyPanelState()
         
-        privateTabMessageContainer.snp_makeConstraints { (make) in
-            make.topMargin.equalTo(braveShieldStatsView.snp_bottom).offset(30)
-            make.centerX.equalTo(self.view)
-        }
-        
         background.snp_makeConstraints { make in
             make.edges.equalTo(self.view)
         }
         
+        privateTabMessageContainer.snp_makeConstraints { (make) in
+            make.centerX.equalTo(self.view)
+            make.centerY.equalTo(self.view)
+            make.leftMargin.equalTo(self.view).offset(40)
+            make.rightMargin.equalTo(self.view).offset(-40)
+        }
+        
         privateTabGraphic.snp_makeConstraints { (make) in
             make.top.equalTo(0)
-            make.centerX.equalTo(self.view)
+            make.centerX.equalTo(self.privateTabMessageContainer)
         }
         
         privateTabTitleLabel.snp_makeConstraints { (make) in
             make.top.equalTo(self.privateTabGraphic.snp_bottom).offset(15)
-            make.centerX.equalTo(self.view)
+            make.centerX.equalTo(self.privateTabMessageContainer)
         }
         
         privateTabInfoLabel.snp_makeConstraints { (make) in
-            make.top.equalTo(self.privateTabTitleLabel.snp_bottom).offset(10)
-            make.width.equalTo(CGRectGetWidth(self.view.frame) - 80)
-            make.centerX.equalTo(self.view)
+            make.top.equalTo(self.privateTabTitleLabel.snp_bottom).offset(15)
+            make.left.equalTo(0)
+            make.right.equalTo(0)
+            make.bottom.equalTo(0)
         }
     }
     
-    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+    func handleRotation() {
+        
+        let toInterfaceOrientation = UIApplication.sharedApplication().statusBarOrientation
         
         if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
             return
         }
         
         if toInterfaceOrientation == .LandscapeLeft || toInterfaceOrientation == .LandscapeRight {
-            privateTabGraphic.snp_remakeConstraints(closure: { (make) in
-                make.height.equalTo(0)
+            UIView.animateWithDuration(0.2, animations: {
+                self.privateTabGraphic.alpha = 0
             })
         }
         else {
-            privateTabGraphic.snp_remakeConstraints(closure: { (make) in
-                let image = UIImage(named: "privateLion")
-                if let size = image?.size {
-                    make.height.equalTo(size.height)
-                }
+            UIView.animateWithDuration(0.2, animations: {
+                self.privateTabGraphic.alpha = 1
             })
         }
         
@@ -214,6 +217,7 @@ class TopSitesPanel: UIViewController {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivateDataClearedHistory, object: nil)
 //        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivacyModeChanged, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
 
     func notificationReceived(notification: NSNotification) {
