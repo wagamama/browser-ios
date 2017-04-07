@@ -50,7 +50,6 @@ class DataController: NSObject {
         
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         if let docURL = urls.last {
-            let storeURL = docURL.URLByAppendingPathComponent("Model.sqlite")
             do {
                 
                 let options: [String: AnyObject] = [
@@ -58,6 +57,12 @@ class DataController: NSObject {
                     NSInferMappingModelAutomaticallyOption: true,
                     NSPersistentStoreFileProtectionKey : NSFileProtectionComplete
                 ]
+                
+                // Old store URL from old beta, can be removed at some point (thorough migration testing though)
+                var storeURL = docURL.URLByAppendingPathComponent("Brave.sqlite")
+                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: options)
+                
+                storeURL = docURL.URLByAppendingPathComponent("Model.sqlite")
                 try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: options)
             }
             catch {
