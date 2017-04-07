@@ -127,6 +127,8 @@ class BookmarkEditingViewController: FormViewController {
         if let block = self.completionBlock {
             block(controller: self)
         }
+        
+        self.bookmark.update(customTitle: self.titleRow.value, url: self.urlRow.value, save: true)
     }
     
     var isEditingFolder:Bool {
@@ -145,13 +147,7 @@ class BookmarkEditingViewController: FormViewController {
             row.title = Strings.Name
             row.value = bookmark.displayTitle
             self.titleRow = row
-        }.onCellHighlightChanged({ (cell, row) in
-            if self.bookmark.customTitle != row.value && row.value != self.bookmark.displayTitle {
-                // Only update when the result has changed
-                self.bookmark.customTitle = row.value
-                DataController.saveContext()
-            }
-        })
+        }
 
         form +++ nameSection
         
@@ -162,9 +158,6 @@ class BookmarkEditingViewController: FormViewController {
                 row.title = Strings.URL
                 row.value = bookmark.url
                 self.urlRow = row
-            }.onChange { row in
-                self.bookmark.url = row.value
-                DataController.saveContext()
             }
         }
 

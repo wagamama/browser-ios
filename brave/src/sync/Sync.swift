@@ -36,6 +36,8 @@ enum SyncActions: Int {
 class Sync: JSInjector {
     
     static let SeedByteLength = 32
+    /// Number of records that is considered a fetch limit as opposed to full data set
+    static let RecordRateLimitCount = 985
     static let shared = Sync()
 
     /// This must be public so it can be added into the view hierarchy 
@@ -221,7 +223,7 @@ class Sync: JSInjector {
                 self.fetch()
                 
                 // Fetch timer to run on regular basis
-                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(20.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
+                fetchTimer = NSTimer.scheduledTimerWithTimeInterval(30.0, target: self, selector: #selector(Sync.fetchWrapper), userInfo: nil, repeats: true)
             }
             
             if lastFetchedRecordTimestamp == 0 {
@@ -275,13 +277,8 @@ extension Sync {
             let evaluate = "callbackList['send-sync-records'](null, 'BOOKMARKS',\(json))"
             self.webView.evaluateJavaScript(evaluate,
                                        completionHandler: { (result, error) in
-                                        print(result)
                                         if error != nil {
                                             print(error)
-                                        }
-                                        
-                                        if error == nil {
-                                            // TODO: Mark all bookmarks as synced?
                                         }
                                         
                                         completion?(error)
@@ -314,7 +311,6 @@ extension Sync {
             // Pass in `lastFetch` to get records since that time
             self.webView.evaluateJavaScript("callbackList['fetch-sync-records'](null, ['BOOKMARKS'], \(self.lastSuccessfulSync), true)",
                                        completionHandler: { (result, error) in
-                                        print(error)
                                         completion?(error)
             })
         }
@@ -344,7 +340,7 @@ extension Sync {
                 print("Deleting record!")
                 Bookmark.remove(bookmark: singleBookmark)
                 continue
-            } else if action == SyncActions.create || action == SyncActions.update {
+            } else if action == SyncActions.create {
                 
                 if singleBookmark != nil {
                     // Error! Should not exist and call create
@@ -353,6 +349,8 @@ extension Sync {
                 // TODO: Needs favicon
                 // TODO: Create better `add` method to accept sync bookmark
                 Bookmark.add(rootObject: fetchedRoot, save: false)
+            } else if action == SyncActions.update {
+                singleBookmark?.update(rootObject: fetchedRoot, save: false)
             }
         }
         
@@ -361,6 +359,11 @@ extension Sync {
         
         // After records have been written, without crash, save timestamp
         if let stamp = self.lastFetchedRecordTimestamp { self.lastSuccessfulSync = stamp }
+        
+        if syncRecords.count > Sync.RecordRateLimitCount {
+            // Do fast refresh, do not wait for timer
+            self.fetch()
+        }
     }
 
     func deleteSyncUser(data: [String: AnyObject]) {
@@ -419,9 +422,7 @@ extension Sync {
         self.lastFetchedRecordTimestamp = data?.lastFetchedTimestamp
             
         self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(serializedData))",
-            completionHandler: { (result, error) in
-                print(error)
-        })
+            completionHandler: { (result, error) in })
     }
 
     // Only called when the server has info for client to save
