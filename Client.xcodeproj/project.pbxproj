@@ -5166,7 +5166,7 @@
 				5D3891041E97C74B00F959E6 /* Model 2.xcdatamodel */,
 				5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */,
 			);
-			currentVersion = 5C44C0D41E39834600B1FD81 /* Model.xcdatamodel */;
+			currentVersion = 5D3891041E97C74B00F959E6 /* Model 2.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = brave/src/data/Model.xcdatamodeld;
 			sourceTree = "<group>";
