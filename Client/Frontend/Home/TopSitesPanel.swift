@@ -32,6 +32,11 @@ class TopSitesPanel: UIViewController {
     weak var homePanelDelegate: HomePanelDelegate?
     private lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverlayView()
     private var collection: TopSitesCollectionView? = nil
+    private var background: UIImageView!
+    private var privateTabMessageContainer: UIView!
+    private var privateTabGraphic: UIImageView!
+    private var privateTabTitleLabel: UILabel!
+    private var privateTabInfoLabel: UILabel!
     private var braveShieldStatsView: BraveShieldStatsView? = nil
     private lazy var dataSource: TopSitesDataSource = {
         return TopSitesDataSource()
@@ -90,10 +95,36 @@ class TopSitesPanel: UIViewController {
         let statsHeight: CGFloat = 150.0
         let statsBottomMargin: CGFloat = 25.0
         
+        background = UIImageView(image: UIImage(named: "privateBg"))
+        background.hidden = PrivateBrowsing.singleton.isOn == false
+        view.addSubview(background)
+        
+        privateTabMessageContainer = UIView()
+        privateTabMessageContainer.hidden = PrivateBrowsing.singleton.isOn == false
+        
+        privateTabGraphic = UIImageView(image: UIImage(named: "privateLion"))
+        privateTabMessageContainer.addSubview(privateTabGraphic)
+        
+        privateTabTitleLabel = UILabel()
+        privateTabTitleLabel.lineBreakMode = .ByWordWrapping
+        privateTabTitleLabel.font = UIFont.systemFontOfSize(18, weight: UIFontWeightSemibold)
+        privateTabTitleLabel.textColor = UIColor(white: 1, alpha: 0.6)
+        privateTabTitleLabel.text = "This is a Private Tab"
+        privateTabMessageContainer.addSubview(privateTabTitleLabel)
+        
+        privateTabInfoLabel = UILabel()
+        privateTabInfoLabel.lineBreakMode = .ByWordWrapping
+        privateTabInfoLabel.textAlignment = .Center
+        privateTabInfoLabel.numberOfLines = 0
+        privateTabInfoLabel.font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+        privateTabInfoLabel.textColor = UIColor(white: 1, alpha: 0.25)
+        privateTabInfoLabel.text = "Private tabs are not logged in page history. If you open link from within a Private Tab, it will also be private.\r\rWhen you close Brave, all of your Private Tabs will vanish, forgotten forever."
+        privateTabMessageContainer.addSubview(privateTabInfoLabel)
+        
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
-        collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
+        collection.backgroundColor = PrivateBrowsing.singleton.isOn ? UIColor.clearColor() : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
         collection.delegate = self
-        collection.dataSource = dataSource
+        collection.dataSource = PrivateBrowsing.singleton.isOn == false ? dataSource : nil
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
         collection.keyboardDismissMode = .OnDrag
         collection.accessibilityIdentifier = "Top Sites View"
@@ -110,6 +141,8 @@ class TopSitesPanel: UIViewController {
         collection.addSubview(braveShieldStatsView)
         self.braveShieldStatsView = braveShieldStatsView
         
+        collection.addSubview(privateTabMessageContainer)
+        
         // Could setup as section header but would need to use flow layout,
         // Auto-layout subview within collection doesn't work properly,
         // Quick-and-dirty layout here.
@@ -125,8 +158,56 @@ class TopSitesPanel: UIViewController {
         self.dataSource.collectionView = self.collection
         self.refreshTopSites(self.maxFrecencyLimit)
         self.updateEmptyPanelState()
+        
+        privateTabMessageContainer.snp_makeConstraints { (make) in
+            make.topMargin.equalTo(braveShieldStatsView.snp_bottom).offset(30)
+            make.centerX.equalTo(self.view)
+        }
+        
+        background.snp_makeConstraints { make in
+            make.edges.equalTo(self.view)
+        }
+        
+        privateTabGraphic.snp_makeConstraints { (make) in
+            make.top.equalTo(0)
+            make.centerX.equalTo(self.view)
+        }
+        
+        privateTabTitleLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.privateTabGraphic.snp_bottom).offset(15)
+            make.centerX.equalTo(self.view)
+        }
+        
+        privateTabInfoLabel.snp_makeConstraints { (make) in
+            make.top.equalTo(self.privateTabTitleLabel.snp_bottom).offset(10)
+            make.width.equalTo(CGRectGetWidth(self.view.frame) - 80)
+            make.centerX.equalTo(self.view)
+        }
     }
-
+    
+    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+        
+        if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+            return
+        }
+        
+        if toInterfaceOrientation == .LandscapeLeft || toInterfaceOrientation == .LandscapeRight {
+            privateTabGraphic.snp_remakeConstraints(closure: { (make) in
+                make.height.equalTo(0)
+            })
+        }
+        else {
+            privateTabGraphic.snp_remakeConstraints(closure: { (make) in
+                let image = UIImage(named: "privateLion")
+                if let size = image?.size {
+                    make.height.equalTo(size.height)
+                }
+            })
+        }
+        
+        self.view.setNeedsUpdateConstraints()
+    }
+    
     deinit {
 //        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
 //        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationProfileDidFinishSyncing, object: nil)
@@ -143,7 +224,9 @@ class TopSitesPanel: UIViewController {
         case NotificationPrivacyModeChanged:
             // TODO: This entire blockshould be abstracted
             //  to make code in this class DRY (duplicates from elsewhere)
-            collection?.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
+            collection?.backgroundColor = PrivateBrowsing.singleton.isOn ? UIColor.clearColor() : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
+            background.hidden = PrivateBrowsing.singleton.isOn == false
+            privateTabMessageContainer.hidden = PrivateBrowsing.singleton.isOn == false
             braveShieldStatsView?.timeStatView.color = PrivateBrowsing.singleton.isOn ? .whiteColor() : .blackColor()
             collection?.reloadData()
             break
@@ -176,7 +259,7 @@ class TopSitesPanel: UIViewController {
     }
 
     private func updateEmptyPanelState() {
-        if dataSource.count() == 0 {
+        if dataSource.count() == 0 && PrivateBrowsing.singleton.isOn == false {
             if self.emptyStateOverlayView.superview == nil {
                 self.view.addSubview(self.emptyStateOverlayView)
                 self.emptyStateOverlayView.snp_makeConstraints { make -> Void in
@@ -749,7 +832,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     private func count() -> Int {
-        return sites.count
+        return PrivateBrowsing.singleton.isOn == false ? sites.count : 0
     }
 
     private func extractDomainURL(url: String) -> String {
