@@ -66,9 +66,11 @@ class SyncPairWordsViewController: UIViewController {
         }
         
         containerView.snp_makeConstraints { (make) in
-            make.top.equalTo(self.scrollView)
-            make.left.equalTo(self.scrollView)
-            make.right.equalTo(self.scrollView)
+            // Making these edges based off of the scrollview removes selectability on codewords.
+            //  This currently works for all layouts and enables interaction, so using `view` instead.
+            make.top.equalTo(self.view)
+            make.left.equalTo(self.view)
+            make.right.equalTo(self.view)
             make.height.equalTo(295)
         }
         
