@@ -129,15 +129,24 @@ class BraveSettingsView : AppSettingsTableViewController {
             ),
             SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults.uppercaseString), children: shieldSettingsList)]
 
+        
+        var supportChildren: [Setting] = [
+            BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyUserAllowsTelemetry, defaultValue: true, titleText: Strings.Opt_in_to_telemetry),
+        ]
+        
+        // If this macro is ever removed, this array can be inline, like the other settings
         #if !DISABLE_INTRO_SCREEN
-        settings += [
-            SettingSection(title: NSAttributedString(string: Strings.Support.uppercaseString), children: [
-                BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyUserAllowsTelemetry, defaultValue: true, titleText: Strings.Opt_in_to_telemetry),
-                ShowIntroductionSetting(settings: self),
-                BraveSupportLinkSetting(),
-                BravePrivacyPolicySetting(), BraveTermsOfUseSetting(),
-                ])]
+            supportChildren += [ShowIntroductionSetting(settings: self)]
         #endif
+        
+        supportChildren += [
+            BraveSupportLinkSetting(),
+            BravePrivacyPolicySetting(), BraveTermsOfUseSetting()
+        ]
+    
+        settings += [
+            SettingSection(title: NSAttributedString(string: Strings.Support.uppercaseString), children: supportChildren)]
+        
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.About.uppercaseString), children: [
                 VersionSetting(settings: self),
