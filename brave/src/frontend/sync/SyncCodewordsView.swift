@@ -14,7 +14,7 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
     var doneKeyCallback: (() -> Void)?
     
     convenience init(data: [String]) {
-        self.init(frame: CGRectZero)
+        self.init()
         
         for i in 0...15 {
             let field = UITextField()
@@ -38,19 +38,9 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         }
         
         // Read-only if data passed.
-        if data.count != 0 {
-            for field: UITextField in fields {
-                field.enabled = false
-            }
+        if !data.isEmpty {
+            fields.forEach { $0.enabled = false }
         }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     func codeWords() -> [String] {
