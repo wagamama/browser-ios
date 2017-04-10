@@ -490,8 +490,6 @@ class TabTrayController: UIViewController {
     }
     
     func SELdidTogglePrivateMode() {
-        telemetry(action: "Private mode button tapped", props: nil)
-
         let fromView: UIView
         if privateTabsAreEmpty() {
             fromView = emptyPrivateTabsView
@@ -504,8 +502,10 @@ class TabTrayController: UIViewController {
 
         privateMode = !privateMode
         if privateMode {
+            telemetry(action: "Entering Private Mode", props: nil)
             PrivateBrowsing.singleton.enter()
         } else {
+            telemetry(action: "Leaving Private Mode", props: nil)
             view.userInteractionEnabled = false
             let activityView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
             activityView.center = view.center

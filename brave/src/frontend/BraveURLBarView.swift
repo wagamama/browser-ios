@@ -186,13 +186,12 @@ class BraveURLBarView : URLBarView {
     }
 
     @objc func onClickLeftSlideOut() {
-         telemetry(action: "show left panel", props: nil)
         leftSidePanelButton.selected = !leftSidePanelButton.selected
         NSNotificationCenter.defaultCenter().postNotificationName(kNotificationLeftSlideOutClicked, object: leftSidePanelButton)
     }
 
     @objc func onClickBraveButton() {
-        telemetry(action: "show brave panel", props: nil)
+        telemetry(action: "Show Brave Panel", props: nil)
         NSNotificationCenter.defaultCenter().postNotificationName(kNotificationBraveButtonClicked, object: braveButton)
     }
 
@@ -202,7 +201,6 @@ class BraveURLBarView : URLBarView {
     }
 
     class func tabButtonPressed() {
-        telemetry(action: "show tab tray", props: ["bottomToolbar": "false"])
         guard let instance = BraveURLBarView.currentInstance else { return }
         instance.delegate?.urlBarDidPressTabs(instance)
     }

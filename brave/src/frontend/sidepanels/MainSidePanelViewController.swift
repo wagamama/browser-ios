@@ -77,10 +77,6 @@ class MainSidePanelViewController : SidePanelBaseViewController {
        // NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(historyItemAdded), name: kNotificationSiteAddedToHistory, object: nil)
     }
 
-//    @objc func historyItemAdded() {
-//        telemetry(action: "page changed", props: nil)
-//    }
-
     func willHide() {
         //check if we are editing bookmark, if so pop controller then continue
         if self.bookmarksNavController?.visibleViewController is BookmarkEditingViewController {

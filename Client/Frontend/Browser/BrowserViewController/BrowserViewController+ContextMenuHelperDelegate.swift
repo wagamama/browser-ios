@@ -42,7 +42,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
                     self.tabManager.addTab(NSURLRequest(URL: url), isPrivate: isPrivate)
                 })
-                telemetry(action: "New tab", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(openNewTabAction)
 
@@ -52,7 +51,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                     self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
                         self.tabManager.addTabAndSelect(NSURLRequest(URL: url), isPrivate: true)
                     })
-                    telemetry(action: "New private tab", props: ["source" : "context menu"])
                 }
                 actionSheetController.addAction(openNewPrivateTabAction)
             }
@@ -63,14 +61,12 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 if let dialogTitle = dialogTitle, url = NSURL(string: dialogTitle) {
                     pasteBoard.URL = url
                 }
-                telemetry(action: "copy link", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(copyAction)
 
             let shareTitle = Strings.Share_Link
             let shareAction = UIAlertAction(title: shareTitle, style: UIAlertActionStyle.Default) { _ in
                 self.presentActivityViewController(url, tab: currentTab, sourceView: self.view, sourceRect: CGRect(origin: touchPoint, size: touchSize), arrowDirection: .Any)
-                telemetry(action: "share link", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(shareAction)
         }
@@ -85,7 +81,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
                     self.tabManager.addTab(NSURLRequest(URL: url), isPrivate: isPrivate)
                 })
-                telemetry(action: "New tab", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(openImageAction)
 
@@ -104,7 +99,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                     accessDenied.addAction(settingsAction)
                     self.presentViewController(accessDenied, animated: true, completion: nil)
                 }
-                telemetry(action: "share link", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(saveImageAction)
 
@@ -133,7 +127,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
                         application.endBackgroundTask(taskId)
                 }
-                telemetry(action: "copy image", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(copyAction)
         }

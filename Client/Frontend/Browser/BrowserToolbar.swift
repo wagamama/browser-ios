@@ -91,7 +91,6 @@ public class BrowserToolbarHelper: NSObject {
     }
     
     func SELdidClickAddTab() {
-        telemetry(action: "add tab", props: ["bottomToolbar": "true"])
         let app = UIApplication.sharedApplication().delegate as! AppDelegate
         let isPrivate = PrivateBrowsing.singleton.isOn
         if isPrivate {

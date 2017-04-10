@@ -451,8 +451,6 @@ class BraveRightSidePanelViewController : SidePanelBaseViewController {
             BraveShieldState.set(forDomain:site, state: (siteShieldKey, state))
             (getApp().browserViewController as! BraveBrowserViewController).updateBraveShieldButtonState(animated: true)
             BraveApp.getCurrentWebView()?.reload()
-
-            telemetry(action: "brave switch toggled \(siteShieldKey)", props: ["value" : "\(sender.on)"])
         }
 
         switch (sender) {
