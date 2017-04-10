@@ -59,12 +59,7 @@ class ShareExtensionHelper: NSObject {
         }
 
         activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, activityError in
-            if !completed {
-                completionHandler(completed)
-                return
-            }
-
-            if self.isPasswordManagerActivityType(activityType) {
+            if completed, let activityType = activityType where self.isPasswordManagerActivityType(activityType) {
                 if let logins = returnedItems {
                     self.fillPasswords(logins)
                 }
@@ -114,7 +109,7 @@ private extension ShareExtensionHelper {
         return OnePasswordExtension.sharedExtension().isAppExtensionAvailable()
     }
 
-    func isPasswordManagerActivityType(activityType: String?) -> Bool {
+    func isPasswordManagerActivityType(activityType: String) -> Bool {
         if (!ShareExtensionHelper.isPasswordManagerExtensionAvailable()) {
             return false
         }
@@ -122,10 +117,13 @@ private extension ShareExtensionHelper {
         // com.agilebits.onepassword-ios.extension
         // com.app77.ios.pwsafe2.find-login-action-password-actionExtension
         // If your extension's bundle identifier does not contain "password", simply submit a pull request by adding your bundle identifier.
-        return (activityType?.rangeOfString("password") != nil)
-            || (activityType == "com.lastpass.ilastpass.LastPassExt")
-            || (activityType == "com.8bit.bitwarden.find-login-action-extension")
-
+        
+        let additionalIdentifiers = [
+            "com.lastpass.ilastpass.LastPassExt",
+            "com.8bit.bitwarden.find-login-action-extension"
+        ]
+        
+        return activityType.contains("password") || additionalIdentifiers.contains(activityType)
     }
 
     func findLoginExtensionItem() {
