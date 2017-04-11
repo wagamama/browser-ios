@@ -128,7 +128,7 @@ class BookmarkEditingViewController: FormViewController {
             block(controller: self)
         }
         
-        self.bookmark.update(customTitle: self.titleRow.value, url: self.urlRow.value, save: true)
+        self.bookmark.update(customTitle: self.titleRow != nil ? self.titleRow.value : nil, url: self.urlRow != nil ? self.urlRow.value : nil, save: true)
     }
     
     var isEditingFolder:Bool {
@@ -537,11 +537,20 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             }
         }
         
-        // Same logic
         let fontSize: CGFloat = 14.0
         cell.textLabel?.text = item.displayTitle ?? item.url
-        //
-
+        cell.textLabel?.lineBreakMode = .ByClipping
+        
+        if let textLabel = cell.textLabel {
+            let size = textLabel.sizeThatFits(CGSizeMake(CGFloat.max, CGFloat.max))
+            var frame = textLabel.frame
+            frame.origin.x = 58.0
+            frame.origin.y = 20.5
+            frame.size.width =  size.width + 10
+            frame.size.height = size.height
+            cell.textLabel?.frame = frame
+        }
+        
         if !item.isFolder {
             configCell(icon: item.domain?.favicon, longPressForContextMenu: true)
             cell.textLabel?.font = UIFont.systemFontOfSize(fontSize)

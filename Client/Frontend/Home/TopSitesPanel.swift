@@ -32,7 +32,6 @@ class TopSitesPanel: UIViewController {
     weak var homePanelDelegate: HomePanelDelegate?
     private lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverlayView()
     private var collection: TopSitesCollectionView? = nil
-    private var background: UIImageView!
     private var privateTabMessageContainer: UIView!
     private var privateTabGraphic: UIImageView!
     private var privateTabTitleLabel: UILabel!
@@ -96,10 +95,6 @@ class TopSitesPanel: UIViewController {
         let statsHeight: CGFloat = 150.0
         let statsBottomMargin: CGFloat = 25.0
         
-        background = UIImageView(image: UIImage(named: "privateBg"))
-        background.hidden = PrivateBrowsing.singleton.isOn == false
-        view.addSubview(background)
-        
         privateTabMessageContainer = UIView()
         privateTabMessageContainer.hidden = PrivateBrowsing.singleton.isOn == false
         
@@ -123,7 +118,7 @@ class TopSitesPanel: UIViewController {
         privateTabMessageContainer.addSubview(privateTabInfoLabel)
         
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
-        collection.backgroundColor = PrivateBrowsing.singleton.isOn ? UIColor.clearColor() : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
+        collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
         collection.delegate = self
         collection.dataSource = PrivateBrowsing.singleton.isOn == false ? dataSource : nil
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
@@ -159,10 +154,6 @@ class TopSitesPanel: UIViewController {
         self.dataSource.collectionView = self.collection
         self.refreshTopSites(self.maxFrecencyLimit)
         self.updateEmptyPanelState()
-        
-        background.snp_makeConstraints { make in
-            make.edges.equalTo(self.view)
-        }
         
         privateTabMessageContainer.snp_makeConstraints { (make) in
             make.centerX.equalTo(self.view)
@@ -228,8 +219,7 @@ class TopSitesPanel: UIViewController {
         case NotificationPrivacyModeChanged:
             // TODO: This entire blockshould be abstracted
             //  to make code in this class DRY (duplicates from elsewhere)
-            collection?.backgroundColor = PrivateBrowsing.singleton.isOn ? UIColor.clearColor() : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
-            background.hidden = PrivateBrowsing.singleton.isOn == false
+            collection?.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
             privateTabMessageContainer.hidden = PrivateBrowsing.singleton.isOn == false
             braveShieldStatsView?.timeStatView.color = PrivateBrowsing.singleton.isOn ? .whiteColor() : .blackColor()
             collection?.reloadData()
