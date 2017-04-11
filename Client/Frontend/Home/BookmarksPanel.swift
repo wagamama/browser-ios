@@ -103,8 +103,8 @@ class BookmarkEditingViewController: FormViewController {
     let BOOKMARK_URL_ROW_TAG:String = "BOOKMARK_URL_ROW_TAG"
     let BOOKMARK_FOLDER_ROW_TAG:String = "BOOKMARK_FOLDER_ROW_TAG"
 
-    var titleRow:TextRow!
-    var urlRow:TextRow!
+    var titleRow:TextRow?
+    var urlRow:TextRow?
     
     init(bookmarksPanel: BookmarksPanel, indexPath: NSIndexPath, bookmark: Bookmark) {
         super.init(nibName: nil, bundle: nil)
@@ -128,7 +128,7 @@ class BookmarkEditingViewController: FormViewController {
             block(controller: self)
         }
         
-        self.bookmark.update(customTitle: self.titleRow != nil ? self.titleRow.value : nil, url: self.urlRow != nil ? self.urlRow.value : nil, save: true)
+        self.bookmark.update(customTitle: self.titleRow?.value, url: self.urlRow?.value, save: true)
     }
     
     var isEditingFolder:Bool {
