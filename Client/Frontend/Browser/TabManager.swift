@@ -222,7 +222,7 @@ class TabManager : NSObject {
     }
 
     func addTabAndSelect(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil) -> Browser? {
-        guard let tab = addTab(request, configuration: configuration, id: TabMO.freshTab()) else { return nil }
+        guard let tab = addTab(request, configuration: configuration, isPrivate: PrivateBrowsing.singleton.isOn, id: TabMO.freshTab()) else { return nil }
         selectTab(tab)
         return tab
     }
