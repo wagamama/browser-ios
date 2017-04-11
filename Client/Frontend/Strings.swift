@@ -57,7 +57,6 @@ extension Strings {
 extension Strings {
 
     public static let NewFolder = NSLocalizedString("New Folder", comment: "")
-    public static let DeleteFolder = NSLocalizedString("Delete Folder", comment: "")
     public static let Edit = NSLocalizedString("Edit", comment: "")
 
     public static let ShowTour = NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings")

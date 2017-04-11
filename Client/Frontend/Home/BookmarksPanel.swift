@@ -176,8 +176,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     var editBookmarksToolbar:UIToolbar!
     var editBookmarksButton:UIBarButtonItem!
-    var addRemoveFolderButton:UIBarButtonItem!
-    var removeFolderButton:UIBarButtonItem!
     var addFolderButton:UIBarButtonItem!
     weak var addBookmarksFolderOkAction: UIAlertAction?
   
@@ -267,8 +265,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         let editMode:Bool = forceOff ? false : !tableView.editing
         tableView.setEditing(editMode, animated: forceOff ? false : true)
         
-        //only when the 'edit' button has been pressed
-        updateAddRemoveFolderButton(true)
         updateEditBookmarksButton(editMode)
         resetCellLongpressGesture(tableView.editing)
     }
@@ -288,54 +284,14 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         }
     }
     
-    /*
-     * Subfolders can only be added to the root folder, and only subfolders can be deleted/removed, so we use
-     * this button (on the left side of the bookmarks toolbar) for both functions depending on where we are.
-     * Therefore when we enter edit mode on the root we show 'new folder'
-     * the button disappears when not in edit mode in both cases. When a subfolder is not empty,
-     * pressing the remove folder button will show an error message explaining why (suboptimal, but allows to expose this functionality)
-     */
-    func updateAddRemoveFolderButton(tableIsEditing:Bool) {
-        
-        if !tableIsEditing {
-            addRemoveFolderButton.enabled = false
-            addRemoveFolderButton.title = nil
-            return
-        }
-
-        addRemoveFolderButton.enabled = true
-
-        var targetButton:UIBarButtonItem!
-        
-//        if currentFolder == nil { //on root, this button allows adding subfolders
-            targetButton = addFolderButton
-//        } else { //on a subfolder, this button allows removing the current folder (if empty)
-//            targetButton = removeFolderButton
-//        }
-        
-        addRemoveFolderButton.title = targetButton.title
-        addRemoveFolderButton.style = targetButton.style
-        addRemoveFolderButton.target = targetButton.target
-        addRemoveFolderButton.action = targetButton.action
-    }
-    
     func createEditBookmarksToolbar() {
         var items = [UIBarButtonItem]()
         
         items.append(UIBarButtonItem.createFixedSpaceItem(5))
 
-        //these two buttons are created as placeholders for the data/actions in each case. see #updateAddRemoveFolderButton and
-        //#switchTableEditingMode
         addFolderButton = UIBarButtonItem(title: Strings.NewFolder,
                                           style: .Plain, target: self, action: #selector(onAddBookmarksFolderButton))
-        removeFolderButton = UIBarButtonItem(title: Strings.DeleteFolder,
-                                             style: .Plain, target: self, action: #selector(onDeleteBookmarksFolderButton))
-        
-        //this is the button that actually lives in the toolbar
-        addRemoveFolderButton = UIBarButtonItem()
-        items.append(addRemoveFolderButton)
-
-        updateAddRemoveFolderButton(true)
+        items.append(addFolderButton)
         
         items.append(UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: self, action: nil))
 
