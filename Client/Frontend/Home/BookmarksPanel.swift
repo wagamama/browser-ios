@@ -268,7 +268,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         tableView.setEditing(editMode, animated: forceOff ? false : true)
         
         //only when the 'edit' button has been pressed
-        updateAddRemoveFolderButton(editMode)
+        updateAddRemoveFolderButton(true)
         updateEditBookmarksButton(editMode)
         resetCellLongpressGesture(tableView.editing)
     }
@@ -335,7 +335,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         addRemoveFolderButton = UIBarButtonItem()
         items.append(addRemoveFolderButton)
 
-        updateAddRemoveFolderButton(false)
+        updateAddRemoveFolderButton(true)
         
         items.append(UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: self, action: nil))
 
