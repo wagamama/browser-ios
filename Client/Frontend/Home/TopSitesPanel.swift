@@ -77,10 +77,7 @@ class TopSitesPanel: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationFirefoxAccountChanged, object: nil)
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationProfileDidFinishSyncing, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationPrivateDataClearedHistory, object: nil)
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationDynamicFontChanged, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.notificationReceived(_:)), name: NotificationPrivacyModeChanged, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TopSitesPanel.handleRotation), name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
@@ -203,10 +200,7 @@ class TopSitesPanel: UIViewController {
     }
     
     deinit {
-//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
-//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationProfileDidFinishSyncing, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivateDataClearedHistory, object: nil)
-//        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivacyModeChanged, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
@@ -277,13 +271,6 @@ class TopSitesPanel: UIViewController {
     private func updateAllRemoveButtonStates() {
         collection?.indexPathsForVisibleItems().forEach(updateRemoveButtonStateForIndexPath)
     }
-
-//    private func deleteTileForSuggestedSite(site: SuggestedSite) -> Success {
-//        var deletedSuggestedSites = profile.prefs.arrayForKey("topSites.deletedSuggestedSites") as! [String]
-//        deletedSuggestedSites.append(site.url)
-//        profile.prefs.setObject(deletedSuggestedSites, forKey: "topSites.deletedSuggestedSites")
-//        return succeed()
-//    }
 
     private func topSitesQuery() -> Deferred<[Site]> {
         let result = Deferred<[Site]>()

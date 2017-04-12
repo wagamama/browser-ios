@@ -187,7 +187,6 @@ class SettingsTableViewController: UITableViewController {
     weak var settingsDelegate: SettingsDelegate?
 
     var profile: Profile!
-    ///var tabManager: TabManager!
 
     /// Used to calculate cell heights.
     private lazy var dummyToggleCell: UITableViewCell = {

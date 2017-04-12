@@ -153,6 +153,7 @@ extension SQLiteHistory: BrowserHistory {
     func recordVisitedSite(site: Site) -> Success {
         var error: NSError? = nil
 
+        // TODO: This got dropped during CD refactor, consider re-adding it
         // Don't store visits to sites with about: protocols
 //        if isIgnoredURL(site.url) {
 //            return deferMaybe(IgnoredSiteError())

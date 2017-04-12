@@ -125,7 +125,6 @@ class SearchSetting: Setting {
 
 class LoginsSetting: Setting {
     let profile: Profile
-    ///var tabManager: TabManager!
     weak var navigationController: UINavigationController?
 
     override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
@@ -134,7 +133,6 @@ class LoginsSetting: Setting {
 
     init(settings: SettingsTableViewController, delegate: SettingsDelegate?) {
         self.profile = settings.profile
-        ///self.tabManager = settings.tabManager
         self.navigationController = settings.navigationController
 
         let loginsTitle = Strings.Logins
@@ -151,7 +149,6 @@ class LoginsSetting: Setting {
 
 class SyncDevicesSetting: Setting {
     let profile: Profile
-    //var tabManager: TabManager!
     
     override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
     
@@ -159,7 +156,6 @@ class SyncDevicesSetting: Setting {
     
     init(settings: SettingsTableViewController) {
         self.profile = settings.profile
-        //self.tabManager = settings.tabManager
         
         let clearTitle = Strings.SyncDevices
         super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
@@ -207,7 +203,6 @@ class RemoveDeviceSetting: Setting {
 
 class ClearPrivateDataSetting: Setting {
     let profile: Profile
-    //var tabManager: TabManager!
 
     override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
 
@@ -215,7 +210,6 @@ class ClearPrivateDataSetting: Setting {
 
     init(settings: SettingsTableViewController) {
         self.profile = settings.profile
-        //self.tabManager = settings.tabManager
 
         let clearTitle = Strings.ClearPrivateData
         super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
@@ -224,7 +218,6 @@ class ClearPrivateDataSetting: Setting {
     override func onClick(navigationController: UINavigationController?) {
         let viewController = ClearPrivateDataTableViewController()
         viewController.profile = profile
-        //viewController.tabManager = tabManager
         navigationController?.pushViewController(viewController, animated: true)
     }
 }
