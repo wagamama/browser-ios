@@ -123,7 +123,7 @@ class Bookmark: NSManagedObject {
         Sync.shared.sendSyncRecords(.bookmark, action: .update, bookmarks: [self])
     }
 
-    // TODO: Name change, since this also handles updating records
+    // Should not be used for updating, modify to increase protection
     class func add(rootObject root: SyncRoot, save: Bool = false, sendToSync: Bool = false, parentFolder: Bookmark? = nil) -> Bookmark? {
         let bookmark = root.bookmark
         let site = bookmark?.site
@@ -148,7 +148,7 @@ class Bookmark: NSManagedObject {
         bk.title = site?.title ?? bk.title
         bk.customTitle = site?.customTitle ?? bk.customTitle // TODO: Check against empty titles
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder ?? false
-        bk.syncUUID = root.objectId ?? bk.syncUUID
+        bk.syncUUID = root.objectId ?? bk.syncUUID ?? (1..<16).map { _ in Int(arc4random_uniform(256)) }
         
         if let created = site?.creationTime {
             bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
@@ -170,25 +170,7 @@ class Bookmark: NSManagedObject {
         bk.parentFolder = parentFolder
         bk.syncParentUUID = bookmark?.parentFolderObjectId ?? bk.syncParentUUID
         
-        if bk.syncUUID == nil {
-            // Need async creation of UUID
-            Niceware.shared.uniqueBytes(count: 16) {
-                (result, error) in
-                
-                bk.syncUUID = result
-                
-                if save {
-                    DataController.saveContext()
-                }
-                
-                // TODO: Should probably check against global config, since this is new
-                if sendToSync {
-                    Sync.shared.sendSyncRecords(.bookmark, action: .create, bookmarks: [bk])
-                }
-            }
-        } else if save {
-            
-            // TODO: Optimize (e.g. updating)
+        if save {
             // For folders that are saved _with_ a syncUUID, there may be child bookmarks
             //  (e.g. sync sent down bookmark before parent folder)
             if bk.isFolder {
@@ -197,8 +179,6 @@ class Bookmark: NSManagedObject {
                     
                     // TODO: Setup via bk.children property instead
                     children.forEach { $0.parentFolder = bk }
-//                    print(children)
-//                    bk.children = NSSet(array: children) as? Set<Bookmark>
                 }
             }
             
@@ -207,7 +187,6 @@ class Bookmark: NSManagedObject {
                 Sync.shared.sendSyncRecords(.bookmark, action: .update, bookmarks: [bk])
             }
             
-            // If no syncUUI is available, it will be saved after id is set
             DataController.saveContext()
         }
         
