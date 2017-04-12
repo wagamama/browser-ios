@@ -194,26 +194,14 @@ class PasswordManagerButtonSetting: PicklistSettingMainItem<String> {
     static var currentSetting: ThirdPartyPasswordManagerType?
 
     private static let _prefName = kPrefName3rdPartyPasswordShortcutEnabled
-    private static let _options =  [
-        Choice<String> { PasswordManagerButtonAction.ShowPicker },
-        Choice<String> { PasswordManagerButtonAction.OnePassword },
-        Choice<String> { PasswordManagerButtonAction.LastPass }
-    ]
 
     static func setupOnAppStart() {
         guard let current = BraveApp.getPrefs()?.intForKey(_prefName) else { return }
-        switch Int(current) {
-        case PasswordManagerButtonAction.OnePassword.prefId:
-            currentSetting = PasswordManagerButtonAction.OnePassword
-        case PasswordManagerButtonAction.LastPass.prefId:
-            currentSetting = PasswordManagerButtonAction.LastPass
-        default:
-            currentSetting = PasswordManagerButtonAction.ShowPicker
-        }
+        currentSetting = ThirdPartyPasswordManagerType(rawValue: Int(current))
     }
 
     init(profile: Profile) {
-        super.init(profile: profile, displayName: "", prefName: PasswordManagerButtonSetting._prefName, options: PasswordManagerButtonSetting._options)
+        super.init(profile: profile, displayName: "", prefName: PasswordManagerButtonSetting._prefName, options: ThirdPartyPasswordManagerType.choices)
         picklistFooterMessage = Strings.Password_manager_button_settings_footer
     }
 

@@ -9,11 +9,75 @@ var noPopupOnSites: [String] = []
 
 let kPrefName3rdPartyPasswordShortcutEnabled = "thirdPartyPasswordShortcutEnabled"
 
-typealias ThirdPartyPasswordManagerType = (displayName: String, cellLabel: String, prefId: Int)
-struct PasswordManagerButtonAction {
-    static let ShowPicker:ThirdPartyPasswordManagerType = (displayName: "Show picker", cellLabel: "", prefId: 0)
-    static let OnePassword:ThirdPartyPasswordManagerType = (displayName: "1Password", cellLabel: "1Password", prefId: 1)
-    static let LastPass:ThirdPartyPasswordManagerType = (displayName: "LastPass", cellLabel: "LastPass", prefId: 2)
+// Although this enum looks a bit bloated it is designed to completely centralize _all_ 3rd party PMs
+//  To add or remove a PM this is the _only_ place that requires modifications (except adding image)
+
+// To add new PM,
+//  1. Add to enum case
+//  2. Add image asset
+//  3. Add static dicts/arrays below
+
+enum ThirdPartyPasswordManagerType: Int {
+    case ShowPicker = 0
+    case OnePassword, LastPass, Bitwarden
+    
+    var prefId: Int { return self.rawValue }
+    
+    var displayName: String {
+        return ThirdPartyPasswordManagerType.PMDisplayTitles[self] ?? ""
+    }
+    
+    var cellLabel: String {
+        return self == .ShowPicker ? "" : self.displayName
+    }
+    
+    var icon: UIImage? {
+        return UIImage.templateImage(named: ThirdPartyPasswordManagerType.PMIconTitle[self] ?? "")
+    }
+    
+    func choice() -> (String, String, Int) {
+        return (displayName, cellLabel, prefId)
+    }
+    
+    static var choices: [Choice<String>] = {
+        return PMTypes.map { type in Choice<String> { type.choice() } }
+    }()
+    
+    // Same as icon, just sets a default as a fallback
+    static func icon(type type: ThirdPartyPasswordManagerType?) -> UIImage? {
+        return (type ?? .ShowPicker).icon
+    }
+    
+    static func passwordManager(action: String) -> ThirdPartyPasswordManagerType? {
+        if action.contains("onepassword") {
+            return .OnePassword
+        } else if action.contains("lastpass") {
+            return .LastPass
+        } else if action.contains("bitwarden") {
+            return .Bitwarden
+        }
+        return nil
+    }
+    
+    // Must have explicit type
+    // ALL PM types from above enum
+    static private let PMTypes = [ ThirdPartyPasswordManagerType.ShowPicker, .OnePassword, .LastPass, .Bitwarden ]
+    
+    // Titles to be displayed for user selection/view
+    static private let PMDisplayTitles: [ThirdPartyPasswordManagerType: String] = [
+        .ShowPicker : "Show picker",
+        .OnePassword : "1Password",
+        .LastPass : "LastPass",
+        .Bitwarden : "bitwarden"
+    ]
+    
+    // PM image names
+    static private let PMIconTitle: [ThirdPartyPasswordManagerType: String] = [
+        .ShowPicker: "key",
+        .OnePassword : "passhelper_1pwd",
+        .LastPass : "passhelper_lastpass",
+        .Bitwarden : "passhelper_bitwarden"
+    ]
 }
 
 extension LoginsHelper {
@@ -110,13 +174,12 @@ extension LoginsHelper {
             old.removeFromSuperview()
         }
 
-        let lastPassSelected = PasswordManagerButtonSetting.currentSetting?.prefId ?? 0 == PasswordManagerButtonAction.LastPass.prefId
-        let image = lastPassSelected ? UIImage(named: "passhelper_lastpass") : UIImage(named: "passhelper_1pwd")
+        let image = ThirdPartyPasswordManagerType.icon(type: PasswordManagerButtonSetting.currentSetting)
 
         let managerButton = UIButton(frame: CGRectMake(0, 0, 44, 44))
         managerButton.tag = tagForManagerButton
         managerButton.tintColor = BraveUX.DefaultBlue
-        managerButton.setImage(image?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
+        managerButton.setImage(image, forState: .Normal)
         managerButton.addTarget(self, action: #selector(LoginsHelper.onExecuteTapped), forControlEvents: .TouchUpInside)
         managerButton.sizeToFit()
         accessoryView.addSubview(managerButton)
@@ -127,7 +190,7 @@ extension LoginsHelper {
         managerButton.frame = managerButtonFrame
     }
 
-    // recurse through items until the 1pw/lastpass share item is found
+    // recurse through items until the 1pw/lastpass/bitwarden share item is found
     private func selectShareItem(view: UIView, shareItemName: String) -> Bool {
         if shareItemName.characters.count == 0 {
             return false
@@ -166,7 +229,7 @@ extension LoginsHelper {
     @objc func onExecuteTapped(sender: UIButton) {
         self.browser?.webView?.endEditing(true)
 
-        let automaticallyPickPasswordShareItem = PasswordManagerButtonSetting.currentSetting != nil && PasswordManagerButtonSetting.currentSetting!.prefId != PasswordManagerButtonAction.ShowPicker.prefId
+        let automaticallyPickPasswordShareItem = PasswordManagerButtonSetting.currentSetting != nil
 
         if automaticallyPickPasswordShareItem {
             UIActivityViewController.hackyHideSharePickerOn(true)
@@ -184,14 +247,9 @@ extension LoginsHelper {
             }
 
             // At this point, user has not explicitly selected a currentSetting, let's choose one for them if a PW manager was picked
-            if action.contains("onepassword") {
-                PasswordManagerButtonSetting.currentSetting = PasswordManagerButtonAction.OnePassword
-            }
-            else if action.contains("lastpass") {
-                PasswordManagerButtonSetting.currentSetting = PasswordManagerButtonAction.LastPass
-            }
-
-            if let setting = PasswordManagerButtonSetting.currentSetting {
+            if let setting = ThirdPartyPasswordManagerType.passwordManager(action) {
+                PasswordManagerButtonSetting.currentSetting = setting
+                // TODO: Move to currentSetting setter
                 BraveApp.getPrefs()?.setInt(Int32(setting.prefId), forKey: kPrefName3rdPartyPasswordShortcutEnabled)
             }
         }
