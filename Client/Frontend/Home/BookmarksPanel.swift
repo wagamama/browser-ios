@@ -349,6 +349,10 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         alert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
             textField.placeholder = "Folder name"
             textField.secureTextEntry = false
+            textField.keyboardAppearance = .Dark
+            textField.autocapitalizationType = .Words
+            textField.autocorrectionType = .Default
+            textField.returnKeyType = .Done
             NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.notificationReceived(_:)), name: UITextFieldTextDidChangeNotification, object: textField)
         })
         
