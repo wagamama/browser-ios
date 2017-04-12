@@ -226,7 +226,9 @@ class MigrateData: NSObject {
                 let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 5))) ?? ""
                 
                 if let bk = Bookmark.addForMigration(url: url, title: title, customTitle: description, parentFolder: relationshipHash[parentid] ?? nil, isFolder: (type == 2)) {
-                    bk.parentFolder = relationshipHash[parentid]
+                    let parent = relationshipHash[parentid]
+                    bk.parentFolder = parent
+                    bk.syncParentUUID = parent?.syncUUID
                     if let baseUrl = NSURL(string: url)?.baseURL {
                         bk.domain = Domain.getOrCreateForUrl(baseUrl, context: DataController.moc)
                     }
