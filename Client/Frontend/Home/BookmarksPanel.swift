@@ -489,7 +489,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 cell.imageView?.image = image
                 restrictImageSize()
             } else {
-                cell.imageView?.image = nil
+                cell.imageView?.image = UIImage(named: "defaultFavicon")
             }
         }
         
