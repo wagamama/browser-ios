@@ -93,7 +93,7 @@ class TopSitesPanel: UIViewController {
         let statsBottomMargin: CGFloat = 25.0
         
         privateTabMessageContainer = UIView()
-        privateTabMessageContainer.hidden = PrivateBrowsing.singleton.isOn == false
+        privateTabMessageContainer.hidden = !PrivateBrowsing.singleton.isOn
         
         privateTabGraphic = UIImageView(image: UIImage(named: "privateLion"))
         privateTabMessageContainer.addSubview(privateTabGraphic)
@@ -117,7 +117,7 @@ class TopSitesPanel: UIViewController {
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
         collection.delegate = self
-        collection.dataSource = PrivateBrowsing.singleton.isOn == false ? dataSource : nil
+        collection.dataSource = PrivateBrowsing.singleton.isOn ? nil : dataSource
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
         collection.keyboardDismissMode = .OnDrag
         collection.accessibilityIdentifier = "Top Sites View"
@@ -214,7 +214,7 @@ class TopSitesPanel: UIViewController {
             // TODO: This entire blockshould be abstracted
             //  to make code in this class DRY (duplicates from elsewhere)
             collection?.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
-            privateTabMessageContainer.hidden = PrivateBrowsing.singleton.isOn == false
+            privateTabMessageContainer.hidden = !PrivateBrowsing.singleton.isOn
             braveShieldStatsView?.timeStatView.color = PrivateBrowsing.singleton.isOn ? .whiteColor() : .blackColor()
             collection?.reloadData()
             break
@@ -247,7 +247,7 @@ class TopSitesPanel: UIViewController {
     }
 
     private func updateEmptyPanelState() {
-        if dataSource.count() == 0 && PrivateBrowsing.singleton.isOn == false {
+        if dataSource.count() == 0 && !PrivateBrowsing.singleton.isOn {
             if self.emptyStateOverlayView.superview == nil {
                 self.view.addSubview(self.emptyStateOverlayView)
                 self.emptyStateOverlayView.snp_makeConstraints { make -> Void in
@@ -813,7 +813,7 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
     }
 
     private func count() -> Int {
-        return PrivateBrowsing.singleton.isOn == false ? sites.count : 0
+        return PrivateBrowsing.singleton.isOn ? 0 : sites.count
     }
 
     private func extractDomainURL(url: String) -> String {
