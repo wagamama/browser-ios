@@ -157,8 +157,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
                     ClearPrivateDataTableViewController.clearPrivateData(clear).upon {
                         postAsyncToMain(0.1) {
                             PrivateBrowsing.singleton.enter()
-                            getApp().tabManager.addTab(isPrivate: false)
-                            getApp().tabManager.selectTab(getApp().tabManager.addTab(nil, isPrivate: true))
+                            getApp().tabManager.addTabAndSelect()
                         }
                     }
                 }

@@ -754,20 +754,37 @@ class BrowserViewController: UIViewController {
     }
     // Mark: Opening New Tabs
 
-    func switchToPrivacyMode(){
-        let isPrivate = true // this func should be expaneded to handle exiting, which requires a deferred return val
+    func switchBrowsingMode(toPrivate isPrivate: Bool, request: NSURLRequest? = nil) {
+        if PrivateBrowsing.singleton.isOn == isPrivate {
+            // No change
+            return
+        }
+        
+        func update() {
+            applyTheme(isPrivate ? Theme.PrivateMode : Theme.NormalMode)
+            
+            let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
+            tabTrayController.changePrivacyMode(isPrivate)
+            self.tabTrayController = tabTrayController
+            
+            // Should be fixed as part of larger privatemode refactor
+            //  But currently when switching to PM tabCount == 1, but no tabs actually
+            //  exist, so causes lot of issues, explicit check for isPM
+            if tabManager.tabCount == 0 || request != nil || isPrivate {
+                tabManager.addTabAndSelect(request)
+            }
+        }
+        
         if isPrivate {
             PrivateBrowsing.singleton.enter()
+            update()
+        } else {
+            PrivateBrowsing.singleton.exit().uponQueue(dispatch_get_main_queue()) {
+                self.tabManager.restoreTabs()
+                update()
+            }
         }
         // exiting is async and non-trivial for Brave, not currently handled here
-        
-        applyTheme(isPrivate ? Theme.PrivateMode : Theme.NormalMode)
-
-        let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
-        if tabTrayController.privateMode != isPrivate {
-            tabTrayController.changePrivacyMode(isPrivate)
-        }
-        self.tabTrayController = tabTrayController
     }
 
     func switchToTabForURLOrOpen(url: NSURL, isPrivate: Bool = false) {
@@ -785,19 +802,14 @@ class BrowserViewController: UIViewController {
             screenshotHelper.takeScreenshot(selectedTab)
         }
 
-        let request: NSURLRequest?
+        var request: NSURLRequest? = nil
         if let url = url {
             request = NSURLRequest(URL: url)
-        } else {
-            request = nil
         }
 
+        tabManager.addTab(request)
         let isPrivate = PrivateBrowsing.singleton.isOn
-
-        if isPrivate {
-            switchToPrivacyMode()
-        }
-        tabManager.addTabAndSelect(request, isPrivate: isPrivate)
+        switchBrowsingMode(toPrivate: isPrivate, request: request)
     }
 
     func openBlankNewTabAndFocus(isPrivate isPrivate: Bool = false) {

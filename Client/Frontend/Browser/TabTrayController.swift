@@ -559,9 +559,10 @@ class TabTrayController: UIViewController {
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
         self.collectionView.performBatchUpdates({ _ in
+            // TODO: This logic seems kind of finicky
             var tab: Browser?
             let tabID = TabMO.freshTab()
-            tab = self.tabManager.addTab(request, isPrivate: self.privateMode, id: tabID)
+            tab = self.tabManager.addTab(request, id: tabID)
             tab?.tabID = tabID
             
             if let tab = tab {

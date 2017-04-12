@@ -40,16 +40,17 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let openNewTabAction =  UIAlertAction(title: newTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                 actionSheetController.view.tag = 0 // BRAVE: clear this to allow navigation
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                    self.tabManager.addTab(NSURLRequest(URL: url), isPrivate: isPrivate)
+                    self.tabManager.addTab(NSURLRequest(URL: url))
                 })
             }
             actionSheetController.addAction(openNewTabAction)
 
             if !isPrivate {
+                // Only show this option if not in private mode, otherwise, new tab just opens in private mode (since that is the current mode)
                 let openNewPrivateTabTitle = Strings.Open_In_New_Private_Tab
                 let openNewPrivateTabAction =  UIAlertAction(title: openNewPrivateTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                     self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                        self.tabManager.addTabAndSelect(NSURLRequest(URL: url), isPrivate: true)
+                        self.switchBrowsingMode(toPrivate: true, request: NSURLRequest(URL: url))
                     })
                 }
                 actionSheetController.addAction(openNewPrivateTabAction)
@@ -71,15 +72,14 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             actionSheetController.addAction(shareAction)
         }
 
-        if let url = elements.image, let currentTab = tabManager.selectedTab {
+        if let url = elements.image {
             if dialogTitle == nil {
                 dialogTitle = url.absoluteString
             }
-            let isPrivate = currentTab.isPrivate
             let openImageTitle = Strings.Open_Image_In_Background_Tab
             let openImageAction = UIAlertAction(title: openImageTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                    self.tabManager.addTab(NSURLRequest(URL: url), isPrivate: isPrivate)
+                    self.tabManager.addTab(NSURLRequest(URL: url))
                 })
             }
             actionSheetController.addAction(openImageAction)

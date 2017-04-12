@@ -24,8 +24,7 @@ class BraveBrowserViewController : BrowserViewController {
 
         struct RunOnceAtStartup { static var ran = false }
         if !RunOnceAtStartup.ran && profile.prefs.boolForKey(kPrefKeyPrivateBrowsingAlwaysOn) ?? false {
-            getApp().browserViewController.switchToPrivacyMode()
-            getApp().tabManager.addTabAndSelect(isPrivate: true)
+            getApp().browserViewController.switchBrowsingMode(toPrivate: true)
         }
 
         RunOnceAtStartup.ran = true
@@ -57,12 +56,10 @@ class BraveBrowserViewController : BrowserViewController {
 
         struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
         dispatch_once(&RunOnceAtStartup.token) {
-            if BraveApp.shouldRestoreTabs() {
+            if BraveApp.shouldRestoreTabs() && !PrivateBrowsing.singleton.isOn {
+                // Only do tab restoration if in normal mode.
+                //  If in PM, restoration happens on leaving.
                 tabManager.restoreTabs()
-
-                if tabManager.tabCount < 1 {
-                    tabManager.addTabAndSelect()
-                }
             } else {
                 tabManager.addTabAndSelect()
             }

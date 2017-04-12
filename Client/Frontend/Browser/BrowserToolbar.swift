@@ -92,12 +92,7 @@ public class BrowserToolbarHelper: NSObject {
     
     func SELdidClickAddTab() {
         let app = UIApplication.sharedApplication().delegate as! AppDelegate
-        let isPrivate = PrivateBrowsing.singleton.isOn
-        if isPrivate {
-            app.tabManager.addTabAndSelect(nil, configuration: nil, isPrivate: true)
-        } else {
-            app.tabManager.addTabAndSelect()
-        }
+        app.tabManager.addTabAndSelect()
         app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
     }
 }

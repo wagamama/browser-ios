@@ -53,6 +53,11 @@ extension TabManager {
     }
 
     func restoreTabs() {
+        struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
+        dispatch_once(&RunOnceAtStartup.token, restoreTabsInternal)
+    }
+
+    private func restoreTabsInternal() {
         var tabToSelect: Browser?
         let savedTabs = TabMO.getAll(DataController.moc)
         for savedTab in savedTabs {
@@ -63,7 +68,7 @@ extension TabManager {
                 continue
             }
             
-            guard let tab = addTab(nil, configuration: nil, zombie: true, isPrivate: false, id: savedTab.syncUUID) else { return }
+            guard let tab = addTab(nil, configuration: nil, zombie: true, id: savedTab.syncUUID) else { return }
             
             debugPrint(savedTab)
             
@@ -84,6 +89,8 @@ extension TabManager {
         // Only tell our delegates that we restored tabs if we actually restored a tab(s)
         if savedTabs.count > 0 {
             delegates.forEach { $0.value?.tabManagerDidRestoreTabs(self) }
+        } else {
+            tabToSelect = addTab()
         }
 
         if let tab = tabToSelect {

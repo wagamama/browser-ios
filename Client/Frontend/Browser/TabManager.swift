@@ -215,14 +215,8 @@ class TabManager : NSObject {
         return tab
     }
 
-    func addTabAndSelect(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil, isPrivate: Bool) -> Browser? {
-        guard let tab = addTab(request, configuration: configuration, isPrivate: isPrivate, id: TabMO.freshTab()) else { return nil }
-        selectTab(tab)
-        return tab
-    }
-
     func addTabAndSelect(request: NSURLRequest! = nil, configuration: WKWebViewConfiguration! = nil) -> Browser? {
-        guard let tab = addTab(request, configuration: configuration, isPrivate: PrivateBrowsing.singleton.isOn, id: TabMO.freshTab()) else { return nil }
+        guard let tab = addTab(request, configuration: configuration, id: TabMO.freshTab()) else { return nil }
         selectTab(tab)
         return tab
     }
@@ -289,13 +283,14 @@ class TabManager : NSObject {
         }
     }
 
-    func addTab(request: NSURLRequest? = nil, configuration: WKWebViewConfiguration? = nil, zombie: Bool = false, isPrivate:Bool = false, id: String? = nil) -> Browser? {
+    func addTab(request: NSURLRequest? = nil, configuration: WKWebViewConfiguration? = nil, zombie: Bool = false, id: String? = nil) -> Browser? {
         debugNoteIfNotMainThread()
         if (!NSThread.isMainThread()) { // No logical reason this should be off-main, don't add a tab.
             return nil
         }
         objc_sync_enter(self); defer { objc_sync_exit(self) }
 
+        let isPrivate = PrivateBrowsing.singleton.isOn
         let tab = Browser(configuration: self.configuration, isPrivate: isPrivate)
         if id != nil {
             tab.tabID = id
@@ -370,7 +365,7 @@ class TabManager : NSObject {
 
         // Make sure we never reach 0 normal tabs
         if tabs.displayedTabsForCurrentPrivateMode.count == 0 && createTabIfNoneLeft {
-            let tab = addTab(isPrivate: PrivateBrowsing.singleton.isOn, id: TabMO.freshTab())
+            let tab = addTab(id: TabMO.freshTab())
             selectTab(tab)
         }
         

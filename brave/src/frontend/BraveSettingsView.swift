@@ -118,13 +118,7 @@ class BraveSettingsView : AppSettingsTableViewController {
             SettingSection(title: NSAttributedString(string: Strings.Privacy.uppercaseString), children:
                 [ClearPrivateDataSetting(settings: self), CookieSetting(profile: self.profile),
                     BoolSetting(prefs: prefs, prefKey: kPrefKeyPrivateBrowsingAlwaysOn, defaultValue: false, titleText: Strings.Private_Browsing_Only, statusText: nil, settingDidChange: { isOn in
-                        if !isOn {
-                            return
-                        }
-                        if !PrivateBrowsing.singleton.isOn {
-                            getApp().browserViewController.switchToPrivacyMode()
-                            getApp().tabManager.addTabAndSelect(isPrivate: true)
-                        }
+                        getApp().browserViewController.switchBrowsingMode(toPrivate: isOn)
                     })]
             ),
             SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults.uppercaseString), children: shieldSettingsList)]
