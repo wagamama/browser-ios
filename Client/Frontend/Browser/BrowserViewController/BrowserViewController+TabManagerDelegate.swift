@@ -39,7 +39,7 @@ extension BrowserViewController: TabManagerDelegate {
             //                webView.scrollView.hidden = false
             //            }
 
-            updateURLBarDisplayURL(tab)
+            updateURLBarDisplayURL(tab: tab)
 
             if tab.isPrivate {
                 readerModeCache = MemoryReaderModeCache.sharedInstance
@@ -61,21 +61,14 @@ extension BrowserViewController: TabManagerDelegate {
             #endif
             addOpenInViewIfNeccessary(webView.URL)
 
-            if let url = webView.URL?.absoluteString {
+            if let url = webView.URL {
                 // Don't bother fetching bookmark state for about/sessionrestore and about/home.
-                if AboutUtils.isAboutURL(webView.URL) {
+                if AboutUtils.isAboutURL(url) {
                     // Indeed, because we don't show the toolbar at all, don't even blank the star.
                 } else {
-                    profile.bookmarks.modelFactory >>== {
-                        $0.isBookmarked(url).uponQueue(dispatch_get_main_queue()) {
-                            guard let isBookmarked = $0.successValue else {
-                                log.error("Error getting bookmark status: \($0.failureValue).")
-                                return
-                            }
-
-                            self.urlBar.updateBookmarkStatus(isBookmarked)
-                        }
-                    }
+                    Bookmark.contains(url: url, completionOnMain: { isBookmarked in
+                        self.urlBar.updateBookmarkStatus(isBookmarked)
+                    })
                 }
             } else {
                 // The web view can go gray if it was zombified due to memory pressure.
@@ -121,16 +114,12 @@ extension BrowserViewController: TabManagerDelegate {
             updateTabCountUsingTabManager(tabManager)
         }
         tab.browserDelegate = self
-
-        telemetry(action: "add tab", props: ["isPrivate" : "\(tab.isPrivate)"])
     }
 
     func tabManager(tabManager: TabManager, didRemoveTab tab: Browser) {
         updateTabCountUsingTabManager(tabManager)
         // browserDelegate is a weak ref (and the tab's webView may not be destroyed yet)
         // so we don't expcitly unset it.
-
-        telemetry(action: "remove tab", props: ["isPrivate" : "\(tab.isPrivate)"])
     }
 
     func tabManagerDidAddTabs(tabManager: TabManager) {

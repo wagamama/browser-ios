@@ -167,8 +167,6 @@ class BoolSetting: Setting {
     @objc func switchValueChanged(control: UISwitch) {
         prefs.setBool(control.on, forKey: prefKey)
         settingDidChange?(control.on)
-
-        telemetry(action: "setting changed", props: ["(control.title)" : "\(control.on)"])
     }
 }
 
@@ -189,7 +187,6 @@ class SettingsTableViewController: UITableViewController {
     weak var settingsDelegate: SettingsDelegate?
 
     var profile: Profile!
-    ///var tabManager: TabManager!
 
     /// Used to calculate cell heights.
     private lazy var dummyToggleCell: UITableViewCell = {
@@ -386,13 +383,13 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
         }
     }
 
-    var showTopBorder: Bool = true {
+    var showTopBorder: Bool = false {
         didSet {
             topBorder.hidden = !showTopBorder
         }
     }
 
-    var showBottomBorder: Bool = true {
+    var showBottomBorder: Bool = false {
         didSet {
             bottomBorder.hidden = !showBottomBorder
         }
@@ -448,8 +445,8 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        showTopBorder = true
-        showBottomBorder = true
+        showTopBorder = false
+        showBottomBorder = false
         titleLabel.text = nil
         titleAlignment = .Bottom
     }

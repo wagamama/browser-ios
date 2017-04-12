@@ -42,7 +42,6 @@ class SearchEnginePicker: UITableViewController {
 
         guard let cell = tableView.cellForRowAtIndexPath(indexPath) else { return }
         cell.accessoryType = UITableViewCellAccessoryType.Checkmark
-        telemetry(action: "search engine changed", props: ["engine" : cell.textLabel?.text ?? ""])
     }
 
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {

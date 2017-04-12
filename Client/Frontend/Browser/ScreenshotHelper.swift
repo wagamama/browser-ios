@@ -31,9 +31,7 @@ class ScreenshotHelper {
                 if showForScreenshot {
                     getApp().rootViewController.view.insertSubview(wv, atIndex: 0)
                     wv.frame = wv.convertRect(getApp().tabManager.selectedTab?.webView?.frame ?? CGRectZero, toView: nil)
-                    print(wv.frame)
                     postAsyncToMain(0.1) { [weak tab] in
-                        print(tab?.webView?.frame)
                         screenshot = tab?.webView?.screenshot(offset: offset)
                         tab?.setScreenshot(screenshot)
 

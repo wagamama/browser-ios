@@ -148,9 +148,6 @@ class TabsBarViewController: UIViewController {
     }
 
     override func viewDidAppear(animated: Bool) {
-        addLeftRightScrollHint(isRightSide: false, maskLayer: leftOverflowIndicator)
-        addLeftRightScrollHint(isRightSide: true, maskLayer: rightOverflowIndicator)
-
         if tabs.count < 1 {
             return
         }
@@ -181,11 +178,13 @@ class TabsBarViewController: UIViewController {
         overflowIndicators()
         
         scrollView.layoutIfNeeded()
+        
+        addLeftRightScrollHint(isRightSide: false, maskLayer: leftOverflowIndicator)
+        addLeftRightScrollHint(isRightSide: true, maskLayer: rightOverflowIndicator)
     }
 
 
     func addTab(browser browser: Browser) -> TabWidget {
-    
         let t = TabWidget(browser: browser, parentScrollView: scrollView)
         t.delegate = self
         
@@ -272,7 +271,7 @@ class TabsBarViewController: UIViewController {
 
     func addLeftRightScrollHint(isRightSide isRightSide: Bool, maskLayer: CAGradientLayer) {
         maskLayer.removeFromSuperlayer()
-        let colors = [UIColor(white: 80/255, alpha: 0).CGColor, UIColor(white:66/255, alpha: 1.0).CGColor]
+        let colors = PrivateBrowsing.singleton.isOn ? [BraveUX.DarkToolbarsBackgroundSolidColor.colorWithAlphaComponent(0).CGColor, BraveUX.DarkToolbarsBackgroundSolidColor.CGColor] : [BraveUX.ToolbarsBackgroundSolidColor.colorWithAlphaComponent(0).CGColor, BraveUX.ToolbarsBackgroundSolidColor.CGColor]
         let locations = [0.9, 1.0]
         maskLayer.startPoint = CGPoint(x: isRightSide ? 0 : 1.0, y: 0.5)
         maskLayer.endPoint = CGPoint(x: isRightSide ? 1.0 : 0, y: 0.5)

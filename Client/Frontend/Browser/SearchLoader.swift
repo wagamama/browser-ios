@@ -6,6 +6,7 @@ import Foundation
 import Shared
 import Storage
 import XCGLogger
+import Deferred
 
 private let log = Logger.browserLogger
 
@@ -19,7 +20,7 @@ typealias SearchLoader = _SearchLoader<AnyObject, AnyObject>
  * Shared data source for the SearchViewController and the URLBar domain completion.
  * Since both of these use the same SQL query, we can perform the query once and dispatch the results.
  */
-class _SearchLoader<UnusedA, UnusedB>: Loader<Cursor<Site>, SearchViewController> {
+class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
     private let profile: Profile
     private let urlBar: URLBarView
     private var inProgress: Cancellable? = nil
@@ -35,10 +36,43 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<Cursor<Site>, SearchViewController
         return try! String(contentsOfFile: filePath!).componentsSeparatedByString("\n")
     }()
 
+    // TODO: This is not a proper frecency query, it just gets sites from the past week
+    private func getSitesByFrecency() -> Deferred<[Site]> {
+        let result = Deferred<[Site]>()
+
+        let context = DataController.shared.workerContext()
+        context.performBlock {
+            var sites = [Site]()
+
+            let historyItems = History.frecencyQuery(context)
+            for h in historyItems {
+                let s = Site(url: h.url ?? "", title: h.title ?? "")
+
+                if let url = h.domain?.favicon?.url {
+                    s.icon = Favicon(url: url, type: IconType.Guess)
+                }
+                sites.append(s)
+            }
+
+            for bm in Bookmark.frecencyQuery(context) {
+                let s = Site(url: bm.url ?? "", title: bm.title ?? "", bookmarked: true)
+
+                if let url = bm.domain?.favicon?.url {
+                    s.icon = Favicon(url: url, type: IconType.Guess)
+                }
+                sites.append(s)
+            }
+
+
+            result.fill(sites)
+        }
+        return result
+    }
+
     var query: String = "" {
         didSet {
             if query.isEmpty {
-                self.load(Cursor(status: .Success, msg: "Empty query"))
+                self.load([Site]())
                 return
             }
 
@@ -47,33 +81,30 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<Cursor<Site>, SearchViewController
                 self.inProgress = nil
             }
 
-            let deferred = self.profile.history.getSitesByFrecencyWithHistoryLimit(100, bookmarksLimit: 5, whereURLContains: query)
+            let deferred = getSitesByFrecency()
             inProgress = deferred as? Cancellable
 
             deferred.uponQueue(dispatch_get_main_queue()) { result in
                 self.inProgress = nil
 
-                // Failed cursors are excluded in .get().
-                if let cursor = result.successValue {
-                    // First, see if the query matches any URLs from the user's search history.
-                    self.load(cursor)
-                    for site in cursor {
-                        if let url = site?.url,
-                               completion = self.completionForURL(url) {
-                            self.urlBar.setAutocompleteSuggestion(completion)
-                            return
-                        }
+                // First, see if the query matches any URLs from the user's search history.
+                self.load(result)
+                for site in result {
+                    if let completion = self.completionForURL(site.url) {
+                        self.urlBar.setAutocompleteSuggestion(completion)
+                        return
                     }
+                }
 
-                    // If there are no search history matches, try matching one of the Alexa top domains.
-                    for domain in self.topDomains {
-                        if let completion = self.completionForDomain(domain) {
-                            self.urlBar.setAutocompleteSuggestion(completion)
-                            return
-                        }
+                // If there are no search history matches, try matching one of the Alexa top domains.
+                for domain in self.topDomains {
+                    if let completion = self.completionForDomain(domain) {
+                        self.urlBar.setAutocompleteSuggestion(completion)
+                        return
                     }
                 }
             }
+
         }
     }
 

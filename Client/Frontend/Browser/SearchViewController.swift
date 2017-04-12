@@ -13,7 +13,8 @@ private let PromptNo = Strings.No
 private enum SearchListSection: Int {
     case SearchSuggestions
     case BookmarksAndHistory
-    static let Count = 2
+    case FindInPage
+    static let Count = 3
 }
 
 private struct SearchViewControllerUX {
@@ -49,11 +50,15 @@ private struct SearchViewControllerUX {
 
 protocol SearchViewControllerDelegate: class {
     func searchViewController(searchViewController: SearchViewController, didSelectURL url: NSURL)
+    func searchViewController(searchViewController: SearchViewController, shouldFindInPage query: String)
     func presentSearchSettingsController()
 }
 
 class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, LoaderListener {
     var searchDelegate: SearchViewControllerDelegate?
+
+    //var profile: Profile!
+    var data = [Site]()
 
     private let isPrivate: Bool
     private var suggestClient: SearchSuggestClient?
@@ -462,7 +467,7 @@ class SearchViewController: SiteTableViewController, KeyboardHelperDelegate, Loa
         })
     }
 
-    func loader(dataLoaded data: Cursor<Site>) {
+    func loader(dataLoaded data: [Site]) {
         self.data = data
         tableView.reloadData()
     }
@@ -472,11 +477,14 @@ extension SearchViewController {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let section = SearchListSection(rawValue: indexPath.section)!
         if section == SearchListSection.BookmarksAndHistory {
-            if let site = data[indexPath.row] {
+            let site = data[indexPath.row]
                 if let url = NSURL(string: site.url) {
                     searchDelegate?.searchViewController(self, didSelectURL: url)
                 }
-            }
+
+        }
+        else if section == SearchListSection.FindInPage {
+            searchDelegate?.searchViewController(self, shouldFindInPage: searchQuery)
         }
     }
 
@@ -497,7 +505,28 @@ extension SearchViewController {
     }
 
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
+        switch SearchListSection(rawValue: section)! {
+        case .SearchSuggestions:
+            return 0
+        case .BookmarksAndHistory:
+            return 0
+        case .FindInPage:
+            return 22
+        }
+    }
+    
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if let currentSection = SearchListSection(rawValue: section) {
+            switch currentSection {
+            case .FindInPage:
+                let header = super.tableView(tableView, viewForHeaderInSection: section) as! SiteTableViewHeader
+                header.titleLabel.text = Strings.SearchInPage
+                return header
+            default:
+                return super.tableView(tableView, viewForHeaderInSection: section)
+            }
+        }
+        return super.tableView(tableView, viewForHeaderInSection: section)
     }
 }
 
@@ -512,14 +541,19 @@ extension SearchViewController {
 
         case .BookmarksAndHistory:
             let cell = super.tableView(tableView, cellForRowAtIndexPath: indexPath)
-            if let site = data[indexPath.row] {
-                if let cell = cell as? TwoLineTableViewCell {
-                    let isBookmark = site.bookmarked ?? false
-                    cell.setLines(site.title, detailText: site.url)
-                    cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
-                    cell.imageView?.setIcon(site.icon, withPlaceholder: FaviconFetcher.defaultFavicon)
-                }
+            let site = data[indexPath.row]
+            if let cell = cell as? TwoLineTableViewCell {
+                let isBookmark = site.bookmarked ?? false
+                cell.setLines(site.title, detailText: site.url)
+                cell.setRightBadge(isBookmark ? self.bookmarkedBadge : nil)
+                cell.imageView?.setIcon(site.icon, withPlaceholder: FaviconFetcher.defaultFavicon)
             }
+
+            return cell
+        case .FindInPage:
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+            cell.textLabel?.text = String(format: Strings.FindInPage, searchQuery)
+            cell.imageView?.image = UIImage(named: "quickSearch")
             return cell
         }
     }
@@ -530,6 +564,8 @@ extension SearchViewController {
             return searchEngines.shouldShowSearchSuggestions && !searchQuery.looksLikeAURL() && !isPrivate ? 1 : 0
         case .BookmarksAndHistory:
             return data.count
+        case .FindInPage:
+            return 1
         }
     }
 

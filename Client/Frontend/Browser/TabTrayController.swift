@@ -490,8 +490,6 @@ class TabTrayController: UIViewController {
     }
     
     func SELdidTogglePrivateMode() {
-        telemetry(action: "Private mode button tapped", props: nil)
-
         let fromView: UIView
         if privateTabsAreEmpty() {
             fromView = emptyPrivateTabsView
@@ -504,8 +502,10 @@ class TabTrayController: UIViewController {
 
         privateMode = !privateMode
         if privateMode {
+            telemetry(action: "Entering Private Mode", props: nil)
             PrivateBrowsing.singleton.enter()
         } else {
+            telemetry(action: "Leaving Private Mode", props: nil)
             view.userInteractionEnabled = false
             let activityView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
             activityView.center = view.center
@@ -559,9 +559,12 @@ class TabTrayController: UIViewController {
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
         self.collectionView.performBatchUpdates({ _ in
+            // TODO: This logic seems kind of finicky
             var tab: Browser?
-            tab = self.tabManager.addTab(request, isPrivate: self.privateMode)
-
+            let tabID = TabMO.freshTab()
+            tab = self.tabManager.addTab(request, id: tabID)
+            tab?.tabID = tabID
+            
             if let tab = tab {
                 self.tabManager.selectTab(tab)
             }

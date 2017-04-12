@@ -17,10 +17,8 @@ private struct HomePanelViewControllerUX {
 }
 
 protocol HomePanelViewControllerDelegate: class {
-    func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL, visitType: VisitType)
+    func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL)
     func homePanelViewController(HomePanelViewController: HomePanelViewController, didSelectPanel panel: Int)
-    func homePanelViewControllerDidRequestToSignIn(homePanelViewController: HomePanelViewController)
-    func homePanelViewControllerDidRequestToCreateAccount(homePanelViewController: HomePanelViewController)
 }
 
 @objc
@@ -35,9 +33,7 @@ struct HomePanelUX {
 
 @objc
 protocol HomePanelDelegate: class {
-    func homePanelDidRequestToSignIn(homePanel: HomePanel)
-    func homePanelDidRequestToCreateAccount(homePanel: HomePanel)
-    func homePanel(homePanel: HomePanel, didSelectURL url: NSURL, visitType: VisitType)
+    func homePanel(homePanel: HomePanel, didSelectURL url: NSURL)
     optional func homePanel(homePanel: HomePanel, didSelectURLString url: String, visitType: VisitType)
     optional func homePanelWillEnterEditingMode(homePanel: HomePanel)
 }
@@ -223,7 +219,7 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
         }
     }
 
-    func homePanel(homePanel: HomePanel, didSelectURLString url: String, visitType: VisitType) {
+    func homePanel(homePanel: HomePanel, didSelectURLString url: String) {
         // If we can't get a real URL out of what should be a URL, we let the user's
         // default search engine give it a shot.
         // Typically we'll be in this state if the user has tapped a bookmarked search template
@@ -236,19 +232,11 @@ class HomePanelViewController: UIViewController, UITextFieldDelegate, HomePanelD
             return
         }
 
-        return self.homePanel(homePanel, didSelectURL: url, visitType: visitType)
+        return self.homePanel(homePanel, didSelectURL: url)
     }
 
-    func homePanel(homePanel: HomePanel, didSelectURL url: NSURL, visitType: VisitType) {
-        delegate?.homePanelViewController(self, didSelectURL: url, visitType: visitType)
-    }
-
-    func homePanelDidRequestToCreateAccount(homePanel: HomePanel) {
-        delegate?.homePanelViewControllerDidRequestToCreateAccount(self)
-    }
-
-    func homePanelDidRequestToSignIn(homePanel: HomePanel) {
-        delegate?.homePanelViewControllerDidRequestToSignIn(self)
+    func homePanel(homePanel: HomePanel, didSelectURL url: NSURL) {
+        delegate?.homePanelViewController(self, didSelectURL: url)
     }
 
     func homePanelWillEnterEditingMode(homePanel: HomePanel) {

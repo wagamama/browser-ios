@@ -40,19 +40,18 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let openNewTabAction =  UIAlertAction(title: newTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                 actionSheetController.view.tag = 0 // BRAVE: clear this to allow navigation
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                    self.tabManager.addTab(NSURLRequest(URL: url), isPrivate: isPrivate)
+                    self.tabManager.addTab(NSURLRequest(URL: url))
                 })
-                telemetry(action: "New tab", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(openNewTabAction)
 
             if !isPrivate {
+                // Only show this option if not in private mode, otherwise, new tab just opens in private mode (since that is the current mode)
                 let openNewPrivateTabTitle = Strings.Open_In_New_Private_Tab
                 let openNewPrivateTabAction =  UIAlertAction(title: openNewPrivateTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                     self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                        self.tabManager.addTabAndSelect(NSURLRequest(URL: url), isPrivate: true)
+                        self.switchBrowsingMode(toPrivate: true, request: NSURLRequest(URL: url))
                     })
-                    telemetry(action: "New private tab", props: ["source" : "context menu"])
                 }
                 actionSheetController.addAction(openNewPrivateTabAction)
             }
@@ -63,29 +62,25 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 if let dialogTitle = dialogTitle, url = NSURL(string: dialogTitle) {
                     pasteBoard.URL = url
                 }
-                telemetry(action: "copy link", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(copyAction)
 
             let shareTitle = Strings.Share_Link
             let shareAction = UIAlertAction(title: shareTitle, style: UIAlertActionStyle.Default) { _ in
                 self.presentActivityViewController(url, tab: currentTab, sourceView: self.view, sourceRect: CGRect(origin: touchPoint, size: touchSize), arrowDirection: .Any)
-                telemetry(action: "share link", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(shareAction)
         }
 
-        if let url = elements.image, let currentTab = tabManager.selectedTab {
+        if let url = elements.image {
             if dialogTitle == nil {
                 dialogTitle = url.absoluteString
             }
-            let isPrivate = currentTab.isPrivate
             let openImageTitle = Strings.Open_Image_In_Background_Tab
             let openImageAction = UIAlertAction(title: openImageTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                    self.tabManager.addTab(NSURLRequest(URL: url), isPrivate: isPrivate)
+                    self.tabManager.addTab(NSURLRequest(URL: url))
                 })
-                telemetry(action: "New tab", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(openImageAction)
 
@@ -104,7 +99,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                     accessDenied.addAction(settingsAction)
                     self.presentViewController(accessDenied, animated: true, completion: nil)
                 }
-                telemetry(action: "share link", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(saveImageAction)
 
@@ -133,7 +127,6 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
                         application.endBackgroundTask(taskId)
                 }
-                telemetry(action: "copy image", props: ["source" : "context menu"])
             }
             actionSheetController.addAction(copyAction)
         }

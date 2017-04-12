@@ -244,7 +244,6 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
     }
 
     func SELstartBrowsing() {
-        telemetry(action: "Intro: start browsing", props: nil)
         delegate?.introViewControllerDidFinish(self)
     }
 
@@ -303,7 +302,6 @@ class IntroViewController: UIViewController, UIScrollViewDelegate {
 
 
     private func setActiveIntroView(newIntroView: UIView, forPage page: Int) {
-        telemetry(action: "Intro: page changed", props: ["page" : "\(page)"])
 
         if introView != newIntroView {
             UIView.animateWithDuration(IntroViewControllerUX.FadeDuration, animations: { () -> Void in

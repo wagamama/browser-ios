@@ -6,12 +6,7 @@
  */
 
 class BlankTargetLinkHandler {
-//    private static var enabled = false
-//    static func updatedEnabledState() {
-//        if let profile = getApp().profile {
-//            enabled = !(profile.prefs.boolForKey("blockPopups") ?? true)
-//        }
-//    }
+    private var tapLocation = CGPointZero
 
     func isBrowserTopmost() -> Bool {
         return getApp().rootViewController.visibleViewController as? BraveTopViewController != nil
@@ -37,21 +32,27 @@ class BlankTargetLinkHandler {
                 return
             }
 
+            if touch.phase != .Began && tapLocation == CGPointZero {
+                webView.blankTargetUrl = nil
+                return
+            }
+
             switch touch.phase {
-            case .Began:  // A finger touched the screen
-                let tapLocation = touch.locationInView(window)
-                if let element = ElementAtPoint().getHit(tapLocation),
-                    url = element.url,
-                    t = element.urlTarget where t == "_blank"
-                {
-                    webView.urlBlankTargetTapped(url)
-                    print("LinkTargetBlankHandler \(element)")
+            case .Began:
+                tapLocation = touch.locationInView(window)
+                if let element = ElementAtPoint().getHit(tapLocation), url = element.url,
+                    t = element.urlTarget where t == "_blank" {
+                    webView.blankTargetUrl = url
+                } else {
+                    tapLocation = CGPointZero
                 }
 
-                break
-            case .Moved, .Stationary:
-                break
+            case .Moved:
+                tapLocation = CGPointZero
+                webView.blankTargetUrl = nil
             case .Ended, .Cancelled:
+                tapLocation = CGPointZero
+            case .Stationary:
                 break
             }
         }

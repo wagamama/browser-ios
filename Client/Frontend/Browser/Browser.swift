@@ -6,6 +6,7 @@ import Foundation
 import WebKit
 import Storage
 import Shared
+import CoreData
 
 import XCGLogger
 
@@ -119,6 +120,8 @@ class Browser: NSObject, BrowserWebViewDelegate {
     var lastRequest: NSURLRequest? = nil
     var restoring: Bool = false
     var pendingScreenshot = false
+    
+    var tabID: String?
 
     /// The last title shown by this tab. Used by the tab tray to show titles for zombie tabs.
     var lastTitle: String?
@@ -223,7 +226,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             webView.navigationDelegate = navigationDelegate
             helperManager = HelperManager(webView: webView)
 
-            restore(webView)
+            restore(webView, restorationData: nil)
 
             _webView = webView
             browserDelegate?.browser(self, didCreateWebView: self.webView!)
@@ -237,22 +240,23 @@ class Browser: NSObject, BrowserWebViewDelegate {
         }
     }
 
-    func restore(webView: BraveWebView) {
+    func restore(webView: BraveWebView, restorationData: SavedTab?) {
         // Pulls restored session data from a previous SavedTab to load into the Browser. If it's nil, a session restore
         // has already been triggered via custom URL, so we use the last request to trigger it again; otherwise,
         // we extract the information needed to restore the tabs and create a NSURLRequest with the custom session restore URL
         // to trigger the session restore via custom handlers
-        if let sessionData = self.sessionData {
+        if let sessionData = restorationData {
             #if !BRAVE // no idea why restoring is needed, but it causes the displayed url not to update, which is bad
                 restoring = true
             #endif
-            lastTitle = sessionData.currentTitle
+            lastTitle = sessionData.title
             if let title = lastTitle {
                 webView.title = title
             }
             var updatedURLs = [String]()
             var prev = ""
-            for url in sessionData.urls {
+            for urlString in sessionData.history {
+                guard let url = NSURL(string: urlString) else { continue }
                 let updatedURL = WebServer.sharedInstance.updateLocalURL(url)!.absoluteString
                 guard let curr = updatedURL?.regexReplacePattern("https?:..", with: "") else { continue }
                 if curr.characters.count > 1 && curr == prev {
@@ -260,13 +264,12 @@ class Browser: NSObject, BrowserWebViewDelegate {
                 }
                 prev = curr
                 updatedURLs.append(updatedURL!)
-                print("😇" + updatedURL!)
             }
-            let currentPage = sessionData.currentPage
+            let currentPage = sessionData.historyIndex
             self.sessionData = nil
             var jsonDict = [String: AnyObject]()
             jsonDict["history"] = updatedURLs
-            jsonDict["currentPage"] = currentPage
+            jsonDict["currentPage"] = Int(currentPage)
             let escapedJSON = JSON.stringify(jsonDict, pretty: false).stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
             let restoreURL = NSURL(string: "\(WebServer.sharedInstance.base)/about/sessionrestore?history=\(escapedJSON)")
             lastRequest = NSURLRequest(URL: restoreURL!)
@@ -361,7 +364,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
         var width = 0
         var largest: Favicon?
         for icon in favicons {
-            if icon.0 != webView?.URL?.baseDomain() {
+            if icon.0 != webView?.URL?.normalizedHost() {
                 continue
             }
             if icon.1.width > width {

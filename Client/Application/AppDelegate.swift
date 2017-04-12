@@ -122,6 +122,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true
         self.window!.rootViewController = rootViewController
+        
+        // TODO: Show activity indicator instead of launching app.
+        _ = MigrateData(completed: { (success) in
+            if success {
+                // TODO: Remove activity indicator.
+            }
+        })
 
 #if !BRAVE
         activeCrashReporter = BreakpadCrashReporter(breakpadInstance: BreakpadController.sharedInstance())
@@ -389,7 +396,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 viewURLInNewTab(notification)
                 switch(action) {
                 case .Bookmark:
-                    addBookmark(notification)
+                    //addBookmark(notification)
                     break
                 case .ReadingList:
                     addToReadingList(notification)
@@ -428,16 +435,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
 
-            if DebugSettingsBundleOptions.attachTabStateToDebugEmail {
-                if let tabStateDebugData = TabManager.tabRestorationDebugInfo().dataUsingEncoding(NSUTF8StringEncoding) {
-                    mailComposeViewController.addAttachmentData(tabStateDebugData, mimeType: "text/plain", fileName: "tabState.txt")
-                }
-
-                if let tabStateData = TabManager.tabArchiveData() {
-                    mailComposeViewController.addAttachmentData(tabStateData, mimeType: "application/octet-stream", fileName: "tabsState.archive")
-                }
-            }
-
             self.window?.rootViewController?.presentViewController(mailComposeViewController, animated: true, completion: nil)
         }
     }
@@ -458,18 +455,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    private func addBookmark(notification: UILocalNotification) {
-        if let alertURL = notification.userInfo?[TabSendURLKey] as? String,
-            let title = notification.userInfo?[TabSendTitleKey] as? String {
-                browserViewController.addBookmark(alertURL, title: title)
-
-//                if #available(iOS 9, *) {
-//                    let userData = [QuickActions.TabURLKey: alertURL,
-//                        QuickActions.TabTitleKey: title]
-//                    QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastBookmark, withUserData: userData, toApplication: UIApplication.sharedApplication())
-//                }
-        }
-    }
 
     private func addToReadingList(notification: UILocalNotification) {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String,

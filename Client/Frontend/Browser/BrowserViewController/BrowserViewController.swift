@@ -6,7 +6,7 @@ import Foundation
 import UIKit
 import WebKit
 import Shared
-import Storage
+import CoreData
 import SnapKit
 import XCGLogger
 import Shared
@@ -95,7 +95,7 @@ class BrowserViewController: UIViewController {
     // Tracking navigation items to record history types.
     // TODO: weak references?
     var ignoredNavigation = Set<WKNavigation>()
-    var typedNavigation = [WKNavigation: VisitType]()
+
     var navigationToolbar: BrowserToolbarProtocol {
         return toolbar ?? urlBar
     }
@@ -200,7 +200,7 @@ class BrowserViewController: UIViewController {
 
         if let tab = tabManager.selectedTab,
                webView = tab.webView {
-            updateURLBarDisplayURL(tab)
+            updateURLBarDisplayURL(tab: tab)
             navigationToolbar.updateBackStatus(webView.canGoBack)
             navigationToolbar.updateForwardStatus(webView.canGoForward)
             navigationToolbar.updateReloadStatus(tab.loading ?? false)
@@ -266,7 +266,6 @@ class BrowserViewController: UIViewController {
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: BookmarkStatusChangedNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillEnterForegroundNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationDidEnterBackgroundNotification, object: nil)
@@ -281,7 +280,7 @@ class BrowserViewController: UIViewController {
         log.debug("BVC viewDidLoad…")
         super.viewDidLoad()
         log.debug("BVC super viewDidLoad called.")
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELBookmarkStatusDidChange(_:)), name: BookmarkStatusChangedNotification, object: nil)
+
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELappWillResignActiveNotification), name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELappDidBecomeActiveNotification), name: UIApplicationDidBecomeActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BrowserViewController.SELappDidEnterBackgroundNotification), name: UIApplicationDidEnterBackgroundNotification, object: nil)
@@ -419,34 +418,14 @@ class BrowserViewController: UIViewController {
     }
 
     private func dequeueQueuedTabs() {
-        assert(!NSThread.currentThread().isMainThread, "This must be called in the background.")
-        self.profile.queue.getQueuedTabs() >>== { cursor in
-
-            // This assumes that the DB returns rows in some kind of sane order.
-            // It does in practice, so WFM.
-            log.debug("Queue. Count: \(cursor.count).")
-            if cursor.count <= 0 {
-                return
-            }
-
-            let urls = cursor.flatMap { $0?.url.asURL }
-            if !urls.isEmpty {
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.tabManager.addTabsForURLs(urls, zombie: false)
-                }
-            }
-
-            // Clear *after* making an attempt to open. We're making a bet that
-            // it's better to run the risk of perhaps opening twice on a crash,
-            // rather than losing data.
-            self.profile.queue.clearQueuedTabs()
-        }
+        // Brave doesn't have queued tabs
     }
 
     override func viewWillAppear(animated: Bool) {
         log.debug("BVC viewWillAppear.")
         super.viewWillAppear(animated)
         log.debug("BVC super.viewWillAppear done.")
+        
 #if !DISABLE_INTRO_SCREEN
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
@@ -478,8 +457,18 @@ class BrowserViewController: UIViewController {
     }
 
     private func shouldRestoreTabs() -> Bool {
-        guard let tabsToRestore = TabManager.tabsToRestore() else { return false }
-        let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 || !AboutUtils.isAboutHomeURL($0.sessionData?.urls.first) }
+        let tabsToRestore = TabManager.tabsToRestore()
+        let onlyNoHistoryTabs = !tabsToRestore.every {
+            if let history = $0.urlHistorySnapshot as? [String] {
+                if history.count > 1 {
+                    return false
+                }
+                if let first = history.first {
+                    return first.contains(WebServer.sharedInstance.base)
+                }
+            }
+            return true
+        }
         return !onlyNoHistoryTabs && !DebugSettingsBundleOptions.skipSessionRestore
     }
 
@@ -674,7 +663,7 @@ class BrowserViewController: UIViewController {
     }
 
     
-    func finishEditingAndSubmit(url: NSURL, visitType: VisitType) {
+    func finishEditingAndSubmit(url: NSURL) {
         guard let tab = tabManager.selectedTab else {
             return
         }
@@ -692,46 +681,18 @@ class BrowserViewController: UIViewController {
             resetSpoofedUserAgentIfRequired(webView, newURL: url)
         }
 #endif
-        if let nav = tab.loadRequest(NSURLRequest(URL: url)) {
-            self.recordNavigationInTab(tab, navigation: nav, visitType: visitType)
-        }
+        tab.loadRequest(NSURLRequest(URL: url))
     }
 
-    func addBookmark(url: String, title: String?, folderId:String? = nil, folderTitle:String? = nil) -> Success {
-        let shareItem = ShareItem(url: url, title: title, favicon: nil, folderId: folderId, folderTitle: folderTitle)
-        let deferred = Success()
-        profile.bookmarks.shareItem(shareItem).upon { result in
-            postAsyncToMain {
-                self.urlBar.updateBookmarkStatus(true)
-            }
-            deferred.fill(result)
-        }
-        return deferred
+    func addBookmark(url: String?, title: String?, parentFolder: Bookmark? = nil) {
+        // Custom title can only be applied during an edit
+        Bookmark.add(url: url, title: title, parentFolder: parentFolder)
+        self.urlBar.updateBookmarkStatus(true)
     }
 
-    func removeBookmark(url: String, completion: dispatch_block_t? = nil) {
-        profile.bookmarks.modelFactory >>== {
-            $0.removeByURL(url).uponQueue(dispatch_get_main_queue()) { res in
-                if res.isSuccess {
-                    self.urlBar.updateBookmarkStatus(false)
-                    if let completionBlock = completion {
-                        completionBlock()
-                    }
-
-                }
-            }
-        }
-    }
-
-    func SELBookmarkStatusDidChange(notification: NSNotification) {
-        if let bookmark = notification.object as? BookmarkItem {
-            if bookmark.url == urlBar.currentURL?.absoluteString {
-                if let userInfo = notification.userInfo as? Dictionary<String, Bool>{
-                    if let added = userInfo["added"]{
-                        self.urlBar.updateBookmarkStatus(added)
-                    }
-                }
-            }
+    func removeBookmark(url: NSURL) {
+        if Bookmark.remove(forUrl: url) {
+            self.urlBar.updateBookmarkStatus(false)
         }
     }
 
@@ -751,7 +712,7 @@ class BrowserViewController: UIViewController {
 //    }
 
     func updateUIForReaderHomeStateForTab(tab: Browser) {
-        updateURLBarDisplayURL(tab)
+        updateURLBarDisplayURL(tab: tab)
         updateInContentHomePanel(tab.url)
 
         if let url = tab.url {
@@ -774,46 +735,56 @@ class BrowserViewController: UIViewController {
 
     /// Updates the URL bar text and button states.
     /// Call this whenever the page URL changes.
-    func updateURLBarDisplayURL(tab: Browser) {
+    func updateURLBarDisplayURL(tab _tab: Browser?) {
+        guard let selected = tabManager.selectedTab else { return }
+        let tab = _tab != nil ? _tab! : selected
+
         urlBar.currentURL = tab.displayURL
 
         let isPage = tab.displayURL?.isWebPage() ?? false
         navigationToolbar.updatePageStatus(isWebPage: isPage)
 
-        guard let url = tab.displayURL?.absoluteString else {
+        guard let url = tab.url else {
             return
         }
 
-        succeed().upon { _ in
-            self.profile.bookmarks.modelFactory >>== {
-                $0.isBookmarked(url).uponQueue(dispatch_get_main_queue()) { result in
-                    guard let bookmarked = result.successValue else {
-                        log.error("Error getting bookmark status: \(result.failureValue).")
-                        return
-                    }
-                    postAsyncToMain {
-                        self.urlBar.updateBookmarkStatus(bookmarked)
-                    }
-                }
-            }
-        }
+        Bookmark.contains(url: url, completionOnMain: { isBookmarked in
+            self.urlBar.updateBookmarkStatus(isBookmarked)
+        })
     }
     // Mark: Opening New Tabs
 
-    func switchToPrivacyMode(){
-        let isPrivate = true // this func should be expaneded to handle exiting, which requires a deferred return val
+    func switchBrowsingMode(toPrivate isPrivate: Bool, request: NSURLRequest? = nil) {
+        if PrivateBrowsing.singleton.isOn == isPrivate {
+            // No change
+            return
+        }
+        
+        func update() {
+            applyTheme(isPrivate ? Theme.PrivateMode : Theme.NormalMode)
+            
+            let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
+            tabTrayController.changePrivacyMode(isPrivate)
+            self.tabTrayController = tabTrayController
+            
+            // Should be fixed as part of larger privatemode refactor
+            //  But currently when switching to PM tabCount == 1, but no tabs actually
+            //  exist, so causes lot of issues, explicit check for isPM
+            if tabManager.tabCount == 0 || request != nil || isPrivate {
+                tabManager.addTabAndSelect(request)
+            }
+        }
+        
         if isPrivate {
             PrivateBrowsing.singleton.enter()
+            update()
+        } else {
+            PrivateBrowsing.singleton.exit().uponQueue(dispatch_get_main_queue()) {
+                self.tabManager.restoreTabs()
+                update()
+            }
         }
         // exiting is async and non-trivial for Brave, not currently handled here
-        
-        applyTheme(isPrivate ? Theme.PrivateMode : Theme.NormalMode)
-
-        let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
-        if tabTrayController.privateMode != isPrivate {
-            tabTrayController.changePrivacyMode(isPrivate)
-        }
-        self.tabTrayController = tabTrayController
     }
 
     func switchToTabForURLOrOpen(url: NSURL, isPrivate: Bool = false) {
@@ -831,19 +802,14 @@ class BrowserViewController: UIViewController {
             screenshotHelper.takeScreenshot(selectedTab)
         }
 
-        let request: NSURLRequest?
+        var request: NSURLRequest? = nil
         if let url = url {
             request = NSURLRequest(URL: url)
-        } else {
-            request = nil
         }
 
+        tabManager.addTab(request)
         let isPrivate = PrivateBrowsing.singleton.isOn
-
-        if isPrivate {
-            switchToPrivacyMode()
-        }
-        tabManager.addTabAndSelect(request, isPrivate: isPrivate)
+        switchBrowsingMode(toPrivate: isPrivate, request: request)
     }
 
     func openBlankNewTabAndFocus(isPrivate isPrivate: Bool = false) {
@@ -916,7 +882,7 @@ class BrowserViewController: UIViewController {
             if completed {
                 // We don't know what share action the user has chosen so we simply always
                 // update the toolbar and reader mode bar to reflect the latest status.
-                self.updateURLBarDisplayURL(tab)
+                self.updateURLBarDisplayURL(tab: tab)
                 self.updateReaderModeBar()
             }
         })
@@ -993,24 +959,8 @@ extension BrowserViewController {
         self.ignoredNavigation.insert(navigation)
     }
 
-    func recordNavigationInTab(tab: Browser, navigation: WKNavigation, visitType: VisitType) {
-        self.typedNavigation[navigation] = visitType
-    }
-
-    /**
-     * Untrack and do the right thing.
-     */
-    func getVisitTypeForTab(tab: Browser, navigation: WKNavigation?) -> VisitType? {
-        guard let navigation = navigation else {
-            // See https://github.com/WebKit/webkit/blob/master/Source/WebKit2/UIProcess/Cocoa/NavigationState.mm#L390
-            return VisitType.Link
-        }
-
-        if let _ = self.ignoredNavigation.remove(navigation) {
-            return nil
-        }
-
-        return self.typedNavigation.removeValueForKey(navigation) ?? VisitType.Link
+    func recordNavigationInTab(tab: Browser, navigation: WKNavigation) {
+        //self.typedNavigation[navigation] = visitType
     }
 }
 
@@ -1022,9 +972,9 @@ extension BrowserViewController: WindowCloseHelperDelegate {
 
 
 extension BrowserViewController: HomePanelViewControllerDelegate {
-    func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL, visitType: VisitType) {
+    func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectURL url: NSURL) {
         hideHomePanelController()
-        finishEditingAndSubmit(url, visitType: visitType)
+        finishEditingAndSubmit(url)
     }
 
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectPanel panel: Int) {
@@ -1032,23 +982,11 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
             tabManager.selectedTab?.webView?.evaluateJavaScript("history.replaceState({}, '', '#panel=\(panel)')", completionHandler: nil)
         }
     }
-
-    func homePanelViewControllerDidRequestToCreateAccount(homePanelViewController: HomePanelViewController) {
-        #if !BRAVE
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
-        #endif
-    }
-
-    func homePanelViewControllerDidRequestToSignIn(homePanelViewController: HomePanelViewController) {
-        #if !BRAVE
-        presentSignInViewController() // TODO UX Right now the flow for sign in and create account is the same
-        #endif
-    }
 }
 
 extension BrowserViewController: SearchViewControllerDelegate {
     func searchViewController(searchViewController: SearchViewController, didSelectURL url: NSURL) {
-        finishEditingAndSubmit(url, visitType: VisitType.Typed)
+        finishEditingAndSubmit(url)
     }
 
     func presentSearchSettingsController() {
@@ -1058,6 +996,12 @@ extension BrowserViewController: SearchViewControllerDelegate {
         let navController = UINavigationController(rootViewController: settingsNavigationController)
 
         self.presentViewController(navController, animated: true, completion: nil)
+    }
+    
+    func searchViewController(searchViewController: SearchViewController, shouldFindInPage query: String) {
+        cancelSearch()
+        updateFindInPageVisibility(visible: true)
+        findInPageBar?.text = query
     }
 }
 
@@ -1118,39 +1062,6 @@ extension BrowserViewController: IntroViewControllerDelegate {
             }
         }
     }
-
-    #if !BRAVE
-    func presentSignInViewController() {
-        // Show the settings page if we have already signed in. If we haven't then show the signin page
-        let vcToPresent: UIViewController
-        if profile.hasAccount() {
-            let settingsTableViewController = AppSettingsTableViewController()
-            settingsTableViewController.profile = profile
-            settingsTableViewController.tabManager = tabManager
-            vcToPresent = settingsTableViewController
-        } else {
-            let signInVC = FxAContentViewController()
-            signInVC.delegate = self
-            signInVC.url = profile.accountConfiguration.signInURL
-            signInVC.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: #selector(BrowserViewController.dismissSignInViewController))
-            vcToPresent = signInVC
-        }
-
-        let settingsNavigationController = SettingsNavigationController(rootViewController: vcToPresent)
-		settingsNavigationController.modalPresentationStyle = .FormSheet
-        self.presentViewController(settingsNavigationController, animated: true, completion: nil)
-    }
-
-    func dismissSignInViewController() {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-
-    func introViewControllerDidRequestToLogin(introViewController: IntroViewController) {
-        introViewController.dismissViewControllerAnimated(true, completion: { () -> Void in
-            self.presentSignInViewController()
-        })
-    }
-    #endif
 }
 
 extension BrowserViewController: KeyboardHelperDelegate {
@@ -1224,8 +1135,8 @@ extension BrowserViewController: TabTrayDelegate {
     }
 
     func tabTrayDidAddBookmark(tab: Browser) {
-        guard let url = tab.url?.absoluteString where url.characters.count > 0 else { return }
-        self.addBookmark(url, title: tab.title)
+        // A bit silly to convert to string to convert back to URL, may change this
+        self.addBookmark(tab.url?.absoluteString, title: tab.title)
     }
 
 

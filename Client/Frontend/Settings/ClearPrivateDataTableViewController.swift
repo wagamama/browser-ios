@@ -27,7 +27,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
 
     private lazy var clearables: [(clearable: Clearable, checked: DefaultCheckedState)] = {
         return [
-            (HistoryClearable(profile: self.profile), true),
+            (HistoryClearable(), true),
             (CacheClearable(), true),
             (CookiesClearable(), true),
             (PasswordsClearable(profile: self.profile), true),
@@ -157,8 +157,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
                     ClearPrivateDataTableViewController.clearPrivateData(clear).upon {
                         postAsyncToMain(0.1) {
                             PrivateBrowsing.singleton.enter()
-                            getApp().tabManager.addTab(isPrivate: false)
-                            getApp().tabManager.selectTab(getApp().tabManager.addTab(nil, isPrivate: true))
+                            getApp().tabManager.addTabAndSelect()
                         }
                     }
                 }
@@ -175,8 +174,6 @@ class ClearPrivateDataTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         guard indexPath.section == SectionButton else { return }
-
-        telemetry(action: "Clear private data", props: nil)
         
         getApp().profile?.prefs.setObject(self.toggles, forKey: TogglesPrefKey)
         self.clearButtonEnabled = false

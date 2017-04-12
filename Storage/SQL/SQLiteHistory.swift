@@ -39,30 +39,6 @@ func failOrSucceed(err: NSError?, op: String) -> Success {
     return failOrSucceed(err, op: op, val: ())
 }
 
-private var ignoredSchemes = ["about"]
-
-public func isIgnoredURL(url: NSURL) -> Bool {
-    guard let scheme = url.scheme else { return false }
-
-    if let _ = ignoredSchemes.indexOf(scheme) {
-        return true
-    }
-
-    if url.host == "localhost" {
-        return true
-    }
-
-    return false
-}
-
-public func isIgnoredURL(url: String) -> Bool {
-    if let url = NSURL(string: url) {
-        return isIgnoredURL(url)
-    }
-
-    return false
-}
-
 /*
  // Here's the Swift equivalent of the below.
  func simulatedFrecency(now: MicrosecondTimestamp, then: MicrosecondTimestamp, visitCount: Int) -> Double {
@@ -177,10 +153,11 @@ extension SQLiteHistory: BrowserHistory {
     func recordVisitedSite(site: Site) -> Success {
         var error: NSError? = nil
 
+        // TODO: This got dropped during CD refactor, consider re-adding it
         // Don't store visits to sites with about: protocols
-        if isIgnoredURL(site.url) {
-            return deferMaybe(IgnoredSiteError())
-        }
+//        if isIgnoredURL(site.url) {
+//            return deferMaybe(IgnoredSiteError())
+//        }
 
         db.withWritableConnection(&error) { (conn, inout err: NSError?) -> Int in
             let now = NSDate.nowNumber()

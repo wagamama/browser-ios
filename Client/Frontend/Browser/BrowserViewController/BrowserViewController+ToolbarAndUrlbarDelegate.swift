@@ -15,7 +15,7 @@ extension BrowserViewController: URLBarDelegate {
         searchController = SearchViewController(isPrivate: isPrivate)
         searchController!.searchEngines = profile.searchEngines
         searchController!.searchDelegate = self
-        searchController!.profile = self.profile
+        //searchController!.profile = self.profile
 
         searchLoader.addListener(searchController!)
 
@@ -40,6 +40,12 @@ extension BrowserViewController: URLBarDelegate {
             self.searchController = nil
             homePanelController?.view?.hidden = false
         }
+    }
+    
+    func cancelSearch() {
+        urlBar.leaveSearchMode()
+        hideSearchController()
+        updateInContentHomePanel(tabManager.selectedTab?.url)
     }
 
     func urlBarDidPressReload(urlBar: URLBarView) {
@@ -183,7 +189,7 @@ extension BrowserViewController: URLBarDelegate {
                 return
         }
 
-        finishEditingAndSubmit(url, visitType: VisitType.Typed)
+        finishEditingAndSubmit(url)
     }
 
     func urlBarDidEnterSearchMode(urlBar: URLBarView) {
@@ -198,45 +204,39 @@ extension BrowserViewController: URLBarDelegate {
 
 extension BrowserViewController: BrowserToolbarDelegate {
     func browserToolbarDidPressBack(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        telemetry(action: "back button", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
         tabManager.selectedTab?.goBack()
     }
 
     func browserLocationViewDidPressReload(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        telemetry(action: "reload button", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
         tabManager.selectedTab?.reload()
     }
 
     func browserLocationViewDidPressStop(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        telemetry(action: "stop button", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
         tabManager.selectedTab?.stop()
     }
 
     func browserToolbarDidPressForward(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        telemetry(action: "forward button", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
         tabManager.selectedTab?.goForward()
     }
 
     func browserToolbarDidPressBookmark(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         guard let tab = tabManager.selectedTab,
-            let url = tab.displayURL?.absoluteString else {
+            let url = tab.url else {
                 log.error("Bookmark error: No tab is selected, or no URL in tab.")
                 return
         }
 
-        profile.bookmarks.modelFactory >>== {
-            $0.isBookmarked(url) >>== { isBookmarked in
-                if isBookmarked {
-                    self.removeBookmark(url)
-                } else {
-                    self.addBookmark(url, title: tab.title)
-                }
+       Bookmark.contains(url: url, completionOnMain: { isBookmarked in
+            if isBookmarked {
+                self.removeBookmark(url)
+            } else {
+                self.addBookmark(url.absoluteString, title: tab.title)
             }
-        }
+        })
     }
 
     func browserToolbarDidPressShare(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        telemetry(action: "share button", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
+        telemetry(action: "Share Button Pressed", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
         if let tab = tabManager.selectedTab, url = tab.displayURL {
             let sourceView = self.navigationToolbar.shareButton
             presentActivityViewController(url, tab: tab, sourceView: sourceView.superview, sourceRect: sourceView.frame, arrowDirection: .Up)

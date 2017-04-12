@@ -171,14 +171,13 @@ extension BrowserViewController: WKCompatNavigationDelegate {
     }
 
     func updateProfileForLocationChange(tab: Browser) {
-        var info = [String : AnyObject]()
-        info["url"] = tab.displayURL
-        info["title"] = tab.title
-        info["visitType"] = 1 // VisitType.Link
-        info["isPrivate"] = tab.isPrivate
-        if !(tab.title?.isEmpty ?? true) {
-            (profile as? BrowserProfile)?.onLocationChange(info)
+        guard let title = tab.title, let historyUrl = tab.displayURL else { return }
+        if tab.isPrivate {
+            return
         }
+
+        History.add(title: title, url: historyUrl)
+        //history.setTopSitesNeedsInvalidation()
     }
 
 

@@ -24,11 +24,21 @@ class BraveBrowserViewController : BrowserViewController {
 
         struct RunOnceAtStartup { static var ran = false }
         if !RunOnceAtStartup.ran && profile.prefs.boolForKey(kPrefKeyPrivateBrowsingAlwaysOn) ?? false {
-            getApp().browserViewController.switchToPrivacyMode()
-            getApp().tabManager.addTabAndSelect(isPrivate: true)
+            getApp().browserViewController.switchBrowsingMode(toPrivate: true)
         }
 
         RunOnceAtStartup.ran = true
+        
+        // Initialize Sync without connecting. Sync webview needs to be in a "permanent" location to continue working predictably
+        //  If Sync is not in the view "hierarchy" it will behavior extremely unpredictably, often just dying in the middle of a promize chain
+        //  Added to keyWindow, since it can then be utilized from any VC (e.g. settings modal)
+        Sync.shared.webView.alpha = 0.01
+        UIApplication.sharedApplication().keyWindow?.insertSubview(Sync.shared.webView, atIndex: 0)
+        
+        // TODO: Remove
+        // Makes webview visible for debug logging
+//        Sync.shared.webView.alpha = 1
+//        UIApplication.sharedApplication().keyWindow?.addSubview(Sync.shared.webView)
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -43,10 +53,16 @@ class BraveBrowserViewController : BrowserViewController {
         
         // TODO: Should never call setupConstraints multiple times, this can cause huge headaches. Constraints should mostly be static with adjustments made to those constraints.
         setupConstraints()
-        if BraveApp.shouldRestoreTabs() {
-            tabManager.restoreTabs()
-        } else {
-            tabManager.addTabAndSelect()
+
+        struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
+        dispatch_once(&RunOnceAtStartup.token) {
+            if BraveApp.shouldRestoreTabs() && !PrivateBrowsing.singleton.isOn {
+                // Only do tab restoration if in normal mode.
+                //  If in PM, restoration happens on leaving.
+                tabManager.restoreTabs()
+            } else {
+                tabManager.addTabAndSelect()
+            }
         }
 
         updateTabCountUsingTabManager(tabManager, animated: false)

@@ -112,29 +112,35 @@ class BraveSettingsView : AppSettingsTableViewController {
 
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.General.uppercaseString), children: generalSettings),
+            SettingSection(title: NSAttributedString(string: Strings.Sync.uppercaseString), children:
+                [SyncDevicesSetting(settings: self)]
+            ),
             SettingSection(title: NSAttributedString(string: Strings.Privacy.uppercaseString), children:
                 [ClearPrivateDataSetting(settings: self), CookieSetting(profile: self.profile),
                     BoolSetting(prefs: prefs, prefKey: kPrefKeyPrivateBrowsingAlwaysOn, defaultValue: false, titleText: Strings.Private_Browsing_Only, statusText: nil, settingDidChange: { isOn in
-                        if !isOn {
-                            return
-                        }
-                        if !PrivateBrowsing.singleton.isOn {
-                            getApp().browserViewController.switchToPrivacyMode()
-                            getApp().tabManager.addTabAndSelect(isPrivate: true)
-                        }
+                        getApp().browserViewController.switchBrowsingMode(toPrivate: isOn)
                     })]
             ),
             SettingSection(title: NSAttributedString(string: Strings.Brave_Shield_Defaults.uppercaseString), children: shieldSettingsList)]
 
-        //#if !DISABLE_INTRO_SCREEN
+        
+        var supportChildren: [Setting] = [
+            BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyUserAllowsTelemetry, defaultValue: true, titleText: Strings.Opt_in_to_telemetry),
+        ]
+        
+        // If this macro is ever removed, this array can be inline, like the other settings
+        #if !DISABLE_INTRO_SCREEN
+            supportChildren += [ShowIntroductionSetting(settings: self)]
+        #endif
+        
+        supportChildren += [
+            BraveSupportLinkSetting(),
+            BravePrivacyPolicySetting(), BraveTermsOfUseSetting()
+        ]
+    
         settings += [
-            SettingSection(title: NSAttributedString(string: Strings.Support.uppercaseString), children: [
-                BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyUserAllowsTelemetry, defaultValue: true, titleText: Strings.Opt_in_to_telemetry),
-                ShowIntroductionSetting(settings: self),
-                BraveSupportLinkSetting(),
-                BravePrivacyPolicySetting(), BraveTermsOfUseSetting(),
-                ])]
-        //#endif
+            SettingSection(title: NSAttributedString(string: Strings.Support.uppercaseString), children: supportChildren)]
+        
         settings += [
             SettingSection(title: NSAttributedString(string: Strings.About.uppercaseString), children: [
                 VersionSetting(settings: self),

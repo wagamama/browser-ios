@@ -161,12 +161,40 @@
 		59D6B30954B53C907F022CA7 /* FindInPage.js in Resources */ = {isa = PBXBuildFile; fileRef = EA59A531812A82B1DAC03D72 /* FindInPage.js */; };
 		59F67C0B4DAA5B488E2C83EF /* SpotlightHelper.js in Resources */ = {isa = PBXBuildFile; fileRef = E76112E70EDA47CD3A7F2845 /* SpotlightHelper.js */; };
 		5B352CB4FE3A4ED634975490 /* WebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E56C0216FAEB62B2CDF5FE7 /* WebViewProgress.swift */; };
+		5C0293851E70D9AE00CA99D0 /* MigrateData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0293841E70D9AE00CA99D0 /* MigrateData.swift */; };
+		5C0FCE4D1E5FB3810016DF0F /* SyncWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */; };
+		5C0FCE531E637B9D0016DF0F /* SyncAddDeviceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */; };
+		5C0FCE5C1E637C160016DF0F /* SyncPairCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */; };
+		5C0FCE5E1E6381B70016DF0F /* SyncSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5D1E6381B70016DF0F /* SyncSettingsViewController.swift */; };
+		5C0FCE601E63E1790016DF0F /* SyncBarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE5F1E63E1790016DF0F /* SyncBarcodeView.swift */; };
+		5C0FCE621E63E1D90016DF0F /* SyncCodewordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE611E63E1D90016DF0F /* SyncCodewordsView.swift */; };
+		5C0FCE641E63EA170016DF0F /* SyncPairWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE631E63EA170016DF0F /* SyncPairWordsViewController.swift */; };
+		5C0FCE661E63EB8B0016DF0F /* SyncCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0FCE651E63EB8B0016DF0F /* SyncCameraView.swift */; };
 		5C32C7B6034B41A9C822555E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE1D74E40F9E392FFCE9F2F /* main.swift */; };
 		5C404E1B2531DC2E178F80F8 /* ReaderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F8C87651157C51F01D4D96F /* ReaderPanel.swift */; };
+		5C44C0CF1E3847A100B1FD81 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C44C0C21E38479200B1FD81 /* CoreData.framework */; };
+		5C44C0D21E384AE700B1FD81 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D11E384AE700B1FD81 /* DataController.swift */; };
+		5C44C0D71E3C08B400B1FD81 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */; };
+		5C44C0DA1E3EE42D00B1FD81 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0D91E3EE42D00B1FD81 /* Domain.swift */; };
+		5C44C0DE1E3EE47B00B1FD81 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C44C0DD1E3EE47B00B1FD81 /* History.swift */; };
 		5C67126F8B355442E99D9EDB /* BrowserViewController+FindInPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BA9175CB5140E6C4D47DC15 /* BrowserViewController+FindInPage.swift */; };
+		5C6F1B1D1E67433F008B0ADD /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C6F1B1C1E67433F008B0ADD /* CoreImage.framework */; };
+		5C82452C1E68E95600D3CA09 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C82452B1E68E95600D3CA09 /* AVFoundation.framework */; };
+		5CD7F38E1E3EFBF100A12BB9 /* FaviconMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */; };
+		5CD7F3901E3FB7FA00A12BB9 /* TabMO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD7F38F1E3FB7FA00A12BB9 /* TabMO.swift */; };
 		5CE70E451E022FAB008B307A /* BraveShieldStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */; };
 		5CE70E4D1E02831B008B307A /* IntExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE70E4C1E02831B008B307A /* IntExtensions.swift */; };
 		5CFC706D1D9D9F30008A7B7A /* BraveTermsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFC706C1D9D9F30008A7B7A /* BraveTermsViewController.swift */; };
+		5D27859A1E70D7EF0066EC15 /* JSInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2785991E70D7EF0066EC15 /* JSInjector.swift */; };
+		5D2785BE1E71D7050066EC15 /* NicewareTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D27858C1E70CC660066EC15 /* NicewareTest.swift */; };
+		5D2AE6F81E83F3EC00BC274C /* SyncBookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */; };
+		5D2AE6F91E83F3EC00BC274C /* SyncRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */; };
+		5D2AE6FA1E83F3EC00BC274C /* SyncSite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */; };
+		5D2B07EB1E6733B900244C39 /* niceware.js in Resources */ = {isa = PBXBuildFile; fileRef = 5D2B07EA1E6733B900244C39 /* niceware.js */; };
+		5D3892551E98108F00F959E6 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5D3892531E98108F00F959E6 /* Model.xcdatamodeld */; };
+		5D71B69B1E6885E00073621F /* Niceware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D71B69A1E6885E00073621F /* Niceware.swift */; };
+		5DB199151E859F9100A851B6 /* SyncResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DB199141E859F9100A851B6 /* SyncResponse.swift */; };
+		5DCC5D841E7C50B300054BBD /* NSJSONSerializationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */; };
 		5E5E76550DFB4EB71194132F /* LICENSE in Sources */ = {isa = PBXBuildFile; fileRef = 36C647DC00749BCC944D6EC6 /* LICENSE */; };
 		5E6571D452F3C000461D2481 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F94204C0EC007236424A86 /* AppDelegate.swift */; };
 		5F05A9BDFA985F96C2CFCA35 /* testutil.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0FA8929C0D08EA248F350718 /* testutil.cc */; };
@@ -482,6 +510,11 @@
 		EBA11E1A1E2EB84800C964E0 /* adblock-regions.txt in Resources */ = {isa = PBXBuildFile; fileRef = EBA11E191E2EB84800C964E0 /* adblock-regions.txt */; };
 		EBACC8551DF9BB3500D5E048 /* SettingsViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */; };
 		EBB345801DAD465C00EE24F0 /* SQLite.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7B9A62DB1C4002B1005C83DC /* SQLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EBD312D01E4967FE0077934D /* SyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD312CF1E4967FE0077934D /* SyncTest.swift */; };
+		EBDB7D471E14231900D744C7 /* Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDB7D461E14231900D744C7 /* Sync.swift */; };
+		EBDB7D501E1432E800D744C7 /* bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D4E1E1432E800D744C7 /* bundle.js */; };
+		EBDB7D551E14331900D744C7 /* fetch.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D531E14331900D744C7 /* fetch.js */; };
+		EBDB7D571E14337800D744C7 /* ios-sync.js in Resources */ = {isa = PBXBuildFile; fileRef = EBDB7D561E14337800D744C7 /* ios-sync.js */; };
 		EBE50B831DAE8D77000BC0A1 /* BookmarksTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */; };
 		EBE50B871DAEC689000BC0A1 /* Deferred.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EBE50B861DAEC689000BC0A1 /* Deferred.framework */; };
 		EBE50B8A1DAEC8DD000BC0A1 /* UITestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE50B881DAEC884000BC0A1 /* UITestUtils.swift */; };
@@ -923,13 +956,42 @@
 		5B60ED58454699DB9549B34B /* AutocompleteTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AutocompleteTextField.swift; path = ./Client/Frontend/Widgets/AutocompleteTextField.swift; sourceTree = "<group>"; };
 		5B7417C2784852C8AA016A94 /* filename.cc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = filename.cc; path = ./brave/ThirdParty/leveldb/db/filename.cc; sourceTree = "<group>"; };
 		5B8A3FF8C10C5708D9DAD03D /* BraveUX.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BraveUX.swift; path = ./brave/src/frontend/BraveUX.swift; sourceTree = "<group>"; };
+		5C0293841E70D9AE00CA99D0 /* MigrateData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MigrateData.swift; path = brave/src/data/MigrateData.swift; sourceTree = "<group>"; };
+		5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncWelcomeViewController.swift; path = brave/src/frontend/sync/SyncWelcomeViewController.swift; sourceTree = "<group>"; };
+		5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncAddDeviceViewController.swift; path = brave/src/frontend/sync/SyncAddDeviceViewController.swift; sourceTree = "<group>"; };
+		5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncPairCameraViewController.swift; path = brave/src/frontend/sync/SyncPairCameraViewController.swift; sourceTree = "<group>"; };
+		5C0FCE5D1E6381B70016DF0F /* SyncSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncSettingsViewController.swift; path = brave/src/frontend/sync/SyncSettingsViewController.swift; sourceTree = "<group>"; };
+		5C0FCE5F1E63E1790016DF0F /* SyncBarcodeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncBarcodeView.swift; path = brave/src/frontend/sync/SyncBarcodeView.swift; sourceTree = "<group>"; };
+		5C0FCE611E63E1D90016DF0F /* SyncCodewordsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncCodewordsView.swift; path = brave/src/frontend/sync/SyncCodewordsView.swift; sourceTree = "<group>"; };
+		5C0FCE631E63EA170016DF0F /* SyncPairWordsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncPairWordsViewController.swift; path = brave/src/frontend/sync/SyncPairWordsViewController.swift; sourceTree = "<group>"; };
+		5C0FCE651E63EB8B0016DF0F /* SyncCameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncCameraView.swift; path = brave/src/frontend/sync/SyncCameraView.swift; sourceTree = "<group>"; };
 		5C39A9721F0FECF98A48015E /* BraveBrowserViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BraveBrowserViewController.swift; path = ./brave/src/frontend/BraveBrowserViewController.swift; sourceTree = "<group>"; };
+		5C44C0C21E38479200B1FD81 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		5C44C0D11E384AE700B1FD81 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataController.swift; path = brave/src/data/DataController.swift; sourceTree = "<group>"; };
+		5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bookmark.swift; path = brave/src/data/Bookmark.swift; sourceTree = "<group>"; };
+		5C44C0D91E3EE42D00B1FD81 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Domain.swift; path = brave/src/data/Domain.swift; sourceTree = "<group>"; };
+		5C44C0DD1E3EE47B00B1FD81 /* History.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = History.swift; path = brave/src/data/History.swift; sourceTree = "<group>"; };
+		5C6F1B1C1E67433F008B0ADD /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		5C82452B1E68E95600D3CA09 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FaviconMO.swift; path = brave/src/data/FaviconMO.swift; sourceTree = "<group>"; };
+		5CD7F38F1E3FB7FA00A12BB9 /* TabMO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TabMO.swift; path = brave/src/data/TabMO.swift; sourceTree = "<group>"; };
 		5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveShieldStatsView.swift; path = brave/src/frontend/BraveShieldStatsView.swift; sourceTree = "<group>"; };
 		5CE70E4C1E02831B008B307A /* IntExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IntExtensions.swift; path = Utils/Extensions/IntExtensions.swift; sourceTree = "<group>"; };
 		5CFC706C1D9D9F30008A7B7A /* BraveTermsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BraveTermsViewController.swift; path = brave/src/frontend/BraveTermsViewController.swift; sourceTree = "<group>"; };
 		5D09BD4576555D874B5D0D4A /* db_impl.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = db_impl.h; path = ./brave/ThirdParty/leveldb/db/db_impl.h; sourceTree = "<group>"; };
+		5D27858C1E70CC660066EC15 /* NicewareTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NicewareTest.swift; sourceTree = "<group>"; };
+		5D2785991E70D7EF0066EC15 /* JSInjector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSInjector.swift; sourceTree = "<group>"; };
+		5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncBookmark.swift; sourceTree = "<group>"; };
+		5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncRoot.swift; sourceTree = "<group>"; };
+		5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSite.swift; sourceTree = "<group>"; };
+		5D2B07EA1E6733B900244C39 /* niceware.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = niceware.js; path = Carthage/Checkouts/niceware/browser/niceware.js; sourceTree = SOURCE_ROOT; };
+		5D3892541E98108F00F959E6 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		5D3892561E9810B400F959E6 /* Model2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model2.xcdatamodel; sourceTree = "<group>"; };
+		5D71B69A1E6885E00073621F /* Niceware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Niceware.swift; sourceTree = "<group>"; };
 		5D84AB2CBD701CBBDC40620C /* ReadingListAuthenticator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ReadingListAuthenticator.swift; path = ./ReadingList/ReadingListAuthenticator.swift; sourceTree = "<group>"; };
+		5DB199141E859F9100A851B6 /* SyncResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResponse.swift; sourceTree = "<group>"; };
 		5DC93C70E9DA3485A2FD2BD3 /* Error.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Error.swift; path = ./ThirdParty/Result/Error.swift; sourceTree = "<group>"; };
+		5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSJSONSerializationExtensions.swift; sourceTree = "<group>"; };
 		5E2DD2C9767F04D79BD241B0 /* port_posix.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = port_posix.h; path = ./brave/ThirdParty/leveldb/port/port_posix.h; sourceTree = "<group>"; };
 		5ED8720B8C08231F6A2FC090 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsTableViewController.swift; path = ./Client/Frontend/Settings/SettingsTableViewController.swift; sourceTree = "<group>"; };
 		603F85E39F9E018441B742A3 /* amazondotcom.xml */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = amazondotcom.xml; path = ./Client/Assets/Search/SearchOverrides/en/amazondotcom.xml; sourceTree = "<group>"; };
@@ -1307,6 +1369,11 @@
 		EBA6F12E1E39312100F7B3D9 /* ad-hoc-export.applescript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.applescript; name = "ad-hoc-export.applescript"; path = "brave/build-system/ad-hoc-export.applescript"; sourceTree = "<group>"; };
 		EBA6F13F1E39410E00F7B3D9 /* upload-to-app-store.applescript */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.applescript; name = "upload-to-app-store.applescript"; path = "brave/build-system/upload-to-app-store.applescript"; sourceTree = "<group>"; };
 		EBACC8541DF9BB3500D5E048 /* SettingsViewTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewTest.swift; sourceTree = "<group>"; };
+		EBD312CF1E4967FE0077934D /* SyncTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncTest.swift; sourceTree = "<group>"; };
+		EBDB7D461E14231900D744C7 /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
+		EBDB7D4E1E1432E800D744C7 /* bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bundle.js; sourceTree = "<group>"; };
+		EBDB7D531E14331900D744C7 /* fetch.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = fetch.js; sourceTree = "<group>"; };
+		EBDB7D561E14337800D744C7 /* ios-sync.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "ios-sync.js"; sourceTree = "<group>"; };
 		EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksTest.swift; sourceTree = "<group>"; };
 		EBE50B861DAEC689000BC0A1 /* Deferred.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Deferred.framework; path = Carthage/Build/iOS/Deferred.framework; sourceTree = "<group>"; };
 		EBE50B881DAEC884000BC0A1 /* UITestUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITestUtils.swift; sourceTree = "<group>"; };
@@ -1367,6 +1434,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C82452C1E68E95600D3CA09 /* AVFoundation.framework in Frameworks */,
+				5C6F1B1D1E67433F008B0ADD /* CoreImage.framework in Frameworks */,
+				5C44C0CF1E3847A100B1FD81 /* CoreData.framework in Frameworks */,
 				E6231C051B90A472005ABB0D /* libxml2.2.tbd in Frameworks */,
 				E6231C031B90A466005ABB0D /* libstdc++.6.0.9.tbd in Frameworks */,
 				E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */,
@@ -1511,6 +1581,7 @@
 				2C3C78F7F3FB6427BD51A1E8 /* sidepanels */,
 				430FDA25DAA3C35191998991 /* SwizzlingToHideSharePicker.h */,
 				84C51F13ADC0C2BC71D40BEF /* SwizzlingToHideSharePicker.m */,
+				5C0FCE4B1E5FB32F0016DF0F /* sync */,
 				3A6E86EA8E9535F4C6C7B748 /* tabsbar */,
 				5CE70E441E022FAB008B307A /* BraveShieldStatsView.swift */,
 			);
@@ -1942,6 +2013,36 @@
 			name = FBSnapshotTestCase;
 			sourceTree = "<group>";
 		};
+		5C0FCE4B1E5FB32F0016DF0F /* sync */ = {
+			isa = PBXGroup;
+			children = (
+				5C0FCE4C1E5FB3810016DF0F /* SyncWelcomeViewController.swift */,
+				5C0FCE521E637B9D0016DF0F /* SyncAddDeviceViewController.swift */,
+				5C0FCE5B1E637C160016DF0F /* SyncPairCameraViewController.swift */,
+				5C0FCE631E63EA170016DF0F /* SyncPairWordsViewController.swift */,
+				5C0FCE5D1E6381B70016DF0F /* SyncSettingsViewController.swift */,
+				5C0FCE5F1E63E1790016DF0F /* SyncBarcodeView.swift */,
+				5C0FCE611E63E1D90016DF0F /* SyncCodewordsView.swift */,
+				5C0FCE651E63EB8B0016DF0F /* SyncCameraView.swift */,
+			);
+			name = sync;
+			sourceTree = "<group>";
+		};
+		5C44C0D01E384AB300B1FD81 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				5D3892531E98108F00F959E6 /* Model.xcdatamodeld */,
+				5C44C0D11E384AE700B1FD81 /* DataController.swift */,
+				5C44C0D61E3C08B400B1FD81 /* Bookmark.swift */,
+				5C44C0D91E3EE42D00B1FD81 /* Domain.swift */,
+				5CD7F38D1E3EFBF100A12BB9 /* FaviconMO.swift */,
+				5C44C0DD1E3EE47B00B1FD81 /* History.swift */,
+				5CD7F38F1E3FB7FA00A12BB9 /* TabMO.swift */,
+				5C0293841E70D9AE00CA99D0 /* MigrateData.swift */,
+			);
+			name = data;
+			sourceTree = "<group>";
+		};
 		5CB4DCFE2FABD0F4904B147F /* PodFiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -1949,6 +2050,17 @@
 				B09BAC548B83576231EBD806 /* NSMutableArray+SWUtilityButtons.m */,
 			);
 			name = PodFiles;
+			sourceTree = "<group>";
+		};
+		5D2AE6ED1E83F3D200BC274C /* fetched models */ = {
+			isa = PBXGroup;
+			children = (
+				5DB199141E859F9100A851B6 /* SyncResponse.swift */,
+				5D2AE6F61E83F3EC00BC274C /* SyncRoot.swift */,
+				5D2AE6F51E83F3EC00BC274C /* SyncBookmark.swift */,
+				5D2AE6F71E83F3EC00BC274C /* SyncSite.swift */,
+			);
+			name = "fetched models";
 			sourceTree = "<group>";
 		};
 		6289C23DD299B40CB6212A38 /* en.lproj */ = {
@@ -2128,6 +2240,9 @@
 		928B373CD06CCFB1407180F1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5C82452B1E68E95600D3CA09 /* AVFoundation.framework */,
+				5C6F1B1C1E67433F008B0ADD /* CoreImage.framework */,
+				5C44C0C21E38479200B1FD81 /* CoreData.framework */,
 				EBE50B861DAEC689000BC0A1 /* Deferred.framework */,
 				B844F80947392751D574C56A /* Fabric.framework */,
 				1852F166F6BAB2154A8BEA92 /* Crashlytics.framework */,
@@ -2540,6 +2655,8 @@
 		DD7766D867DDB5BB9D39E6ED /* src */ = {
 			isa = PBXGroup;
 			children = (
+				5C44C0D01E384AB300B1FD81 /* data */,
+				EBDB7D271E14206700D744C7 /* sync */,
 				C75F23E274D805CF47CC56F4 /* adinfo */,
 				4A968F5D043E33C1866219E7 /* BraveApp.swift */,
 				6F8856E29DAA2D9EAC4F9A85 /* BraveUtil.swift */,
@@ -2711,6 +2828,8 @@
 		EB36616D1D9C3CEC00445C92 /* unit */ = {
 			isa = PBXGroup;
 			children = (
+				EBD312CF1E4967FE0077934D /* SyncTest.swift */,
+				5D27858C1E70CC660066EC15 /* NicewareTest.swift */,
 				EB8E3D651DF78237006EA0D1 /* FingerprintProtectionTest.swift */,
 				EBE50B7C1DAE8D70000BC0A1 /* BookmarksTest.swift */,
 				EB36616E1D9C3CEC00445C92 /* HttpsEverywhereTest.swift */,
@@ -2748,6 +2867,40 @@
 			name = BraveShareTo;
 			path = brave/l10n/BraveShareTo;
 			sourceTree = "<group>";
+		};
+		EBDB7D271E14206700D744C7 /* sync */ = {
+			isa = PBXGroup;
+			children = (
+				EBDB7D561E14337800D744C7 /* ios-sync.js */,
+				5D2B07EA1E6733B900244C39 /* niceware.js */,
+				EBDB7D511E14331900D744C7 /* polyfill */,
+				EBDB7D4C1E1432E800D744C7 /* bundles */,
+				5D2785991E70D7EF0066EC15 /* JSInjector.swift */,
+				EBDB7D461E14231900D744C7 /* Sync.swift */,
+				5D71B69A1E6885E00073621F /* Niceware.swift */,
+				5D2AE6ED1E83F3D200BC274C /* fetched models */,
+			);
+			name = sync;
+			path = brave/src/sync;
+			sourceTree = "<group>";
+		};
+		EBDB7D4C1E1432E800D744C7 /* bundles */ = {
+			isa = PBXGroup;
+			children = (
+				EBDB7D4E1E1432E800D744C7 /* bundle.js */,
+			);
+			name = bundles;
+			path = Carthage/Checkouts/sync/bundles;
+			sourceTree = SOURCE_ROOT;
+		};
+		EBDB7D511E14331900D744C7 /* polyfill */ = {
+			isa = PBXGroup;
+			children = (
+				EBDB7D531E14331900D744C7 /* fetch.js */,
+			);
+			name = polyfill;
+			path = Carthage/Checkouts/sync/client/polyfill;
+			sourceTree = SOURCE_ROOT;
 		};
 		F1D471871D777C7C007B443D /* OnePassword */ = {
 			isa = PBXGroup;
@@ -2890,6 +3043,7 @@
 				A127F3B5A0BED3305F68B2E0 /* HexExtensions.swift */,
 				85BF1920738AC219D231C69E /* NSCharacterSetExtensions.swift */,
 				8C505FBF5BDE8520B98BCCF8 /* NSFileManagerExtensions.swift */,
+				5DCC5D831E7C50B300054BBD /* NSJSONSerializationExtensions.swift */,
 				A62C053A18EDCEAE240498A6 /* NSMutableAttributedStringExtensions.swift */,
 				A9E39E85A79516D1E92939CB /* NSScannerExtensions.swift */,
 				D2243796CB0C27B99AED9742 /* NSStringExtensions.swift */,
@@ -3217,7 +3371,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = Mozilla;
 				TargetAttributes = {
 					288A2D851AB8B3260023ABC3 = {
@@ -3469,6 +3623,7 @@
 				886E3B0001BC705ACFC4AD45 /* adInfo-wrapper.js in Resources */,
 				507ACE2A12D675DAF9C79198 /* adInfo.js in Resources */,
 				EBA11E1A1E2EB84800C964E0 /* adblock-regions.txt in Resources */,
+				EBDB7D501E1432E800D744C7 /* bundle.js in Resources */,
 				E4309BC56F1431FEA791E157 /* BlankTargetDetector.js in Resources */,
 				EB4E15ED1DB7F36600A4C7EA /* Localizable.strings in Resources */,
 				EB8F569F1DD13DF300679A78 /* FiraSans-Light.ttf in Resources */,
@@ -3491,7 +3646,9 @@
 				9EC9707BF7ABD93FBB0FFDB9 /* LoginsHelper.js in Resources */,
 				4D68B2825D2CAD5FB6098D21 /* NetError.css in Resources */,
 				EB8F56991DD13DF300679A78 /* CharisSILI.ttf in Resources */,
+				EBDB7D551E14331900D744C7 /* fetch.js in Resources */,
 				6B06EE00444FA99CCD366C2B /* NetError.html in Resources */,
+				EBDB7D571E14337800D744C7 /* ios-sync.js in Resources */,
 				13657B6789F5024F64E16739 /* PrintHelper.js in Resources */,
 				9238CC0C5284146DC56706EF /* default.txt in Resources */,
 				EB8F56A11DD13DF300679A78 /* FiraSans-Regular.ttf in Resources */,
@@ -3500,6 +3657,7 @@
 				EB8F56A01DD13DF300679A78 /* FiraSans-Medium.ttf in Resources */,
 				2210C35A6B7EB8745B0E93B9 /* SessionRestore.html in Resources */,
 				EB8F569E1DD13DF300679A78 /* FiraSans-Italic.ttf in Resources */,
+				5D2B07EB1E6733B900244C39 /* niceware.js in Resources */,
 				59F67C0B4DAA5B488E2C83EF /* SpotlightHelper.js in Resources */,
 				EB8F56981DD13DF300679A78 /* CharisSILBI.ttf in Resources */,
 				8F8FEAE7F3F5794866B0163C /* topdomains.txt in Resources */,
@@ -3760,7 +3918,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD312D01E4967FE0077934D /* SyncTest.swift in Sources */,
 				EB62B8021DB59EF9006FD479 /* WebViewLoadTest.swift in Sources */,
+				5D2785BE1E71D7050066EC15 /* NicewareTest.swift in Sources */,
 				EB8E3D661DF78237006EA0D1 /* FingerprintProtectionTest.swift in Sources */,
 				EB3661761D9C3CEC00445C92 /* HttpsEverywhereTest.swift in Sources */,
 				EB8E3D711DF785CD006EA0D1 /* WebViewLoadTestUtils.swift in Sources */,
@@ -3774,9 +3934,11 @@
 			files = (
 				C0725B9765E18BB98FA2C416 /* builder.cc in Sources */,
 				22A2D33804D88F8E5A828EB9 /* c.cc in Sources */,
+				5C44C0DA1E3EE42D00B1FD81 /* Domain.swift in Sources */,
 				0336F9B2BC7FF14F45DB681F /* db_impl.cc in Sources */,
 				DF0324E386DF0AAF40CEE51A /* db_iter.cc in Sources */,
 				E89DEAF4A642EA060CAC3883 /* dbformat.cc in Sources */,
+				5D2AE6FA1E83F3EC00BC274C /* SyncSite.swift in Sources */,
 				A6A180ED09280A17C5C11B72 /* dumpfile.cc in Sources */,
 				252BFD86BA8B20F6B485D561 /* filename.cc in Sources */,
 				7823B137D3AA2D991BC8DC5C /* log_reader.cc in Sources */,
@@ -3788,11 +3950,13 @@
 				3078EC63F4D0D10D8CE0B5E5 /* version_set.cc in Sources */,
 				7BA3C826C13C285AA2A6F789 /* write_batch.cc in Sources */,
 				23E105570490AC11F27B26E8 /* memenv.cc in Sources */,
+				5CD7F3901E3FB7FA00A12BB9 /* TabMO.swift in Sources */,
 				5E5E76550DFB4EB71194132F /* LICENSE in Sources */,
 				8C37559D5128842F1EA41DC1 /* port_posix.cc in Sources */,
 				4DB470E1162880D83AB88E5C /* block.cc in Sources */,
 				5FBB6E142EFF5F6E989ABD49 /* block_builder.cc in Sources */,
 				1204E92DCEECF3540EA648CF /* filter_block.cc in Sources */,
+				5D71B69B1E6885E00073621F /* Niceware.swift in Sources */,
 				40DD8F2FF8733625CF906534 /* format.cc in Sources */,
 				5CE70E451E022FAB008B307A /* BraveShieldStatsView.swift in Sources */,
 				5F88581725B7AAA78F91A4D4 /* iterator.cc in Sources */,
@@ -3801,6 +3965,7 @@
 				D930735487A274E11203B106 /* table_builder.cc in Sources */,
 				9E08BE0D0C19A5DA7BA7BB52 /* two_level_iterator.cc in Sources */,
 				25EC5AB01633FAA4720D56C3 /* arena.cc in Sources */,
+				5C44C0DE1E3EE47B00B1FD81 /* History.swift in Sources */,
 				9936A9499C3DD474BF33C5A7 /* bloom.cc in Sources */,
 				66D96438D7A6745AE7673C3E /* cache.cc in Sources */,
 				015649F978DE96490BACE063 /* coding.cc in Sources */,
@@ -3817,16 +3982,19 @@
 				D974018CF8F1728469457616 /* status.cc in Sources */,
 				8C1EF9076148B5DE1EEC4A0B /* testharness.cc in Sources */,
 				5F05A9BDFA985F96C2CFCA35 /* testutil.cc in Sources */,
+				5D2AE6F81E83F3EC00BC274C /* SyncBookmark.swift in Sources */,
 				23699E7ECA45D2C23FFEB992 /* NSData+GZIP.m in Sources */,
 				736EF030429F5288A4EDE179 /* NSFileManager+Tar.m in Sources */,
 				676AF6C41649B4E23DA21306 /* BraveApp.swift in Sources */,
 				08BC96A6EFBA13BBE99C9A0F /* BraveUtil.swift in Sources */,
 				CF1FD6B869DAC754B459302B /* BraveBrowserBottomToolbar.swift in Sources */,
+				5D2AE6F91E83F3EC00BC274C /* SyncRoot.swift in Sources */,
 				B559CDC0AF8A6D35DE545B6A /* BraveBrowserViewController.swift in Sources */,
 				CBE8F9770BF74CCB68E0807A /* BraveMainWindow.swift in Sources */,
 				184619D873835F18B9731D1E /* BraveScrollController.swift in Sources */,
 				8999244A8E5D55AF862B8167 /* BraveSettingsView.swift in Sources */,
 				42BB62D8A935B31499CE77E3 /* BraveTopViewController.swift in Sources */,
+				5C0FCE4D1E5FB3810016DF0F /* SyncWelcomeViewController.swift in Sources */,
 				6287F57212354177AA5D5F28 /* BraveURLBarView.swift in Sources */,
 				F1D4718F1D777C7C007B443D /* OnePasswordExtension.m in Sources */,
 				D36C19A448AA81DB6DFD701D /* BraveUX.swift in Sources */,
@@ -3844,11 +4012,14 @@
 				7F05CC97A91011D519E12402 /* BraveContextMenu.swift in Sources */,
 				B735CA1D323CBBD44E763DD9 /* BravePageUnloadHelper.swift in Sources */,
 				31CAC008CE6B2D73DBFC9A5E /* ElementAtPoint.swift in Sources */,
+				5CD7F38E1E3EFBF100A12BB9 /* FaviconMO.swift in Sources */,
+				5C0FCE621E63E1D90016DF0F /* SyncCodewordsView.swift in Sources */,
 				67EBDA431847A8081DDCF90E /* FingerprintingProtection.swift in Sources */,
 				365D79EB4650B90378CCF45B /* HideEmptyImages.swift in Sources */,
 				A1CFE166EBD926880A69E052 /* LoginsHelper+1PW.swift in Sources */,
 				907D2E87F3AB62A94DB2D9E7 /* InfoPlist.strings in Sources */,
 				CCCD5D311C1E3408F243DF5E /* ABPFilterLibWrapper.mm in Sources */,
+				5C44C0D21E384AE700B1FD81 /* DataController.swift in Sources */,
 				5CE70E4D1E02831B008B307A /* IntExtensions.swift in Sources */,
 				3AAE8F176D74D5884854D830 /* AdBlocker.swift in Sources */,
 				EB9CAB431DC2592700627A39 /* UIWebViewSwizzling.m in Sources */,
@@ -3871,6 +4042,7 @@
 				C5A2E6F2033E5897F1F43AD7 /* WebViewDocScale.m in Sources */,
 				5B352CB4FE3A4ED634975490 /* WebViewProgress.swift in Sources */,
 				968634F419DEA85A0922394A /* WebViewScripting.swift in Sources */,
+				5C0FCE5C1E637C160016DF0F /* SyncPairCameraViewController.swift in Sources */,
 				CCAC3364419AA9AB527A29B9 /* TPParser.cpp in Sources */,
 				D50043B62400690CFBBB5859 /* AdjustIntegration.swift in Sources */,
 				5E6571D452F3C000461D2481 /* AppDelegate.swift in Sources */,
@@ -3897,6 +4069,7 @@
 				1FA81E870F3EAE5C8FB9269C /* BrowserViewController+ContextMenuHelperDelegate.swift in Sources */,
 				5C67126F8B355442E99D9EDB /* BrowserViewController+FindInPage.swift in Sources */,
 				49603E1E5183CDC3BD1C2D09 /* BrowserViewController+KeyCommands.swift in Sources */,
+				5D27859A1E70D7EF0066EC15 /* JSInjector.swift in Sources */,
 				C1F07A6A18FC4630EA937E6B /* BrowserViewController+ReaderModeDelegate.swift in Sources */,
 				24F13EC5A582B77E0F00EB61 /* BrowserViewController+TabManagerDelegate.swift in Sources */,
 				969DAF9437DD60D2DE8021A0 /* BrowserViewController+ToolbarAndUrlbarDelegate.swift in Sources */,
@@ -3906,8 +4079,10 @@
 				0857095CBFE00F31F190C638 /* BrowserViewController.swift in Sources */,
 				A90DB45DF991E67B7130B8BB /* ContextMenuHelper.swift in Sources */,
 				DD024D7E481298ACAB9EF286 /* ErrorPageHelper.swift in Sources */,
+				5C0293851E70D9AE00CA99D0 /* MigrateData.swift in Sources */,
 				EB00A3081E1BF4CC00680DB8 /* hashFn.cpp in Sources */,
 				91B903FBE39F640B651928D0 /* FaviconManager.swift in Sources */,
+				EBDB7D471E14231900D744C7 /* Sync.swift in Sources */,
 				B12303762D2ADF302DF8F575 /* FindInPageBar.swift in Sources */,
 				57A89B3DB802440164DBCA3E /* FindInPageHelper.swift in Sources */,
 				BAE512B7D2251A8207EBA7D4 /* LoginsHelper.swift in Sources */,
@@ -3916,6 +4091,7 @@
 				B12BAB62656FE6E23B2F8FA7 /* PrintHelper.swift in Sources */,
 				9CF9F9970296253C177CD2E8 /* ReaderModeBarView.swift in Sources */,
 				209C9E2C166E53A1119E09CE /* ScreenshotHelper.swift in Sources */,
+				5DB199151E859F9100A851B6 /* SyncResponse.swift in Sources */,
 				48C6EB7A9F5866B0EAD90E90 /* SearchEngines.swift in Sources */,
 				F5723B6EE5165F5CBF544F6C /* SearchLoader.swift in Sources */,
 				2D0D3E1D9C7AA8872D5EB34D /* SearchSuggestClient.swift in Sources */,
@@ -3923,13 +4099,17 @@
 				F9DDDE64CF5ACAD94F495B1D /* SessionData.swift in Sources */,
 				9BFE547FF9C37E82814BA9C6 /* SessionRestoreHandler.swift in Sources */,
 				715CCD78C38B066CA39D4E10 /* SessionRestoreHelper.swift in Sources */,
+				5C0FCE641E63EA170016DF0F /* SyncPairWordsViewController.swift in Sources */,
 				5CFC706D1D9D9F30008A7B7A /* BraveTermsViewController.swift in Sources */,
 				D84AAF7ADCD719C5A45AFCEE /* SwipeAnimator.swift in Sources */,
 				3D25335ED4A5C9DA042516E9 /* TabManager.swift in Sources */,
+				5C0FCE661E63EB8B0016DF0F /* SyncCameraView.swift in Sources */,
 				EA13B15D4D6AF3EAC2B3177D /* TabTrayController.swift in Sources */,
+				5C0FCE601E63E1790016DF0F /* SyncBarcodeView.swift in Sources */,
 				1A23068D5E66CD83B1512D15 /* URIFixup.swift in Sources */,
 				7A4740A67EFB857AA6E9944A /* URLBarView.swift in Sources */,
 				EB00A2F51E1BF4CC00680DB8 /* BloomFilter.cpp in Sources */,
+				5DCC5D841E7C50B300054BBD /* NSJSONSerializationExtensions.swift in Sources */,
 				5F4A4A111C9E46036CF35F76 /* WindowCloseHelper.swift in Sources */,
 				68450568B88EB41CBF2CF6B0 /* BookmarksPanel.swift in Sources */,
 				162A3AF42CC684A194F305D6 /* HistoryPanel.swift in Sources */,
@@ -3952,9 +4132,11 @@
 				4A6B728ACF11D1753EB947C3 /* Clearables.swift in Sources */,
 				C430DD4BD879C97025E308CB /* ClearPrivateDataTableViewController.swift in Sources */,
 				4AEC1270F1F51DE3120C8E86 /* LoginDetailViewController.swift in Sources */,
+				5C0FCE5E1E6381B70016DF0F /* SyncSettingsViewController.swift in Sources */,
 				D4D89E59C045D41A4853B20F /* SearchEnginePicker.swift in Sources */,
 				D22B5AC8588A48662FD6757A /* SearchSettingsTableViewController.swift in Sources */,
 				7DDC5DDFD3653B02726E925F /* SettingsContentViewController.swift in Sources */,
+				5C44C0D71E3C08B400B1FD81 /* Bookmark.swift in Sources */,
 				71016AB1FC1E6BA1ED8AE24B /* SettingsNavigationController.swift in Sources */,
 				5F75F6A942D553447FCA177F /* SettingsTableViewController.swift in Sources */,
 				A69BFC90988CE401E0A5A0E7 /* FindInPageActivity.swift in Sources */,
@@ -3980,6 +4162,7 @@
 				10443C68C8505F7FDDE1C6F2 /* ThumbnailCell.swift in Sources */,
 				E9788E828C3C9FEF2E9BD34E /* ToggleButton.swift in Sources */,
 				98AAC06AB032F173C2F60733 /* Toolbar.swift in Sources */,
+				5C0FCE531E637B9D0016DF0F /* SyncAddDeviceViewController.swift in Sources */,
 				EEEF79E07492339CF13D856A /* TwoLineCell.swift in Sources */,
 				3696DC8F3824B7E55FDE2466 /* SpotlightHelper.swift in Sources */,
 				E7026A766AA17FE4022C8F83 /* NSUserDefaultsPrefs.swift in Sources */,
@@ -3994,6 +4177,7 @@
 				C3424B76234256F7426F3A7D /* FaviconFetcher.swift in Sources */,
 				32AFA6803EED54948FC69908 /* MenuHelper.swift in Sources */,
 				8C0901558DCB4A138F977DCE /* Swizzling.m in Sources */,
+				5D3892551E98108F00F959E6 /* Model.xcdatamodeld in Sources */,
 				8201EBEC8C36EDD93D330A07 /* Try.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4134,6 +4318,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 5;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -4161,6 +4346,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 5;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -4214,6 +4400,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = NO;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -4223,8 +4410,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)";
@@ -4232,6 +4421,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -4252,7 +4442,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Storage/modules";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Client-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -4265,7 +4455,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = brave/Brave.entitlements;
 				DEVELOPMENT_TEAM = "";
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -4301,6 +4490,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 5;
 				DEFINES_MODULE = YES;
@@ -4351,6 +4541,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 5;
 				DEFINES_MODULE = YES;
@@ -4448,6 +4639,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4530,6 +4722,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
@@ -4793,6 +4986,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLICATION_EXTENSION_API_ONLY = NO;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -4802,8 +4996,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
@@ -4811,6 +5007,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -4850,7 +5047,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = brave/Brave.entitlements;
 				DEVELOPMENT_TEAM = "";
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -4972,6 +5168,21 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		5D3892531E98108F00F959E6 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5D3892561E9810B400F959E6 /* Model2.xcdatamodel */,
+				5D3892541E98108F00F959E6 /* Model.xcdatamodel */,
+			);
+			currentVersion = 5D3892561E9810B400F959E6 /* Model2.xcdatamodel */;
+			name = Model.xcdatamodeld;
+			path = brave/src/data/Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = F84B21B61A090F8100AAB793 /* Project object */;
 }

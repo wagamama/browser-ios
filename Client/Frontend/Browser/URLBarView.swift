@@ -275,71 +275,9 @@ class URLBarView: UIView {
     }
 
     class func updateTabCount(tabsButton: TabsButton, inout clonedTabsButton: TabsButton?, count: Int, animated: Bool = true) {
-        let currentCount = tabsButton.titleLabel.text
-        // only animate a tab count change if the tab count has actually changed
-        if currentCount == "\(count)" {
-            return
-        }
-
-        // make a 'clone' of the tabs button
-        let newTabsButton = tabsButton.clone() as! TabsButton
-        clonedTabsButton = newTabsButton
-        // BRAVE: see clone(), do not to this here: newTabsButton.addTarget(parent, action: "SELdidClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
-        newTabsButton.titleLabel.text = "\(count)"
-        newTabsButton.accessibilityValue = "\(count)"
-
-        // BRAVE added
-        guard let parentView = tabsButton.superview else { return }
-        parentView.addSubview(newTabsButton)
-        newTabsButton.snp_makeConstraints { make in
-            make.center.equalTo(tabsButton)
-            // BRAVE: this will shift the button right during animation on bottom toolbar make.trailing.equalTo(parentView)
-            make.size.equalTo(tabsButton.snp_size)
-        }
-
-        newTabsButton.frame = tabsButton.frame
-
-        // Instead of changing the anchorPoint of the CALayer, lets alter the rotation matrix math to be
-        // a rotation around a non-origin point
-        let frame = tabsButton.insideButton.frame
-        let halfTitleHeight = CGRectGetHeight(frame) / 2
-
-        var newFlipTransform = CATransform3DIdentity
-        newFlipTransform = CATransform3DTranslate(newFlipTransform, 0, halfTitleHeight, 0)
-        newFlipTransform.m34 = -1.0 / 200.0 // add some perspective
-        newFlipTransform = CATransform3DRotate(newFlipTransform, CGFloat(-M_PI_2), 1.0, 0.0, 0.0)
-        newTabsButton.insideButton.layer.transform = newFlipTransform
-
-        var oldFlipTransform = CATransform3DIdentity
-        oldFlipTransform = CATransform3DTranslate(oldFlipTransform, 0, halfTitleHeight, 0)
-        oldFlipTransform.m34 = -1.0 / 200.0 // add some perspective
-        oldFlipTransform = CATransform3DRotate(oldFlipTransform, CGFloat(M_PI_2), 1.0, 0.0, 0.0)
-
-        let animate = {
-            newTabsButton.insideButton.layer.transform = CATransform3DIdentity
-            tabsButton.insideButton.layer.transform = oldFlipTransform
-            tabsButton.insideButton.layer.opacity = 0
-        }
-
-        let completion: (Bool) -> Void = { finished in
-            // remove the clone and setup the actual tab button
-            newTabsButton.removeFromSuperview()
-
-            tabsButton.insideButton.layer.opacity = 1
-            tabsButton.insideButton.layer.transform = CATransform3DIdentity
-            tabsButton.accessibilityLabel = Strings.Show_Tabs
-            
-            // By this time, the 'count' func argument may be out of date, use the correct current count
-            let currentCount = getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count
-            tabsButton.titleLabel.text = "\(currentCount)"
-            tabsButton.accessibilityLabel = "\(currentCount)"
-        }
-
-        if animated {
-            UIView.animateWithDuration(1.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: animate, completion: completion)
-        } else {
-            completion(true)
-        }
+        let newCount = "\(getApp().tabManager.tabs.displayedTabsForCurrentPrivateMode.count)"
+        tabsButton.accessibilityValue = newCount
+        tabsButton.titleLabel.text = newCount
     }
 
     func updateProgressBar(progress: Float, dueToTabChange: Bool = false) {
@@ -460,7 +398,6 @@ class URLBarView: UIView {
     }
 
     func SELdidClickAddTab() {
-        telemetry(action: "show tab tray", props: ["bottomToolbar": "true"])
         delegate?.urlBarDidPressTabs(self)
     }
 

@@ -155,14 +155,6 @@ class BraveWebView: UIWebView {
         }
     }
 
-    func updateLocationFromHtml() -> Bool {
-        guard let js = stringByEvaluatingJavaScriptFromString("document.location.href"), let location = NSURL(string: js) else { return false }
-        if AboutUtils.isAboutHomeURL(location) {
-            return false
-        }
-        return setUrl(location)
-    }
-
     private static var webviewBuiltinUserAgent = UserAgent.defaultUserAgent()
 
     // Needed to identify webview in url protocol
@@ -218,11 +210,7 @@ class BraveWebView: UIWebView {
             return
         }
 
-        if !updateLocationFromHtml() {
-            return
-        }
-
-        print("Page change detected by content size change triggered timer: \(URL?.absoluteString ?? "")")
+        // print("Page change detected by content size change triggered timer: \(URL?.absoluteString ?? "")")
 
         NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
         shieldStatUpdate(.reset)
@@ -275,12 +263,6 @@ class BraveWebView: UIWebView {
 
         let rate = UIScrollViewDecelerationRateFast + (UIScrollViewDecelerationRateNormal - UIScrollViewDecelerationRateFast) * 0.5;
             scrollView.setValue(NSValue(CGSize: CGSizeMake(rate, rate)), forKey: "_decelerationFactor")
-
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(firstLayoutPerformed), name: swizzledFirstLayoutNotification, object: nil)
-    }
-
-    func firstLayoutPerformed() {
-        updateLocationFromHtml()
     }
 
     var jsBlockedStatLastUrl: String? = nil
@@ -347,10 +329,6 @@ class BraveWebView: UIWebView {
 
     var blankTargetUrl: String?
 
-    func urlBlankTargetTapped(url: String) {
-        blankTargetUrl = url
-    }
-
     let internalProgressStartedNotification = "WebProgressStartedNotification"
     let internalProgressChangedNotification = "WebProgressEstimateChangedNotification"
     let internalProgressFinishedNotification = "WebProgressFinishedNotification" // Not usable
@@ -364,8 +342,8 @@ class BraveWebView: UIWebView {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: internalProgressChangedNotification, object: internalWebView)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BraveWebView.internalProgressNotification(_:)), name: internalProgressChangedNotification, object: internalWebView)
 
-        if let url = request.URL, domain = url.normalizedHost() {
-            internalSetBraveShieldStateForDomain(domain)
+        if let url = request.URL {
+            internalSetBraveShieldStateForDomain(url.normalizedHost())
         }
         super.loadRequest(request)
     }
@@ -431,7 +409,6 @@ class BraveWebView: UIWebView {
                     return
             }
 
-            me.updateLocationFromHtml()
             me.updateTitleFromHtml()
             tab.lastExecutedTime = NSDate.now()
             getApp().browserViewController.updateProfileForLocationChange(tab)
@@ -486,8 +463,8 @@ class BraveWebView: UIWebView {
         NSURLCache.sharedURLCache().diskCapacity = 0
         NSURLCache.sharedURLCache().memoryCapacity = 0
 
-        if let url = URL, domain = url.normalizedHost() {
-            internalSetBraveShieldStateForDomain(domain)
+        if let url = URL {
+            internalSetBraveShieldStateForDomain(url.normalizedHost())
             (getApp().browserViewController as! BraveBrowserViewController).updateBraveShieldButtonState(animated: false)
         }
         super.reload()
@@ -730,12 +707,10 @@ extension BraveWebView: UIWebViewDelegate {
             // TODO Maybe separate page unload from link clicked.
             NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
             setUrl(url)
-            #if DEBUG
-                print("Page changed by shouldStartLoad: \(URL?.absoluteString ?? "")")
-            #endif
+            //print("Page changed by shouldStartLoad: \(URL?.absoluteString ?? "")")
 
-            if let url = request.URL, domain = url.normalizedHost() {
-                internalSetBraveShieldStateForDomain(domain)
+            if let url = request.URL {
+                internalSetBraveShieldStateForDomain(url.normalizedHost())
             }
 
             shieldStatUpdate(.reset)
@@ -792,7 +767,7 @@ extension BraveWebView: UIWebViewDelegate {
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError) {
-        print("didFailLoadWithError: \(error)")
+        //print("didFailLoadWithError: \(error)")
         guard let errorUrl = error.userInfo[NSURLErrorFailingURLErrorKey] as? NSURL else { return }
         if errorUrl.isSpecialInternalUrl() {
             return
@@ -854,13 +829,6 @@ extension BraveWebView: UIWebViewDelegate {
                     nd.webViewDidFailNavigation(self, withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
                 }
             }
-        }
-
-        (webView as! BraveWebView).updateLocationFromHtml()
-        postAsyncToMain(1) {
-            // There is no order of event guarantee, so in case some other event sets self.URL AFTER page error, do added check
-            [weak webView] in
-            (webView as? BraveWebView)?.updateLocationFromHtml()
         }
 
         progress?.didFailLoadWithError()

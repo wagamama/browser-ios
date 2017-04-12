@@ -181,7 +181,9 @@ class PrivateBrowsing {
             getApp().profile?.db.reopenIfClosed()
             BraveApp.setupCacheDefaults()
 
-            getApp().profile?.loadBraveShieldsPerBaseDomain().upon() { _ in // clears PB in-memory-only shield data, loads from disk
+
+            // clears PB in-memory-only shield data, loads from disk
+            Domain.loadShieldsIntoMemory {
                 let clear: [Clearable] = [CookiesClearable()]
                 ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(dispatch_get_main_queue()) { _ in
                     self.cookiesFileDiskOperation(.DeletePublicBackup)

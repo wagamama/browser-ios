@@ -125,7 +125,6 @@ class SearchSetting: Setting {
 
 class LoginsSetting: Setting {
     let profile: Profile
-    ///var tabManager: TabManager!
     weak var navigationController: UINavigationController?
 
     override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
@@ -134,7 +133,6 @@ class LoginsSetting: Setting {
 
     init(settings: SettingsTableViewController, delegate: SettingsDelegate?) {
         self.profile = settings.profile
-        ///self.tabManager = settings.tabManager
         self.navigationController = settings.navigationController
 
         let loginsTitle = Strings.Logins
@@ -149,10 +147,62 @@ class LoginsSetting: Setting {
     }
 }
 
+class SyncDevicesSetting: Setting {
+    let profile: Profile
+    
+    override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
+    
+    override var accessibilityIdentifier: String? { return "SyncDevices" }
+    
+    init(settings: SettingsTableViewController) {
+        self.profile = settings.profile
+        
+        let clearTitle = Strings.SyncDevices
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+    }
+    
+    override func onClick(navigationController: UINavigationController?) {
+        
+        if Sync.shared.isInSyncGroup {
+            let settingsTableViewController = SyncSettingsViewController(style: .Grouped)
+            settingsTableViewController.profile = getApp().profile
+            navigationController?.pushViewController(settingsTableViewController, animated: true)
+        } else {
+            navigationController?.pushViewController(SyncWelcomeViewController(), animated: true)
+        }
+    }
+}
+
+class RemoveDeviceSetting: Setting {
+    let profile: Profile
+    
+    override var accessoryType: UITableViewCellAccessoryType { return .None }
+    
+    override var accessibilityIdentifier: String? { return "RemoveDeviceSetting" }
+    
+    override var textAlignment: NSTextAlignment { return .Center }
+    
+    init(settings: SettingsTableViewController) {
+        self.profile = settings.profile
+        let clearTitle = Strings.SyncRemoveThisDevice
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIColor.redColor(), NSFontAttributeName: UIFont.systemFontOfSize(17, weight: UIFontWeightRegular)]))
+    }
+    
+    override func onClick(navigationController: UINavigationController?) {
+        
+        let alert = UIAlertController(title: "Remove this Device?", message: "This device will be disconnected from sync group and no longer receive or send sync data. All existing data will remain on device.", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive) { action in
+            Sync.shared.leaveSyncGroup()
+            navigationController?.popToRootViewControllerAnimated(true)
+        })
+        
+        navigationController?.presentViewController(alert, animated: true, completion: nil)
+    }
+}
 
 class ClearPrivateDataSetting: Setting {
     let profile: Profile
-    //var tabManager: TabManager!
 
     override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
 
@@ -160,7 +210,6 @@ class ClearPrivateDataSetting: Setting {
 
     init(settings: SettingsTableViewController) {
         self.profile = settings.profile
-        //self.tabManager = settings.tabManager
 
         let clearTitle = Strings.ClearPrivateData
         super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
@@ -169,7 +218,6 @@ class ClearPrivateDataSetting: Setting {
     override func onClick(navigationController: UINavigationController?) {
         let viewController = ClearPrivateDataTableViewController()
         viewController.profile = profile
-        //viewController.tabManager = tabManager
         navigationController?.pushViewController(viewController, animated: true)
     }
 }

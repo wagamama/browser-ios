@@ -1,12 +1,12 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Storage
+import CoreData
 import SnapKit
 import Shared
 
 class MainSidePanelViewController : SidePanelBaseViewController {
 
-    let bookmarksPanel = BookmarksPanel()
+    let bookmarksPanel = BookmarksPanel(folder: nil)
     private var bookmarksNavController:UINavigationController!
     
     let history = HistoryPanel()
@@ -74,19 +74,9 @@ class MainSidePanelViewController : SidePanelBaseViewController {
 
         containerView.bringSubviewToFront(topButtonsView)
 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(historyItemAdded), name: kNotificationSiteAddedToHistory, object: nil)
+       // NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(historyItemAdded), name: kNotificationSiteAddedToHistory, object: nil)
     }
 
-    @objc func historyItemAdded() {
-        telemetry(action: "page changed", props: nil)
-        if self.view.hidden {
-            return
-        }
-        postAsyncToMain {
-            self.history.refresh()
-        }
-    }
-    
     func willHide() {
         //check if we are editing bookmark, if so pop controller then continue
         if self.bookmarksNavController?.visibleViewController is BookmarkEditingViewController {
@@ -115,30 +105,28 @@ class MainSidePanelViewController : SidePanelBaseViewController {
     //see MainSidePanelViewController#updateBookmarkStatus(isBookmarked,url)
     func onClickBookmarksButton() {
         guard let tab = browserViewController?.tabManager.selectedTab else { return }
-        guard let url = tab.displayURL?.absoluteString else { return }
-        
+        guard let url = tab.url else { return }
+
+        // stop from spamming the button, and enabled is used elsewhere, so create a guard
+        struct Guard { static var block = false }
+        if Guard.block {
+            return
+        }
+        postAsyncToMain(0.3) {
+            Guard.block = false
+        }
+        Guard.block = true
+
         //switch to bookmarks 'tab' in case we're looking at history and tapped the add/remove bookmark button
         onClickPageButton(bookmarksButton)
 
         //TODO -- need to separate the knowledge of whether current site is bookmarked or not from this UI button
         //tracked in https://github.com/brave/browser-ios/issues/375
         if addBookmarkButton.selected {
-            browserViewController?.removeBookmark(url) {
-                self.bookmarksPanel.currentBookmarksPanel().reloadData()
-            }
+            browserViewController?.removeBookmark(url)
         } else {
-            var folderId:String? = nil
-            var folderTitle:String? = nil
-            if let currentFolder = self.bookmarksPanel.currentBookmarksPanel().bookmarkFolder {
-                folderId = currentFolder.guid
-                folderTitle = currentFolder.title
-            }
-
-            browserViewController?.addBookmark(url, title: tab.title, folderId: folderId, folderTitle: folderTitle).upon { _ in
-                postAsyncToMain {
-                    self.bookmarksPanel.currentBookmarksPanel().reloadData()
-                }
-            }
+            let folder = self.bookmarksPanel.currentBookmarksPanel().currentFolder
+            browserViewController?.addBookmark(url.absoluteString, title: tab.title, parentFolder: folder)
         }
     }
 
@@ -220,8 +208,6 @@ class MainSidePanelViewController : SidePanelBaseViewController {
     }
 
     override func setHomePanelDelegate(delegate: HomePanelDelegate?) {
-        bookmarksPanel.profile = getApp().profile
-        history.profile = getApp().profile
         bookmarksPanel.homePanelDelegate = delegate
         history.homePanelDelegate = delegate
         

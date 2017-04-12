@@ -4,11 +4,8 @@
 
 import Foundation
 import Shared
-import WebKit
 import Deferred
 import WebImage
-
-private let log = Logger.browserLogger
 
 // A base protocol for something that can be cleared.
 protocol Clearable {
@@ -25,33 +22,6 @@ class ClearableError: MaybeErrorType {
     var description: String { return msg }
 }
 
-// Clears our browsing history, including favicons and thumbnails.
-class HistoryClearable: Clearable {
-    let profile: Profile
-    init(profile: Profile) {
-        self.profile = profile
-    }
-
-    var label: String {
-        return Strings.Browsing_History
-    }
-
-    func clear() -> Success {
-        return profile.history.clearHistory().bind { success in
-            (self.profile as! BrowserProfile).clearBraveShieldHistory().bind {
-                _ in
-                dispatch_sync(dispatch_get_main_queue()) {
-                    SDImageCache.sharedImageCache().clearDisk()
-                    SDImageCache.sharedImageCache().clearMemory()
-                    NSNotificationCenter.defaultCenter().postNotificationName(NotificationPrivateDataClearedHistory, object: nil)
-                }
-                log.debug("HistoryClearable succeeded: \(success).")
-                return Deferred(value: success)
-            }
-        }
-    }
-}
-
 struct ClearableErrorType: MaybeErrorType {
     let err: ErrorType
 
@@ -64,43 +34,6 @@ struct ClearableErrorType: MaybeErrorType {
     }
 }
 
-// Clear the web cache. Note, this has to close all open tabs in order to ensure the data
-// cached in them isn't flushed to disk.
-class CacheClearable: Clearable {
-
-    var label: String {
-        return Strings.Cache
-    }
-
-    func clear() -> Success {
-        let result = Deferred<Maybe<()>>()
-        // need event loop to run to autorelease UIWebViews fully
-        postAsyncToMain(0.1) {
-            NSURLCache.sharedURLCache().memoryCapacity = 0;
-            NSURLCache.sharedURLCache().diskCapacity = 0;
-            // Remove the basic cache.
-            NSURLCache.sharedURLCache().removeAllCachedResponses()
-
-            var err: ErrorType?
-            for item in ["Caches", "Preferences", "Cookies", "WebKit"] {
-                do {
-                    try deleteLibraryFolderContents(item, validateClearedExceptFor: ["Snapshots"])
-                } catch {
-                    err = error
-                }
-            }
-            if let err = err {
-                return result.fill(Maybe<()>(failure: ClearableErrorType(err: err)))
-            }
-
-            // Leave the cache off in the error cases above
-            BraveApp.setupCacheDefaults()
-            result.fill(Maybe<()>(success: ()))
-        }
-
-        return result
-    }
-}
 
 // Delete all the contents of a the folder, and verify using validateClearedWithNameContains that critical files are removed (any remaining file must not contain the specified substring(s))
 // Alert the user if these files still exist after clearing.
@@ -140,20 +73,6 @@ private func deleteLibraryFolder(folder: String) throws {
     try manager.removeItemAtURL(dir!)
 }
 
-// Removes all app cache storage.
-class SiteDataClearable: Clearable {
-    var label: String {
-        return Strings.Offline_Website_Data
-    }
-
-    func clear() -> Success {
-        let dataTypes = Set([WKWebsiteDataTypeOfflineWebApplicationCache])
-        WKWebsiteDataStore.defaultDataStore().removeDataOfTypes(dataTypes, modifiedSince: NSDate.distantPast(), completionHandler: {})
-        log.debug("SiteDataClearable succeeded.")
-        return succeed()
-    }
-}
-
 // Remove all cookies stored by the site. This includes localStorage, sessionStorage, and WebSQL/IndexedDB.
 class CookiesClearable: Clearable {
 
@@ -187,3 +106,64 @@ class CookiesClearable: Clearable {
         return result
     }
 }
+
+// Clear the web cache. Note, this has to close all open tabs in order to ensure the data
+// cached in them isn't flushed to disk.
+class CacheClearable: Clearable {
+
+    var label: String {
+        return Strings.Cache
+    }
+
+    func clear() -> Success {
+        let result = Deferred<Maybe<()>>()
+        // need event loop to run to autorelease UIWebViews fully
+        postAsyncToMain(0.1) {
+            NSURLCache.sharedURLCache().memoryCapacity = 0;
+            NSURLCache.sharedURLCache().diskCapacity = 0;
+            // Remove the basic cache.
+            NSURLCache.sharedURLCache().removeAllCachedResponses()
+
+            var err: ErrorType?
+            for item in ["Caches", "Preferences", "Cookies", "WebKit"] {
+                do {
+                    try deleteLibraryFolderContents(item, validateClearedExceptFor: ["Snapshots"])
+                } catch {
+                    err = error
+                }
+            }
+            if let err = err {
+                return result.fill(Maybe<()>(failure: ClearableErrorType(err: err)))
+            }
+
+            // Leave the cache off in the error cases above
+            BraveApp.setupCacheDefaults()
+            result.fill(Maybe<()>(success: ()))
+        }
+        
+        return result
+    }
+}
+
+
+// Clears our browsing history, including favicons and thumbnails.
+class HistoryClearable: Clearable {
+    init() {
+    }
+
+    var label: String {
+        return Strings.Browsing_History
+    }
+
+    func clear() -> Success {
+        let result = Success()
+        History.deleteAll {
+            SDImageCache.sharedImageCache().clearDisk()
+            SDImageCache.sharedImageCache().clearMemory()
+            NSNotificationCenter.defaultCenter().postNotificationName(NotificationPrivateDataClearedHistory, object: nil)
+            result.fill(Maybe<()>(success: ()))
+        }
+        return result
+    }
+}
+
