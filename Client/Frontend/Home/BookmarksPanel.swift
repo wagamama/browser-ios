@@ -423,11 +423,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         }
     }
 
-//    private func hasRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath) -> Bool {
-//        return indexPath.section < tableView.numberOfSections && indexPath.row < tableView.numberOfRowsInSection(indexPath.section)
-//    }
-
-
     func currentBookmarksPanel() -> BookmarksPanel {
         guard let controllers = navigationController?.viewControllers.filter({ $0 as? BookmarksPanel != nil }) else {
             return self
@@ -579,19 +574,6 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     }
 
     func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-//        guard let source = source else {
-//            return .None
-//        }
-//
-//        if source.current[indexPath.row] is BookmarkSeparator {
-//            // Because the deletion block is too big.
-//            return .None
-//        }
-//
-//        if source.current.itemIsEditableAtIndex(indexPath.row) ?? false {
-//            return .Delete
-//        }
-
         return .Delete
     }
     
