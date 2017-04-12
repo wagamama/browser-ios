@@ -7,6 +7,9 @@ import Shared
 
 typealias UIAlertActionCallback = (UIAlertAction) -> Void
 
+// TODO: Build out this functionality a bit more (and remove FF code).
+//  We have a number of "cancel" "yes" type alerts, should abstract here
+
 // MARK: - Extension methods for building specific UIAlertController instances used across the app
 extension UIAlertController {
 

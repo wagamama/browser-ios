@@ -594,19 +594,33 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
         guard let item = frc?.objectAtIndexPath(indexPath) as? Bookmark else { return nil }
 
-        let delete = UITableViewRowAction(style: UITableViewRowActionStyle.Destructive, title: Strings.Delete, handler: { (action, indexPath) in
+        let deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.Destructive, title: Strings.Delete, handler: { (action, indexPath) in
 
-            Bookmark.remove(bookmark: item, save: true)
-
-            // updates the bookmark state
-            getApp().browserViewController.updateURLBarDisplayURL(tab: nil)
+            func delete() {
+                Bookmark.remove(bookmark: item, save: true)
+                
+                // Updates the bookmark state
+                getApp().browserViewController.updateURLBarDisplayURL(tab: nil)
+            }
+            
+            if let children = item.children where !children.isEmpty {
+                let alert = UIAlertController(title: "Delete Folder?", message: "This will delete all folders and bookmarks inside. Are you sure you want to continue?", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+                alert.addAction(UIAlertAction(title: "Yes, Delete", style: UIAlertActionStyle.Destructive) { action in
+                    delete()
+                    })
+               
+                self.presentViewController(alert, animated: true, completion: nil)
+            } else {
+                delete()
+            }
         })
 
-        let edit = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: Strings.Edit, handler: { (action, indexPath) in
+        let editAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: Strings.Edit, handler: { (action, indexPath) in
             self.showEditBookmarkController(tableView, indexPath: indexPath)
         })
 
-        return [delete, edit]
+        return [deleteAction, editAction]
     }
     
     private func showEditBookmarkController(tableView: UITableView, indexPath:NSIndexPath) {
