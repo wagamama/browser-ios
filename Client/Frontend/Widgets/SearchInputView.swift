@@ -45,6 +45,7 @@ class SearchInputView: UIView {
         textField.accessibilityLabel = Strings.Search_Input_Field
         textField.autocorrectionType = .No
         textField.autocapitalizationType = .None
+        textField.keyboardAppearance = .Dark
         return textField
     }()
 
