@@ -113,8 +113,13 @@ class Bookmark: NSManagedObject {
             return
         }
         
-        self.customTitle = customTitle
-        self.url = url
+        if let ct = customTitle where !ct.isEmpty {
+            self.customTitle = customTitle
+        }
+        
+        if let u = url where !u.isEmpty {
+            self.url = url
+        }
         
         if save {
             DataController.saveContext()
