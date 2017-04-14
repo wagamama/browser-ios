@@ -1003,6 +1003,16 @@ extension BrowserViewController: SearchViewControllerDelegate {
         updateFindInPageVisibility(visible: true)
         findInPageBar?.text = query
     }
+    
+    func searchViewControllerAllowFindInPage() -> Bool {
+        // Hides find in page for new tabs.
+        if let st = tabManager.selectedTab, let wv = st.webView {
+            if AboutUtils.isAboutHomeURL(wv.URL) == false {
+                return true
+            }
+        }
+        return false
+    }
 }
 
 extension BrowserViewController: ReaderModeDelegate {
