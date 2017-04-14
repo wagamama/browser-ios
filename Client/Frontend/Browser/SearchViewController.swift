@@ -515,9 +515,7 @@ extension SearchViewController {
             if let sd = searchDelegate where sd.searchViewControllerAllowFindInPage() {
                 return 22
             }
-            else {
-                return 0
-            }
+            return 0
         }
     }
     
@@ -578,9 +576,7 @@ extension SearchViewController {
             if let sd = searchDelegate where sd.searchViewControllerAllowFindInPage() {
                 return 1
             }
-            else {
-                return 0
-            }
+            return 0
         }
     }
 

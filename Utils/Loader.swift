@@ -26,8 +26,6 @@ public class Loader<T, ListenerType: LoaderListener where T == ListenerType.T> {
     }
 
     public func load(data: T) {
-        for listener in listeners {
-            listener.loader(dataLoaded: data)
-        }
+        listeners.forEach { $0.loader(dataLoaded: data) }
     }
 }

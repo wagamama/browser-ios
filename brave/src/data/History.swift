@@ -139,7 +139,7 @@ class History: NSManagedObject {
             let fetchError = error as NSError
             print(fetchError)
         }
-        return [History]()
+        return []
     }
     
     class func deleteAll(completionOnMain: ()->()) {
