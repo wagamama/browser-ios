@@ -123,13 +123,19 @@ class History: NSManagedObject {
         return result
     }
 
-    class func frecencyQuery(context: NSManagedObjectContext) -> [History] {
+    class func frecencyQuery(context: NSManagedObjectContext, containing:String? = nil) -> [History] {
         assert(!NSThread.isMainThread())
 
         let fetchRequest = NSFetchRequest()
         fetchRequest.fetchLimit = 100
         fetchRequest.entity = History.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "visitedOn > %@", History.ThisWeek)
+        
+        var predicate = NSPredicate(format: "visitedOn > %@", History.ThisWeek)
+        if let query = containing {
+            predicate = NSPredicate(format: predicate.predicateFormat + " AND url CONTAINS %@", query)
+        }
+        
+        fetchRequest.predicate = predicate
 
         do {
             if let results = try context.executeFetchRequest(fetchRequest) as? [History] {

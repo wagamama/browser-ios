@@ -37,14 +37,14 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
     }()
 
     // TODO: This is not a proper frecency query, it just gets sites from the past week
-    private func getSitesByFrecency() -> Deferred<[Site]> {
+    private func getSitesByFrecency(containing containing: String? = nil) -> Deferred<[Site]> {
         let result = Deferred<[Site]>()
 
         let context = DataController.shared.workerContext()
         context.performBlock {
             var sites = [Site]()
 
-            let historyItems = History.frecencyQuery(context)
+            let historyItems = History.frecencyQuery(context, containing: containing)
             for h in historyItems {
                 let s = Site(url: h.url ?? "", title: h.title ?? "")
 
@@ -81,7 +81,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
                 self.inProgress = nil
             }
 
-            let deferred = getSitesByFrecency()
+            let deferred = getSitesByFrecency(containing: query)
             inProgress = deferred as? Cancellable
 
             deferred.uponQueue(dispatch_get_main_queue()) { result in
