@@ -6,7 +6,7 @@ import CoreData
 import Foundation
 import Shared
 
-class Bookmark: NSManagedObject {
+class Bookmark: NSManagedObject, WebsitePresentable {
     
     @NSManaged var isFolder: Bool
     @NSManaged var title: String?

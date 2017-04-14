@@ -42,29 +42,13 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
 
         let context = DataController.shared.workerContext()
         context.performBlock {
-            var sites = [Site]()
-
-            let historyItems = History.frecencyQuery(context, containing: containing)
-            for h in historyItems {
-                let s = Site(url: h.url ?? "", title: h.title ?? "")
-
-                if let url = h.domain?.favicon?.url {
-                    s.icon = Favicon(url: url, type: IconType.Guess)
-                }
-                sites.append(s)
-            }
-
-            for bm in Bookmark.frecencyQuery(context, containing: containing) {
-                let s = Site(url: bm.url ?? "", title: bm.title ?? "", bookmarked: true)
-
-                if let url = bm.domain?.favicon?.url {
-                    s.icon = Favicon(url: url, type: IconType.Guess)
-                }
-                sites.append(s)
-            }
-
-
-            result.fill(sites)
+            
+            let history: [WebsitePresentable] = History.frecencyQuery(context, containing: containing)
+            let bookmarks: [WebsitePresentable] = Bookmark.frecencyQuery(context, containing: containing)
+            
+            // History must come before bookmarks, since later items replace existing ones, and want bookmarks to replace history entries
+            let uniqueSites = Set<Site>( (history + bookmarks).map { Site(url: $0.url ?? "", title: $0.title ?? "", bookmarked: $0 is Bookmark) } )
+            result.fill(Array(uniqueSites))
         }
         return result
     }

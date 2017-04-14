@@ -35,7 +35,7 @@ public func isIgnoredURL(url: String) -> Bool {
     return false
 }
 
-class History: NSManagedObject {
+class History: NSManagedObject, WebsitePresentable {
 
     @NSManaged var title: String?
     @NSManaged var url: String?

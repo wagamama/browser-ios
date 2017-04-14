@@ -87,7 +87,7 @@ public class Favicon: NSObject, Identifiable, NSCoding {
 
 // TODO: Site shouldn't have all of these optional decorators. Include those in the
 // cursor results, perhaps as a tuple.
-public class Site: Identifiable {
+public class Site: Identifiable, Hashable {
     public var id: Int? = nil
     var guid: String? = nil
 
@@ -110,5 +110,11 @@ public class Site: Identifiable {
         self.url = url
         self.title = title
         self.bookmarked = bookmarked
+    }
+    
+    // This hash is a bit limited in scope, but contains enough data to make a unique distinction.
+    //  If modified, verify usage elsewhere, as places may rely on the hash only including these two elements.
+    public var hashValue: Int {
+        return self.url.hash + self.title.hash
     }
 }
