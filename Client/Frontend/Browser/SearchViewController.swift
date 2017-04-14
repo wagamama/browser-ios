@@ -12,8 +12,8 @@ private let PromptNo = Strings.No
 
 private enum SearchListSection: Int {
     case SearchSuggestions
-    case BookmarksAndHistory
     case FindInPage
+    case BookmarksAndHistory
     static let Count = 3
 }
 
@@ -51,6 +51,7 @@ private struct SearchViewControllerUX {
 protocol SearchViewControllerDelegate: class {
     func searchViewController(searchViewController: SearchViewController, didSelectURL url: NSURL)
     func searchViewController(searchViewController: SearchViewController, shouldFindInPage query: String)
+    func searchViewControllerAllowFindInPage() -> Bool
     func presentSearchSettingsController()
 }
 
@@ -509,9 +510,14 @@ extension SearchViewController {
         case .SearchSuggestions:
             return 0
         case .BookmarksAndHistory:
-            return 0
+            return 0.1 // show header border w/out extra space.
         case .FindInPage:
-            return 22
+            if let sd = searchDelegate where sd.searchViewControllerAllowFindInPage() {
+                return 22
+            }
+            else {
+                return 0
+            }
         }
     }
     
@@ -521,6 +527,10 @@ extension SearchViewController {
             case .FindInPage:
                 let header = super.tableView(tableView, viewForHeaderInSection: section) as! SiteTableViewHeader
                 header.titleLabel.text = Strings.SearchInPage
+                return header
+            case .BookmarksAndHistory:
+                let header = super.tableView(tableView, viewForHeaderInSection: section) as! SiteTableViewHeader
+                header.titleLabel.text = ""
                 return header
             default:
                 return super.tableView(tableView, viewForHeaderInSection: section)
@@ -565,7 +575,12 @@ extension SearchViewController {
         case .BookmarksAndHistory:
             return data.count
         case .FindInPage:
-            return 1
+            if let sd = searchDelegate where sd.searchViewControllerAllowFindInPage() {
+                return 1
+            }
+            else {
+                return 0
+            }
         }
     }
 
