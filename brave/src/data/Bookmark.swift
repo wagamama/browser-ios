@@ -255,13 +255,18 @@ class Bookmark: NSManagedObject {
         }
     }
 
-    class func frecencyQuery(context: NSManagedObjectContext) -> [Bookmark] {
+    class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
         assert(!NSThread.isMainThread())
 
         let fetchRequest = NSFetchRequest()
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context)
-        fetchRequest.predicate = NSPredicate(format: "lastVisited > %@", History.ThisWeek)
+        
+        var predicate = NSPredicate(format: "lastVisited > %@", History.ThisWeek)
+        if let query = containing {
+            predicate = NSPredicate(format: predicate.predicateFormat + " AND url CONTAINS %@", query)
+        }
+        fetchRequest.predicate = predicate
 
         do {
             if let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark] {

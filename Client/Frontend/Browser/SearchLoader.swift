@@ -54,7 +54,7 @@ class _SearchLoader<UnusedA, UnusedB>: Loader<[Site], SearchViewController> {
                 sites.append(s)
             }
 
-            for bm in Bookmark.frecencyQuery(context) {
+            for bm in Bookmark.frecencyQuery(context, containing: containing) {
                 let s = Site(url: bm.url ?? "", title: bm.title ?? "", bookmarked: true)
 
                 if let url = bm.domain?.favicon?.url {
