@@ -125,7 +125,7 @@ class BrowserLocationView: UIView {
         urlTextField.addGestureRecognizer(self.longPressRecognizer)
         self.tapRecognizer.delegate = self
         urlTextField.addGestureRecognizer(self.tapRecognizer)
-
+        urlTextField.keyboardAppearance = .Dark
         urlTextField.attributedPlaceholder = self.placeholder
         urlTextField.accessibilityIdentifier = "url"
         urlTextField.accessibilityActionsSource = self

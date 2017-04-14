@@ -227,6 +227,7 @@ class URLBarView: UIView {
         locationTextField.translatesAutoresizingMaskIntoConstraints = false
         locationTextField.autocompleteDelegate = self
         locationTextField.keyboardType = UIKeyboardType.WebSearch
+        locationTextField.keyboardAppearance = .Dark
         locationTextField.autocorrectionType = UITextAutocorrectionType.No
         locationTextField.autocapitalizationType = UITextAutocapitalizationType.None
         locationTextField.returnKeyType = UIReturnKeyType.Go
