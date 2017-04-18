@@ -155,6 +155,21 @@ class BraveWebView: UIWebView {
         }
     }
 
+    func updateLocationFromHtml() -> Bool {
+        guard let js = stringByEvaluatingJavaScriptFromString("document.location.href"), let location = NSURL(string: js) else { return false }
+        
+        // Must be in same domain space to allow document location changes
+        if location.baseDomain() != self.URL?.baseDomain() || !location.schemeIsValid {
+            return false
+        }
+        
+        print(location.domainURL())
+        if AboutUtils.isAboutHomeURL(location) {
+            return false
+        }
+        return setUrl(location)
+    }
+
     private static var webviewBuiltinUserAgent = UserAgent.defaultUserAgent()
 
     // Needed to identify webview in url protocol
@@ -207,6 +222,10 @@ class BraveWebView: UIWebView {
         assert(NSThread.isMainThread())
 
         if URL?.isSpecialInternalUrl() ?? true {
+            return
+        }
+
+        if !updateLocationFromHtml() {
             return
         }
 
@@ -263,6 +282,12 @@ class BraveWebView: UIWebView {
 
         let rate = UIScrollViewDecelerationRateFast + (UIScrollViewDecelerationRateNormal - UIScrollViewDecelerationRateFast) * 0.5;
             scrollView.setValue(NSValue(CGSize: CGSizeMake(rate, rate)), forKey: "_decelerationFactor")
+
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(firstLayoutPerformed), name: swizzledFirstLayoutNotification, object: nil)
+    }
+
+    func firstLayoutPerformed() {
+        updateLocationFromHtml()
     }
 
     var jsBlockedStatLastUrl: String? = nil
@@ -409,6 +434,7 @@ class BraveWebView: UIWebView {
                     return
             }
 
+            me.updateLocationFromHtml()
             me.updateTitleFromHtml()
             tab.lastExecutedTime = NSDate.now()
             getApp().browserViewController.updateProfileForLocationChange(tab)
