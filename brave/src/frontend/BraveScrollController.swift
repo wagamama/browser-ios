@@ -92,6 +92,8 @@ class BraveScrollController: NSObject {
     override init() {
         super.init()
 
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(BraveScrollController.pageUnload), name: kNotificationPageUnload, object: nil)
+
         NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(BraveScrollController.keyboardWillAppear(_:)), name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(BraveScrollController.keyboardDidAppear(_:)), name: UIKeyboardDidShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(BraveScrollController.keyboardWillDisappear(_:)), name: UIKeyboardWillHideNotification, object: nil)
@@ -121,6 +123,12 @@ class BraveScrollController: NSObject {
                 self.footerBottomOffset = 0
                 self.urlBar?.updateAlphaForSubviews(1.0)
             }
+        }
+    }
+
+    func pageUnload() {
+        postAsyncToMain(0.1) {
+            self.showToolbars(animated: true)
         }
     }
 
