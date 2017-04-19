@@ -12,6 +12,9 @@ class SyncPairCameraViewController: UIViewController {
     var cameraAccessButton: UIButton!
     var enterWordsButton: UIButton!
     
+    private let prefs: Prefs = getApp().profile!.prefs
+    private let prefKey: String = "CameraPermissionsSetting"
+    
     var loadingView: UIView!
     let loadingSpinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
     
@@ -81,6 +84,7 @@ class SyncPairCameraViewController: UIViewController {
             if authorized {
                 postAsyncToMain(0) {
                     self.cameraAccessButton.hidden = true
+                    self.prefs.setBool(true, forKey: self.prefKey)
                 }
             }
             else {
@@ -176,6 +180,10 @@ class SyncPairCameraViewController: UIViewController {
         
         loadingSpinner.snp_makeConstraints { make in
             make.center.equalTo(loadingSpinner.superview!)
+        }
+        
+        if prefs.boolForKey(prefKey) == true {
+            cameraView.startCapture()
         }
     }
     

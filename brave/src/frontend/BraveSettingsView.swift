@@ -115,9 +115,9 @@ class BraveSettingsView : AppSettingsTableViewController {
             
             // Disabling sync for 1.3.2
             // Since no one in prod has sync this is enough to block it, since no one can init it on the client
-//            SettingSection(title: NSAttributedString(string: Strings.Sync.uppercaseString), children:
-//                [SyncDevicesSetting(settings: self)]
-//            ),
+            SettingSection(title: NSAttributedString(string: Strings.Sync.uppercaseString), children:
+                [SyncDevicesSetting(settings: self)]
+            ),
             SettingSection(title: NSAttributedString(string: Strings.Privacy.uppercaseString), children:
                 [ClearPrivateDataSetting(settings: self), CookieSetting(profile: self.profile),
                     BoolSetting(prefs: prefs, prefKey: kPrefKeyPrivateBrowsingAlwaysOn, defaultValue: false, titleText: Strings.Private_Browsing_Only, statusText: nil, settingDidChange: { isOn in

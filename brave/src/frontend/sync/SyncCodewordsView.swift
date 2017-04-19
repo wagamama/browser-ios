@@ -33,6 +33,7 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
             field.layer.masksToBounds = true
             field.layer.borderWidth = DefaultBorderWidth
             field.layer.borderColor = DefaultBorderColor
+            field.placeholder = "\(i + 1)"
             addSubview(field)
             fields.append(field)
         }
