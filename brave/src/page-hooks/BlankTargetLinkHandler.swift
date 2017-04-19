@@ -32,7 +32,7 @@ class BlankTargetLinkHandler {
                 return
             }
 
-            if touch.phase != .Began && tapLocation == CGPointZero {
+            if touch.phase != .Began || tapLocation == CGPointZero {
                 webView.blankTargetUrl = nil
                 return
             }
