@@ -7,10 +7,7 @@ import Foundation
 typealias SavedTab = (id: String, title: String, url: String, isSelected: Bool, order: Int16, screenshot: UIImage?, history: [String], historyIndex: Int16)
 
 extension TabManager {
-    class func tabsToRestore() -> [TabMO] {
-        return TabMO.getAll(DataController.moc)
-    }
-
+    
     func preserveTabs() {
         print("preserveTabs()")
         var _tabs = [SavedTab]()
@@ -59,7 +56,7 @@ extension TabManager {
 
     private func restoreTabsInternal() {
         var tabToSelect: Browser?
-        let savedTabs = TabMO.getAll(DataController.moc)
+        let savedTabs = TabMO.getAll()
         for savedTab in savedTabs {
             if savedTab.url == nil {
                 if let id = savedTab.syncUUID {
@@ -151,17 +148,17 @@ class TabMO: NSManagedObject {
         return tab!
     }
 
-    class func getAll(context: NSManagedObjectContext) -> [TabMO] {
+    class func getAll() -> [TabMO] {
         let fetchRequest = NSFetchRequest()
-        fetchRequest.entity = TabMO.entity(context)
+        fetchRequest.entity = TabMO.entity(DataController.moc)
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
         do {
-            return try context.executeFetchRequest(fetchRequest) as? [TabMO] ?? [TabMO]()
+            return try DataController.moc.executeFetchRequest(fetchRequest) as? [TabMO] ?? []
         } catch {
             let fetchError = error as NSError
             print(fetchError)
         }
-        return [TabMO]()
+        return []
     }
     
     class func getByID(id: String, context: NSManagedObjectContext) -> TabMO? {

@@ -457,7 +457,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func shouldRestoreTabs() -> Bool {
-        let tabsToRestore = TabManager.tabsToRestore()
+        let tabsToRestore = TabMO.getAll()
         let onlyNoHistoryTabs = !tabsToRestore.every {
             if let history = $0.urlHistorySnapshot as? [String] {
                 if history.count > 1 {
