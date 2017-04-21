@@ -84,7 +84,8 @@ extension TabManager {
         }
 
         // Only tell our delegates that we restored tabs if we actually restored a tab(s)
-        if savedTabs.count > 0 {
+        // Base this off of the actual, physical tabs, not what was stored in CD, as we could have edited removed broken CD records
+        if tabCount > 0 {
             delegates.forEach { $0.value?.tabManagerDidRestoreTabs(self) }
         } else {
             tabToSelect = addTab()
