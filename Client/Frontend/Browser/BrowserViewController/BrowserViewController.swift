@@ -806,10 +806,13 @@ class BrowserViewController: UIViewController {
         if let url = url {
             request = NSURLRequest(URL: url)
         }
-
-        tabManager.addTab(request)
-        let isPrivate = PrivateBrowsing.singleton.isOn
-        switchBrowsingMode(toPrivate: isPrivate, request: request)
+        
+        // Cannot leave PM via this, only enter
+        if PrivateBrowsing.singleton.isOn {
+            switchBrowsingMode(toPrivate: true)
+        }
+        
+        tabManager.addTabAndSelect(request)
     }
 
     func openBlankNewTabAndFocus(isPrivate isPrivate: Bool = false) {
