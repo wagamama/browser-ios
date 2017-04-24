@@ -36,6 +36,7 @@ class TopSitesPanel: UIViewController {
     private var privateTabGraphic: UIImageView!
     private var privateTabTitleLabel: UILabel!
     private var privateTabInfoLabel: UILabel!
+    private var privateTabLinkButton: UIButton!
     private var braveShieldStatsView: BraveShieldStatsView? = nil
     private lazy var dataSource: TopSitesDataSource = {
         return TopSitesDataSource()
@@ -93,6 +94,7 @@ class TopSitesPanel: UIViewController {
         let statsBottomMargin: CGFloat = 25.0
         
         privateTabMessageContainer = UIView()
+        privateTabMessageContainer.userInteractionEnabled = true
         privateTabMessageContainer.hidden = !PrivateBrowsing.singleton.isOn
         
         privateTabGraphic = UIImageView(image: UIImage(named: "privateLion"))
@@ -109,10 +111,20 @@ class TopSitesPanel: UIViewController {
         privateTabInfoLabel.lineBreakMode = .ByWordWrapping
         privateTabInfoLabel.textAlignment = .Center
         privateTabInfoLabel.numberOfLines = 0
-        privateTabInfoLabel.font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
-        privateTabInfoLabel.textColor = UIColor(white: 1, alpha: 0.25)
-        privateTabInfoLabel.text = "Private tabs are not logged in page history. If you open link from within a Private Tab, it will also be private.\r\rWhen you close Brave, all of your Private Tabs will vanish, forgotten forever."
+        privateTabInfoLabel.font = UIFont.systemFontOfSize(14, weight: UIFontWeightMedium)
+        privateTabInfoLabel.textColor = UIColor(white: 1, alpha: 1.0)
+        privateTabInfoLabel.text = "Even though sites you visit in private tabs are not saved locally, they do not make you anonymous or invisible to your ISP, your employer, or to the sites you are visiting."
         privateTabMessageContainer.addSubview(privateTabInfoLabel)
+        
+        privateTabLinkButton = UIButton()
+        let linkButtonTitle = NSAttributedString(string: "Learn about private tabs.", attributes:
+            [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue])
+        privateTabLinkButton.setAttributedTitle(linkButtonTitle, forState: .Normal)
+        privateTabLinkButton.titleLabel?.font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+        privateTabLinkButton.titleLabel?.textColor = UIColor(white: 1, alpha: 0.25)
+        privateTabLinkButton.titleLabel?.textAlignment = .Center
+        privateTabLinkButton.addTarget(self, action: #selector(SEL_privateTabInfo), forControlEvents: .TouchUpInside)
+        privateTabMessageContainer.addSubview(privateTabLinkButton)
         
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
@@ -173,6 +185,12 @@ class TopSitesPanel: UIViewController {
             make.top.equalTo(self.privateTabTitleLabel.snp_bottom).offset(15)
             make.left.equalTo(0)
             make.right.equalTo(0)
+        }
+        
+        privateTabLinkButton.snp_makeConstraints { (make) in
+            make.top.equalTo(self.privateTabInfoLabel.snp_bottom).offset(15)
+            make.left.equalTo(0)
+            make.right.equalTo(0)
             make.bottom.equalTo(0)
         }
     }
@@ -222,6 +240,14 @@ class TopSitesPanel: UIViewController {
             // no need to do anything at all
             log.warning("Received unexpected notification \(notification.name)")
             break
+        }
+    }
+    
+    func SEL_privateTabInfo() {
+        let url = NSURL(string: "https://github.com/brave/browser-laptop/wiki/What-a-Private-Tab-actually-does")!
+        postAsyncToMain(0) {
+            let t = getApp().tabManager
+            t.addTabAndSelect(NSURLRequest(URL: url))
         }
     }
 
