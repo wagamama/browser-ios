@@ -28,7 +28,7 @@ struct TopSitesPanelUX {
     private static let WelcomeScreenItemWidth = 170
 }
 
-class TopSitesPanel: UIViewController, UIGestureRecognizerDelegate {
+class TopSitesPanel: UIViewController {
     weak var homePanelDelegate: HomePanelDelegate?
     private lazy var emptyStateOverlayView: UIView = self.createEmptyStateOverlayView()
     private var collection: TopSitesCollectionView? = nil
@@ -36,7 +36,7 @@ class TopSitesPanel: UIViewController, UIGestureRecognizerDelegate {
     private var privateTabGraphic: UIImageView!
     private var privateTabTitleLabel: UILabel!
     private var privateTabInfoLabel: UILabel!
-    private var privateTabLinkLabel: UILabel!
+    private var privateTabLinkButton: UIButton!
     private var braveShieldStatsView: BraveShieldStatsView? = nil
     private lazy var dataSource: TopSitesDataSource = {
         return TopSitesDataSource()
@@ -116,19 +116,15 @@ class TopSitesPanel: UIViewController, UIGestureRecognizerDelegate {
         privateTabInfoLabel.text = "Even though sites you visit in private tabs are not saved locally, they do not make you anonymous or invisible to your ISP, your employer, or to the sites you are visiting."
         privateTabMessageContainer.addSubview(privateTabInfoLabel)
         
-        privateTabLinkLabel = UILabel()
-        privateTabLinkLabel.attributedText = NSAttributedString(string: "Learn about private tabs.", attributes:
+        privateTabLinkButton = UIButton()
+        let linkButtonTitle = NSAttributedString(string: "Learn about private tabs.", attributes:
             [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue])
-        privateTabInfoLabel.font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
-        privateTabLinkLabel.textColor = UIColor(white: 1, alpha: 0.25)
-        privateTabLinkLabel.textAlignment = .Center
-        
-        
-        let privateTabLinkInfoGesture = UITapGestureRecognizer(target: self, action: #selector(SEL_privateTabInfo))
-        privateTabLinkInfoGesture.delegate = self
-        privateTabLinkLabel.userInteractionEnabled = true
-        privateTabLinkLabel.addGestureRecognizer(privateTabLinkInfoGesture)
-        privateTabMessageContainer.addSubview(privateTabLinkLabel)
+        privateTabLinkButton.setAttributedTitle(linkButtonTitle, forState: .Normal)
+        privateTabLinkButton.titleLabel?.font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
+        privateTabLinkButton.titleLabel?.textColor = UIColor(white: 1, alpha: 0.25)
+        privateTabLinkButton.titleLabel?.textAlignment = .Center
+        privateTabLinkButton.addTarget(self, action: #selector(SEL_privateTabInfo), forControlEvents: .TouchUpInside)
+        privateTabMessageContainer.addSubview(privateTabLinkButton)
         
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collection.backgroundColor = PrivateBrowsing.singleton.isOn ? BraveUX.BackgroundColorForTopSitesPrivate : BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
@@ -191,16 +187,12 @@ class TopSitesPanel: UIViewController, UIGestureRecognizerDelegate {
             make.right.equalTo(0)
         }
         
-        privateTabLinkLabel.snp_makeConstraints { (make) in
+        privateTabLinkButton.snp_makeConstraints { (make) in
             make.top.equalTo(self.privateTabInfoLabel.snp_bottom).offset(15)
             make.left.equalTo(0)
             make.right.equalTo(0)
             make.bottom.equalTo(0)
         }
-    }
-    
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
     }
     
     func handleRotation() {
