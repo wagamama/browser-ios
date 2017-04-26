@@ -454,11 +454,8 @@ class Browser: NSObject, BrowserWebViewDelegate {
     func loadRequest(request: NSURLRequest) -> WKNavigation? {
         if let webView = webView {
             lastRequest = request
-#if !BRAVE
-            return webView.loadRequest(request)
-#else
-            webView.loadRequest(request); return DangerousReturnWKNavigation.emptyNav;
-#endif
+            webView.loadRequest(request)
+            return DangerousReturnWKNavigation.emptyNav
           }
         return nil
     }
