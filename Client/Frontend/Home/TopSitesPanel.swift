@@ -104,7 +104,7 @@ class TopSitesPanel: UIViewController {
         privateTabTitleLabel.lineBreakMode = .ByWordWrapping
         privateTabTitleLabel.font = UIFont.systemFontOfSize(18, weight: UIFontWeightSemibold)
         privateTabTitleLabel.textColor = UIColor(white: 1, alpha: 0.6)
-        privateTabTitleLabel.text = "This is a Private Tab"
+        privateTabTitleLabel.text = Strings.Private_Tab_Title
         privateTabMessageContainer.addSubview(privateTabTitleLabel)
         
         privateTabInfoLabel = UILabel()
@@ -113,11 +113,11 @@ class TopSitesPanel: UIViewController {
         privateTabInfoLabel.numberOfLines = 0
         privateTabInfoLabel.font = UIFont.systemFontOfSize(14, weight: UIFontWeightMedium)
         privateTabInfoLabel.textColor = UIColor(white: 1, alpha: 1.0)
-        privateTabInfoLabel.text = "Even though sites you visit in private tabs are not saved locally, they do not make you anonymous or invisible to your ISP, your employer, or to the sites you are visiting."
+        privateTabInfoLabel.text = Strings.Private_Tab_Body
         privateTabMessageContainer.addSubview(privateTabInfoLabel)
         
         privateTabLinkButton = UIButton()
-        let linkButtonTitle = NSAttributedString(string: "Learn about private tabs.", attributes:
+        let linkButtonTitle = NSAttributedString(string: Strings.Private_Tab_Link, attributes:
             [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue])
         privateTabLinkButton.setAttributedTitle(linkButtonTitle, forState: .Normal)
         privateTabLinkButton.titleLabel?.font = UIFont.systemFontOfSize(16, weight: UIFontWeightMedium)
