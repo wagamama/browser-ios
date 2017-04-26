@@ -143,13 +143,12 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         }
         
         
-        let url = NSURL(string: site?.location ?? bk.url ?? "")
-        if url?.absoluteDisplayString()?.startsWith(WebServer.sharedInstance.base) ?? false {
+        if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
             return nil
         }
         
         // Use new values, fallback to previous values
-        bk.url = url?.absoluteDisplayString() ?? bk.url
+        bk.url = site?.location ?? bk.url
         bk.title = site?.title ?? bk.title
         bk.customTitle = site?.customTitle ?? bk.customTitle // TODO: Check against empty titles
         bk.isFolder = bookmark?.isFolder ?? bk.isFolder ?? false
@@ -167,7 +166,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
             bk.lastVisited = NSDate()
         }
         
-        if let url = url {
+        if let location = site?.location, let url = NSURL(string: location) {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
         }
         
