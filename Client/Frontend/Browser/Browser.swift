@@ -116,6 +116,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
     var bars = [SnackBar]()
     var favicons = [String:Favicon]() // map baseDomain() to favicon
     var lastExecutedTime: Timestamp?
+    // This is messy in relation to the SavedTab tuple and should probably be abstracted into a single use item
     var sessionData: SessionData?
     var lastRequest: NSURLRequest? = nil
     var restoring: Bool = false
@@ -226,7 +227,7 @@ class Browser: NSObject, BrowserWebViewDelegate {
             webView.navigationDelegate = navigationDelegate
             helperManager = HelperManager(webView: webView)
 
-            restore(webView, restorationData: nil)
+            restore(webView, restorationData: self.sessionData?.savedTabData)
 
             _webView = webView
             browserDelegate?.browser(self, didCreateWebView: self.webView!)
@@ -454,11 +455,8 @@ class Browser: NSObject, BrowserWebViewDelegate {
     func loadRequest(request: NSURLRequest) -> WKNavigation? {
         if let webView = webView {
             lastRequest = request
-#if !BRAVE
-            return webView.loadRequest(request)
-#else
-            webView.loadRequest(request); return DangerousReturnWKNavigation.emptyNav;
-#endif
+            webView.loadRequest(request)
+            return DangerousReturnWKNavigation.emptyNav
           }
         return nil
     }
