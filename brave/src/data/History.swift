@@ -165,9 +165,9 @@ class History: NSManagedObject, WebsitePresentable {
                 print(fetchError)
             }
 
-            DataController.saveContext(context)
+            // No save, save in Domain
 
-            Domain.deleteNonBookmarked {
+            Domain.deleteNonBookmarkedAndClearSiteVisits {
                 completionOnMain()
             }
         }

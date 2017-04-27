@@ -160,14 +160,22 @@ class Domain: NSManagedObject {
         }
     }
 
-    class func deleteNonBookmarked(completionOnMain: ()->()) {
+    class func deleteNonBookmarkedAndClearSiteVisits(completionOnMain: ()->()) {
         let context = DataController.shared.workerContext()
         context.performBlock {
             let fetchRequest = NSFetchRequest()
             fetchRequest.entity = Domain.entity(context)
-            fetchRequest.predicate = NSPredicate(format: "bookmarks.@count == 0")
             do {
                 let results = try context.executeFetchRequest(fetchRequest)
+                (results as? [Domain])?.forEach {
+                    if let bms = $0.bookmarks where bms.count > 0 {
+                        // Clear visit count
+                        $0.visits = 0
+                    } else {
+                        // Delete
+                        context.deleteObject($0)
+                    }
+                }
                 for obj in results {
                     // Cascading delete on favicon, it will also get deleted
                     context.deleteObject(obj as! NSManagedObject)
