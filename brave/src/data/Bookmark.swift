@@ -198,7 +198,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     }
     
     // TODO: DELETE
-    class func add(url url: String?,
+    class func add(url url: NSURL?,
                        title: String?,
                        customTitle: String? = nil, // Folders only use customTitle
                        parentFolder:Bookmark? = nil,
@@ -207,7 +207,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         let site = SyncSite()
         site.title = title
         site.customTitle = customTitle
-        site.location = url
+        site.location = Domain.domainAndScheme(fromUrl: url)
         
         let bookmark = SyncBookmark()
         bookmark.isFolder = isFolder
@@ -294,7 +294,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
 // Getters
 extension Bookmark {
     private static func get(forUrl url: NSURL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
-        guard let str = url.absoluteDisplayString() else { return nil }
+        let str = Domain.domainAndScheme(fromUrl: url)
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", str)
@@ -304,11 +304,7 @@ extension Bookmark {
                 return count
             }
             let results = try context.executeFetchRequest(fetchRequest)
-            if let bm = results.first {
-                return bm as? Bookmark
-            } else {
-                return nil
-            }
+            return results.first as? Bookmark
         } catch {
             let fetchError = error as NSError
             print(fetchError)

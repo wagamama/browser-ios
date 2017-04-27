@@ -32,8 +32,8 @@ class Domain: NSManagedObject {
     }
 
     // Always use this function to save or lookup domains in the table
-    class func domainAndScheme(fromUrl url: NSURL) -> String {
-        let domainUrl = (url.scheme ?? "http") + "://" + url.normalizedHost()
+    class func domainAndScheme(fromUrl url: NSURL?) -> String {
+        let domainUrl = (url?.scheme ?? "http") + "://" + (url?.normalizedHost() ?? "")
         return domainUrl
     }
 

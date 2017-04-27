@@ -126,7 +126,7 @@ class MainSidePanelViewController : SidePanelBaseViewController {
             browserViewController?.removeBookmark(url)
         } else {
             let folder = self.bookmarksPanel.currentBookmarksPanel().currentFolder
-            browserViewController?.addBookmark(url.absoluteString, title: tab.title, parentFolder: folder)
+            browserViewController?.addBookmark(url, title: tab.title, parentFolder: folder)
         }
     }
 

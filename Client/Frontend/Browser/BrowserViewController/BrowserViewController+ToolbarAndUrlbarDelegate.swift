@@ -230,7 +230,7 @@ extension BrowserViewController: BrowserToolbarDelegate {
             if isBookmarked {
                 self.removeBookmark(url)
             } else {
-                self.addBookmark(url.absoluteString, title: tab.title)
+                self.addBookmark(url, title: tab.title)
             }
         })
     }
