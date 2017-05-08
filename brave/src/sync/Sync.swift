@@ -385,7 +385,7 @@ extension Sync {
 
     func getExistingObjects(data: SyncResponse?) {
         //  as? [[String: AnyObject]]
-        guard let syncRecords = data?.rootElements else { return }
+        guard let syncRecords = data?.rootElements, let recordType = data?.arg1 else { return }
         
         /* Top level keys: "bookmark", "action","objectId", "objectData:bookmark","deviceId" */
         
@@ -420,8 +420,8 @@ extension Sync {
         
         // Store the last record's timestamp, to know what timestamp to pass in next time if this one does not fail
         self.lastFetchedRecordTimestamp = data?.lastFetchedTimestamp
-            
-        self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, ['BOOKMARKS'], \(serializedData))",
+        
+        self.webView.evaluateJavaScript("callbackList['resolve-sync-records'](null, '\(recordType)', \(serializedData))",
             completionHandler: { (result, error) in })
     }
 
