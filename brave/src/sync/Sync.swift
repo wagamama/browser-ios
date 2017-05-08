@@ -45,7 +45,7 @@ class Sync: JSInjector {
 
     // Should not be accessed directly
     private var syncReadyLock = false
-    var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false)
+    var isSyncFullyInitialized = (syncReady: Bool, fetchReady: Bool, sendRecordsReady: Bool, fetchDevicesReady: Bool, resolveRecordsReady: Bool, deleteUserReady: Bool, deleteSiteSettingsReady: Bool, deleteCategoryReady: Bool)(false, false, false, false, false, false, false, false)
     
     var isInSyncGroup: Bool {
         return syncSeed != nil
@@ -175,7 +175,7 @@ class Sync: JSInjector {
                 lastFetchedRecordTimestamp = 0
                 lastSuccessfulSync = 0
                 syncReadyLock = false
-                isSyncFullyInitialized = (false, false, false, false, false, false, false)
+                isSyncFullyInitialized = (false, false, false, false, false, false, false, false)
                 
                 fetchTimer?.invalidate()
                 fetchTimer = nil
@@ -490,6 +490,8 @@ extension Sync: WKScriptMessageHandler {
             isSyncFullyInitialized.fetchReady = true
         case "send-sync-records":
             isSyncFullyInitialized.sendRecordsReady = true
+        case "fetch-sync-devices":
+            isSyncFullyInitialized.fetchDevicesReady = true
         case "resolve-sync-records":
             isSyncFullyInitialized.resolveRecordsReady = true
         case "delete-sync-user":
