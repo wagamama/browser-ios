@@ -11,6 +11,7 @@ public final class SyncResponse {
         static let message = "message"
         static let arg1 = "arg1"
         static let arg3 = "arg3"
+        static let arg4 = "arg4" // isTruncated
     }
     
     // MARK: Properties
@@ -18,6 +19,7 @@ public final class SyncResponse {
     public var message: String?
     public var arg1: String?
     public var lastFetchedTimestamp: Int? // arg3
+    public var isTruncated: Bool? // arg4
     
     /// Initiates the instance based on the object.
     ///
@@ -35,6 +37,7 @@ public final class SyncResponse {
         message = json?[SerializationKeys.message].asString
         arg1 = json?[SerializationKeys.arg1].asString
         lastFetchedTimestamp = json?[SerializationKeys.arg3].asInt
+        isTruncated = json?[SerializationKeys.arg4].asBool
     }
     
     /// Generates description of the object in the form of a NSDictionary.
@@ -46,6 +49,7 @@ public final class SyncResponse {
         if let value = message { dictionary[SerializationKeys.message] = value }
         if let value = arg1 { dictionary[SerializationKeys.arg1] = value }
         if let value = lastFetchedTimestamp { dictionary[SerializationKeys.arg3] = value }
+        if let value = isTruncated { dictionary[SerializationKeys.arg4] = value }
         return dictionary
     }
     
