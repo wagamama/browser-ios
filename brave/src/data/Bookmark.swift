@@ -142,7 +142,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
             bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
         }
         
-        
+        // Should probably have visual indication before reaching this point
         if site?.location?.startsWith(WebServer.sharedInstance.base) ?? false {
             return nil
         }
@@ -207,7 +207,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         let site = SyncSite()
         site.title = title
         site.customTitle = customTitle
-        site.location = Domain.domainAndScheme(fromUrl: url)
+        site.location = url?.absoluteString
         
         let bookmark = SyncBookmark()
         bookmark.isFolder = isFolder
@@ -294,7 +294,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
 // Getters
 extension Bookmark {
     private static func get(forUrl url: NSURL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
-        let str = Domain.domainAndScheme(fromUrl: url)
+        guard let str = url.absoluteString else { return nil }
         let fetchRequest = NSFetchRequest()
         fetchRequest.entity = Bookmark.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", str)
@@ -303,8 +303,8 @@ extension Bookmark {
                 let count = try context.countForFetchRequest(fetchRequest)
                 return count
             }
-            let results = try context.executeFetchRequest(fetchRequest)
-            return results.first as? Bookmark
+            let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark]
+            return results?.first
         } catch {
             let fetchError = error as NSError
             print(fetchError)
