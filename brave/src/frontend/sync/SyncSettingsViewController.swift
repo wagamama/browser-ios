@@ -22,7 +22,7 @@ class SyncSettingsViewController: AppSettingsTableViewController {
     }
     
     override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 40
+        return section == 1 ? 40 : 20
     }
     
     deinit {
