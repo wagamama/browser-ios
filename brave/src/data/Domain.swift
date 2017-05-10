@@ -127,26 +127,27 @@ class Domain: NSManagedObject {
                 let results = try context.executeFetchRequest(fetchRequest)
                 for obj in results {
                     let domain = obj as! Domain
-                    guard let url = domain.url else { continue }
+                    guard let urlString = domain.url, url = NSURL(string: urlString) else { continue }
+                    let normalizedUrl = url.normalizedHost()
 
-                    print(url)
+                    print(normalizedUrl)
                     if let shield = domain.shield_allOff {
-                        BraveShieldState.setInMemoryforDomain(url, setState: (.AllOff, shield.boolValue))
+                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.AllOff, shield.boolValue))
                     }
                     if let shield = domain.shield_adblockAndTp {
-                        BraveShieldState.setInMemoryforDomain(url, setState: (.AdblockAndTp, shield.boolValue))
+                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.AdblockAndTp, shield.boolValue))
                     }
                     if let shield = domain.shield_safeBrowsing {
-                        BraveShieldState.setInMemoryforDomain(url, setState: (.SafeBrowsing, shield.boolValue))
+                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.SafeBrowsing, shield.boolValue))
                     }
                     if let shield = domain.shield_httpse {
-                        BraveShieldState.setInMemoryforDomain(url, setState: (.HTTPSE, shield.boolValue))
+                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.HTTPSE, shield.boolValue))
                     }
                     if let shield = domain.shield_fpProtection {
-                        BraveShieldState.setInMemoryforDomain(url, setState: (.FpProtection, shield.boolValue))
+                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.FpProtection, shield.boolValue))
                     }
                     if let shield = domain.shield_noScript {
-                        BraveShieldState.setInMemoryforDomain(url, setState: (.NoScript, shield.boolValue))
+                        BraveShieldState.setInMemoryforDomain(normalizedUrl, setState: (.NoScript, shield.boolValue))
                     }
                 }
             } catch {
