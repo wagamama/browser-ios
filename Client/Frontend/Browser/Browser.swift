@@ -8,6 +8,7 @@ import Storage
 import Shared
 import CoreData
 
+import Crashlytics
 import XCGLogger
 
 private let log = Logger.browserLogger
@@ -206,40 +207,44 @@ class Browser: NSObject, BrowserWebViewDelegate {
         objc_sync_enter(self); defer { objc_sync_exit(self) }
 
         if webView == nil {
-#if !BRAVE
-            assert(configuration != nil, "Create webview can only be called once")
-            configuration!.userContentController = WKUserContentController()
-            configuration!.preferences = WKPreferences()
-            configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
-#endif
-            let webView = BraveWebView(frame: CGRectZero, useDesktopUserAgent: useDesktopUserAgent)
-            configuration = nil
-
-            BrowserTabToUAMapper.setId(webView.uniqueId, tab:self)
-
-            webView.accessibilityLabel = Strings.Web_content
-#if !BRAVE
-            webView.allowsBackForwardNavigationGestures = true
-#endif
-            // Turning off masking allows the web content to flow outside of the scrollView's frame
-            // which allows the content appear beneath the toolbars in the BrowserViewController
-            webView.scrollView.layer.masksToBounds = false
-            webView.navigationDelegate = navigationDelegate
+            let webView = createNewWebview(useDesktopUserAgent)
             helperManager = HelperManager(webView: webView)
 
             restore(webView, restorationData: self.sessionData?.savedTabData)
 
             _webView = webView
-            browserDelegate?.browser(self, didCreateWebView: self.webView!)
+            notifyDelegateNewWebview()
 
-#if !BRAVE
-            // lastTitle is used only when showing zombie tabs after a session restore.
-            // Since we now have a web view, lastTitle is no longer useful.
-            lastTitle = nil
-#endif
             lastExecutedTime = NSDate.now()
         }
     }
+    
+    // Created for better debugging against cryptic crash report
+    // Broke these into separate methods to increase data, can merge back to main method at some point
+    private func createNewWebview(useDesktopUserAgent:Bool) -> BraveWebView {
+        let webView = BraveWebView(frame: CGRectZero, useDesktopUserAgent: useDesktopUserAgent)
+        configuration = nil
+        
+        BrowserTabToUAMapper.setId(webView.uniqueId, tab:self)
+        
+        webView.accessibilityLabel = Strings.Web_content
+        
+        // Turning off masking allows the web content to flow outside of the scrollView's frame
+        // which allows the content appear beneath the toolbars in the BrowserViewController
+        webView.scrollView.layer.masksToBounds = false
+        webView.navigationDelegate = navigationDelegate
+        return webView
+    }
+    
+    private func notifyDelegateNewWebview() {
+        guard let webview = self.webView else {
+            Answers.logCustomEventWithName("WebView nil when attempting to notify delegate", customAttributes: nil)
+            return
+        }
+        // Setup answers
+        browserDelegate?.browser(self, didCreateWebView: webview)
+    }
+    // // // // // //
 
     func restore(webView: BraveWebView, restorationData: SavedTab?) {
         // Pulls restored session data from a previous SavedTab to load into the Browser. If it's nil, a session restore
