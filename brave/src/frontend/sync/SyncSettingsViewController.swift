@@ -14,7 +14,7 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         footerView.font = UIFont.systemFontOfSize(13)
         footerView.textColor = UIColor(rgb: 0x696969)
         
-        if section == 0 {
+        if section == 1 {
             footerView.text = Strings.SyncDeviceSettingsFooter
         }
         
@@ -48,7 +48,17 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         let syncPrefTabs = "syncTabsKey"
         let syncPrefHistory = "syncHistoryKey"
         
+        // Generate devices array
+        var devices:[Setting] = []
+        
+        let device1 = SyncDeviceSetting(settings: self, title: "James's Macbook Pro")
+        device1.onTap = {
+            debugPrint("Show action menu with delete option")
+        }
+        devices.append(device1)
+        
         settings += [
+            SettingSection(title: NSAttributedString(string: Strings.Devices.uppercaseString), children: devices),
             SettingSection(title: NSAttributedString(string: Strings.SyncOnDevice.uppercaseString), children:
                 [BoolSetting(prefs: prefs, prefKey: syncPrefBookmarks, defaultValue: true, titleText: Strings.Bookmarks),
                     BoolSetting(prefs: prefs, prefKey: syncPrefTabs, defaultValue: true, titleText: Strings.Tabs),
