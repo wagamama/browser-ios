@@ -324,46 +324,17 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
 
     func onAddBookmarksFolderButton() {
         
-        let alert = UIAlertController(title: "New Folder", message: "Enter folder name", preferredStyle: UIAlertControllerStyle.Alert)
-        
-        let removeTextFieldObserver = {
-            NSNotificationCenter.defaultCenter().removeObserver(self, name: UITextFieldTextDidChangeNotification, object: alert.textFields!.first)
-        }
-
-        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (alertA: UIAlertAction!) in
-            postAsyncToMain {
-                self.addFolder(alertA, alertController:alert)
+        let alert = UIAlertController.userTextInputAlert(title: "New Folder", message: "Enter folder name") {
+            input in
+            if let input = input where !input.isEmpty {
+                self.addFolder(titled: input)
             }
-            removeTextFieldObserver()
         }
-        
-        okAction.enabled = false
-        
-        addBookmarksFolderOkAction = okAction
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (alertA: UIAlertAction!) in
-            removeTextFieldObserver()
-        }
-        
-        alert.addAction(okAction)
-        alert.addAction(cancelAction)
-
-        alert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "Folder name"
-            textField.secureTextEntry = false
-            textField.keyboardAppearance = .Dark
-            textField.autocapitalizationType = .Words
-            textField.autocorrectionType = .Default
-            textField.returnKeyType = .Done
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.notificationReceived(_:)), name: UITextFieldTextDidChangeNotification, object: textField)
-        })
-        
         self.presentViewController(alert, animated: true) {}
     }
 
-    func addFolder(alert: UIAlertAction!, alertController: UIAlertController) {
-        guard let folderName = alertController.textFields?[0].text else { return }
-        Bookmark.add(url: nil, title: nil, customTitle: folderName, parentFolder: currentFolder, isFolder: true)
+    func addFolder(titled title: String) {
+        Bookmark.add(url: nil, title: nil, customTitle: title, parentFolder: currentFolder, isFolder: true)
     }
     
     func onEditBookmarksButton() {
