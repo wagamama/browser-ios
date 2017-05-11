@@ -118,7 +118,7 @@ class UserTextInputAlert: UIAlertController {
         
         self.addTextFieldWithConfigurationHandler {
             textField in
-            textField.placeholder = "Folder name"
+            textField.placeholder = "Name"
             textField.secureTextEntry = false
             textField.keyboardAppearance = .Dark
             textField.autocapitalizationType = .Words
