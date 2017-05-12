@@ -157,9 +157,6 @@ class SyncWelcomeViewController: UIViewController {
         if !Sync.shared.isInSyncGroup {
             NSNotificationCenter.defaultCenter().addObserverForName(NotificationSyncReady, object: nil, queue: NSOperationQueue.mainQueue()) {
                 _ in attemptPush()
-                attemptPush()
-                attemptPush()
-                attemptPush()
             }
             
             self.loadingView.hidden = false
