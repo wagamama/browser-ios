@@ -160,10 +160,20 @@ class SyncWelcomeViewController: UIViewController {
             }
             
             self.loadingView.hidden = false
-            Sync.shared.initializeNewSyncGroup()
             
-            // Forced timeout
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(25.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), attemptPush)
+            // TODO: Move to strings file
+            let alert = UIAlertController.userTextInputAlert(title: "Device Name", message: "Please enter a name for this device") {
+                input in
+                
+                if let input = input {
+                    Sync.shared.initializeNewSyncGroup(deviceName: input)
+                }
+                
+                // Forced timeout
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(25.0) * Int64(NSEC_PER_SEC)), dispatch_get_main_queue(), attemptPush)
+            }
+            self.presentViewController(alert, animated: true, completion: nil)
+            
         } else {
             attemptPush()
         }
