@@ -55,6 +55,7 @@ class Sync: JSInjector {
 
     // TODO: Move to a better place
     private let prefNameId = "device-id-js-array"
+    private let prefNameName = "sync-device-name"
     private let prefNameSeed = "seed-js-array"
     private let prefFetchTimestamp = "sync-fetch-timestamp"
     
@@ -121,12 +122,13 @@ class Sync: JSInjector {
         }
     }
     
-    func initializeNewSyncGroup() {
+    func initializeNewSyncGroup(deviceName name: String?) {
         if syncSeed != nil {
             // Error, to setup new sync group, must have no seed
             return
         }
         
+        self.syncDeviceName = name
         self.webView.loadHTMLString("<body>TEST</body>", baseURL: nil)
     }
 
@@ -151,6 +153,16 @@ class Sync: JSInjector {
         }
         set(value) {
             NSUserDefaults.standardUserDefaults().setValue(value?.first ?? nil, forKey: prefNameId)
+            NSUserDefaults.standardUserDefaults().synchronize()
+        }
+    }
+    
+    private var syncDeviceName: String? {
+        get {
+            return NSUserDefaults.standardUserDefaults().stringForKey(prefNameName)
+        }
+        set(value) {
+            NSUserDefaults.standardUserDefaults().setValue(value, forKey: prefNameName)
             NSUserDefaults.standardUserDefaults().synchronize()
         }
     }
