@@ -9,7 +9,7 @@ import Shared
 
 /// App Settings Screen (triggered by tapping the 'Gear' in the Tab Tray Controller)
 class AppSettingsTableViewController: SettingsTableViewController {
-    private let SectionHeaderIdentifier = "SectionHeaderIdentifier"
+    fileprivate let SectionHeaderIdentifier = "SectionHeaderIdentifier"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,8 +41,8 @@ class AppSettingsTableViewController: SettingsTableViewController {
         ]
 
         let accountChinaSyncSetting: [Setting]
-        let locale = NSLocale.currentLocale()
-        if locale.localeIdentifier != "zh_CN" {
+        let locale = Locale.current
+        if locale.identifier != "zh_CN" {
             accountChinaSyncSetting = []
         } else {
             accountChinaSyncSetting = [
@@ -81,17 +81,17 @@ class AppSettingsTableViewController: SettingsTableViewController {
         return settings
     }
 
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 #if !BRAVE
         if !profile.hasAccount() {
-            let headerView = tableView.dequeueReusableHeaderFooterViewWithIdentifier(SectionHeaderIdentifier) as! SettingsTableSectionHeaderFooterView
+            let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: SectionHeaderIdentifier) as! SettingsTableSectionHeaderFooterView
             let sectionSetting = settings[section]
             headerView.titleLabel.text = sectionSetting.title?.string
 
             switch section {
                 // Hide the bottom border for the Sign In to Firefox value prop
                 case 1:
-                    headerView.titleAlignment = .Top
+                    headerView.titleAlignment = .top
                     headerView.titleLabel.numberOfLines = 0
                     headerView.showBottomBorder = false
                     headerView.titleLabel.snp_updateConstraints { make in

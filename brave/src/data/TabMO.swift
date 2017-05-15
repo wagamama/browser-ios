@@ -19,7 +19,7 @@ extension TabManager {
             
             // Ignore session restore data.
             if let url = tab.url?.absoluteString {
-                if url.containsString("localhost") {
+                if url.contains("localhost") {
                     continue
                 }
             }
@@ -41,7 +41,7 @@ extension TabManager {
         }
 
         let context = DataController.shared.workerContext()
-        context.performBlock {
+        context.perform {
             for t in _tabs {
                 TabMO.add(t, context: context)
             }
@@ -50,11 +50,11 @@ extension TabManager {
     }
 
     func restoreTabs() {
-        struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
+        struct RunOnceAtStartup { static var token: Int = 0 }
         dispatch_once(&RunOnceAtStartup.token, restoreTabsInternal)
     }
 
-    private func restoreTabsInternal() {
+    fileprivate func restoreTabsInternal() {
         var tabToSelect: Browser?
         let savedTabs = TabMO.getAll()
         for savedTab in savedTabs {
@@ -105,7 +105,7 @@ class TabMO: NSManagedObject {
     @NSManaged var order: Int16
     @NSManaged var urlHistorySnapshot: NSArray? // array of strings for urls
     @NSManaged var urlHistoryCurrentIndex: Int16
-    @NSManaged var screenshot: NSData?
+    @NSManaged var screenshot: Data?
     @NSManaged var isSelected: Bool
     @NSManaged var isClosed: Bool
 
@@ -119,20 +119,20 @@ class TabMO: NSManagedObject {
         }
     }
 
-    static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
-        return NSEntityDescription.entityForName("TabMO", inManagedObjectContext: context)!
+    static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
     }
     
     class func freshTab() -> String {
         let context = DataController.moc
-        let tab = TabMO(entity: TabMO.entity(context), insertIntoManagedObjectContext: context)
+        let tab = TabMO(entity: TabMO.entity(context), insertInto: context)
         // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
-        tab.syncUUID = NSUUID().UUIDString
+        tab.syncUUID = UUID().uuidString
         DataController.saveContext(context)
         return tab.syncUUID!
     }
 
-    class func add(tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO? {
+    class func add(_ tabInfo: SavedTab, context: NSManagedObjectContext) -> TabMO? {
         let tab: TabMO? = getByID(tabInfo.id, context: context)
         if tab == nil {
             return nil
@@ -143,18 +143,18 @@ class TabMO: NSManagedObject {
         tab?.url = tabInfo.url
         tab?.order = tabInfo.order
         tab?.title = tabInfo.title
-        tab?.urlHistorySnapshot = tabInfo.history
+        tab?.urlHistorySnapshot = tabInfo.history as NSArray
         tab?.urlHistoryCurrentIndex = tabInfo.historyIndex
         tab?.isSelected = tabInfo.isSelected
         return tab!
     }
 
     class func getAll() -> [TabMO] {
-        let fetchRequest = NSFetchRequest()
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = TabMO.entity(DataController.moc)
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "order", ascending: true)]
         do {
-            return try DataController.moc.executeFetchRequest(fetchRequest) as? [TabMO] ?? []
+            return try DataController.moc.fetch(fetchRequest) as? [TabMO] ?? []
         } catch {
             let fetchError = error as NSError
             print(fetchError)
@@ -162,13 +162,13 @@ class TabMO: NSManagedObject {
         return []
     }
     
-    class func getByID(id: String, context: NSManagedObjectContext) -> TabMO? {
-        let fetchRequest = NSFetchRequest()
+    class func getByID(_ id: String, context: NSManagedObjectContext) -> TabMO? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = TabMO.entity(context)
         fetchRequest.predicate = NSPredicate(format: "syncUUID == %@", id)
         var result: TabMO? = nil
         do {
-            let results = try context.executeFetchRequest(fetchRequest) as? [TabMO]
+            let results = try context.fetch(fetchRequest) as? [TabMO]
             if let item = results?.first {
                 result = item
             }
@@ -179,9 +179,9 @@ class TabMO: NSManagedObject {
         return result
     }
     
-    class func removeTab(id: String) {
+    class func removeTab(_ id: String) {
         if let tab: TabMO = getByID(id, context: DataController.moc) {
-            DataController.moc.deleteObject(tab)
+            DataController.moc.delete(tab)
             DataController.saveContext()
         }
     }

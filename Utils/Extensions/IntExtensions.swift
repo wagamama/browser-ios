@@ -7,7 +7,7 @@ import Foundation
 
 extension Int {
     func formatUsingAbbrevation () -> String {
-        let numFormatter = NSNumberFormatter()
+        let numFormatter = NumberFormatter()
         
         typealias Abbrevation = (threshold:Double, divisor:Double, suffix:String)
         let abbreviations:[Abbrevation] = [(0, 1, ""),
@@ -35,6 +35,6 @@ extension Int {
         numFormatter.minimumFractionDigits = 0
         numFormatter.maximumFractionDigits = 1
         
-        return numFormatter.stringFromNumber(NSNumber (double:value))!
+        return numFormatter.string(from: NSNumber (value: value as Double))!
     }
 }

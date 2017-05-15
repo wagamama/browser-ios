@@ -16,50 +16,50 @@ public let OneHourInMilliseconds = 60 * OneMinuteInMilliseconds
 public let OneMinuteInMilliseconds = 60 * OneSecondInMilliseconds
 public let OneSecondInMilliseconds: UInt64 = 1000
 
-extension NSDate {
-    public class func now() -> Timestamp {
-        return UInt64(1000 * NSDate().timeIntervalSince1970)
+extension Date {
+    public static func now() -> Timestamp {
+        return UInt64(1000 * Date().timeIntervalSince1970)
     }
 
-    public class func nowNumber() -> NSNumber {
-        return NSNumber(unsignedLongLong: now())
+    public static func nowNumber() -> NSNumber {
+        return NSNumber(value: now() as UInt64)
     }
 
-    public class func nowMicroseconds() -> MicrosecondTimestamp {
-        return UInt64(1000000 * NSDate().timeIntervalSince1970)
+    public static func nowMicroseconds() -> MicrosecondTimestamp {
+        return UInt64(1000000 * Date().timeIntervalSince1970)
     }
 
-    public class func fromTimestamp(timestamp: Timestamp) -> NSDate {
-        return NSDate(timeIntervalSince1970: Double(timestamp) / 1000)
+    public static func fromTimestamp(_ timestamp: Timestamp) -> Date {
+        return Date(timeIntervalSince1970: Double(timestamp) / 1000)
     }
 
-    public class func fromMicrosecondTimestamp(microsecondTimestamp: MicrosecondTimestamp) -> NSDate {
-        return NSDate(timeIntervalSince1970: Double(microsecondTimestamp) / 1000000)
+    public static func fromMicrosecondTimestamp(_ microsecondTimestamp: MicrosecondTimestamp) -> Date {
+        return Date(timeIntervalSince1970: Double(microsecondTimestamp) / 1000000)
     }
 
     public func toRelativeTimeString() -> String {
-        let now = NSDate()
+        let now = Date()
 
-        let units: NSCalendarUnit = [NSCalendarUnit.Second, NSCalendarUnit.Minute, NSCalendarUnit.Day, NSCalendarUnit.WeekOfYear, NSCalendarUnit.Month, NSCalendarUnit.Year, NSCalendarUnit.Hour]
+        let units: NSCalendar.Unit = [NSCalendar.Unit.second, NSCalendar.Unit.minute, NSCalendar.Unit.day, NSCalendar.Unit.weekOfYear, NSCalendar.Unit.month, NSCalendar.Unit.year, NSCalendar.Unit.hour]
 
-        let components = NSCalendar.currentCalendar().components(units,
-            fromDate: self,
-            toDate: now,
+        let components = (Calendar.current as NSCalendar).components(units,
+            from: self,
+            to: now,
             options: [])
         
-        if components.year > 0 {
-            return String(format: NSDateFormatter.localizedStringFromDate(self, dateStyle: NSDateFormatterStyle.ShortStyle, timeStyle: NSDateFormatterStyle.ShortStyle))
+        if components.year! > 0 {
+            return String(format: DateFormatter.localizedString(from: self, dateStyle: DateFormatter.Style.short, timeStyle: DateFormatter.Style.short))
         }
 
         if components.month == 1 {
             return Strings.More_than_a_month
         }
 
-        if components.month > 1 {
-            return String(format: NSDateFormatter.localizedStringFromDate(self, dateStyle: NSDateFormatterStyle.ShortStyle, timeStyle: NSDateFormatterStyle.ShortStyle))
+        if components.month! > 1 {
+            return String(format: DateFormatter.localizedString(from: self, dateStyle: DateFormatter.Style.short, timeStyle: DateFormatter.Style.short))
         }
 
-        if components.weekOfYear > 0 {
+        if components.weekOfYear! > 0 {
             return Strings.More_than_a_week
         }
 
@@ -67,12 +67,12 @@ extension NSDate {
             return Strings.Yesterday
         }
 
-        if components.day > 1 {
-            return String(format: Strings.This_week, String(components.day))
+        if components.day! > 1 {
+            return String(format: Strings.This_week, String(describing: components.day))
         }
 
-        if components.hour > 0 || components.minute > 0 {
-            let absoluteTime = NSDateFormatter.localizedStringFromDate(self, dateStyle: NSDateFormatterStyle.NoStyle, timeStyle: NSDateFormatterStyle.ShortStyle)
+        if components.hour! > 0 || components.minute! > 0 {
+            let absoluteTime = DateFormatter.localizedString(from: self, dateStyle: DateFormatter.Style.none, timeStyle: DateFormatter.Style.short)
             return String(format: Strings.Today_at_template, absoluteTime)
         }
 
@@ -80,15 +80,15 @@ extension NSDate {
     }
 }
 
-public func decimalSecondsStringToTimestamp(input: String) -> Timestamp? {
+public func decimalSecondsStringToTimestamp(_ input: String) -> Timestamp? {
     var double = 0.0
-    if NSScanner(string: input).scanDouble(&double) {
+    if Scanner(string: input).scanDouble(&double) {
         return Timestamp(double * 1000)
     }
     return nil
 }
 
-public func millisecondsToDecimalSeconds(input: Timestamp) -> String {
+public func millisecondsToDecimalSeconds(_ input: Timestamp) -> String {
     let val: Double = Double(input) / 1000
     return String(format: "%.2F", val)
 }

@@ -4,7 +4,7 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
     var fields: [UITextField] = []
     
     let DefaultBackgroundColor = UIColor(rgb: 0xcccccc)
-    let SelectedBackgroundColor = UIColor.whiteColor()
+    let SelectedBackgroundColor = UIColor.white
     
     let DefaultBorderWidth: CGFloat = 0.0
     let SelectedBorderWidth: CGFloat = 0.5
@@ -20,13 +20,13 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
             let field = UITextField()
             field.delegate = self
             field.tag = i
-            field.font = UIFont.systemFontOfSize(14, weight: UIFontWeightRegular)
-            field.textAlignment = .Center
-            field.textColor = UIColor.blackColor()
-            field.keyboardAppearance = .Dark
-            field.autocapitalizationType = .None
-            field.autocorrectionType = .No
-            field.returnKeyType = i < 15 ? .Continue : .Done
+            field.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular)
+            field.textAlignment = .center
+            field.textColor = UIColor.black
+            field.keyboardAppearance = .dark
+            field.autocapitalizationType = .none
+            field.autocorrectionType = .no
+            field.returnKeyType = i < 15 ? .continue : .done
             field.text = data.count > i ? data[i] : ""
             field.backgroundColor = DefaultBackgroundColor
             field.layer.cornerRadius = 4
@@ -40,7 +40,7 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         
         // Read-only if data passed.
         if !data.isEmpty {
-            fields.forEach { $0.enabled = false }
+            fields.forEach { $0.isEnabled = false }
         }
     }
     
@@ -53,17 +53,17 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         let spaceY: CGFloat = 7
         var x: CGFloat = 0
         var y: CGFloat = 0
-        let w: CGFloat = (UIScreen.mainScreen().bounds.width - spaceX * 4) / 3
+        let w: CGFloat = (UIScreen.main.bounds.width - spaceX * 4) / 3
         let h: CGFloat = 26
         for i in 0..<fields.count {
             x = x + spaceX
-            if x + w > UIScreen.mainScreen().bounds.width {
+            if x + w > UIScreen.main.bounds.width {
                 x = spaceX
                 y = y + h + spaceY
             }
             if i == fields.count - 1 {
                 // Center last.
-                x = (UIScreen.mainScreen().bounds.width - w) / 2
+                x = (UIScreen.main.bounds.width - w) / 2
             }
             // debugPrint("w \(w) x \(x) y\(y)")
             
@@ -82,12 +82,12 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
     override func sizeToFit() {
         let field = fields[fields.count - 1]
         var f = frame
-        f.size.width = UIScreen.mainScreen().bounds.width
-        f.size.height = CGRectGetMaxY(field.frame)
+        f.size.width = UIScreen.main.bounds.width
+        f.size.height = field.frame.maxY
         frame = f
     }
     
-    func textFieldDidBeginEditing(textField: UITextField) {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.layer.borderWidth = SelectedBorderWidth
         textField.backgroundColor = SelectedBackgroundColor
         
@@ -95,12 +95,12 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         textField.text = nil
     }
     
-    func textFieldDidEndEditing(textField: UITextField) {
+    func textFieldDidEndEditing(_ textField: UITextField) {
         textField.layer.borderWidth = DefaultBorderWidth
         textField.backgroundColor = DefaultBackgroundColor
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField.tag < fields.count - 1 {
             let field = fields[textField.tag + 1]
             field.becomeFirstResponder()
@@ -110,7 +110,7 @@ class SyncCodewordsView: UIView, UITextFieldDelegate {
         return true
     }
     
-    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
         guard let text = textField.text else {
             return true

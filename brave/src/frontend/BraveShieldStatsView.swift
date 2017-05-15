@@ -6,35 +6,35 @@
 import Foundation
 
 class BraveShieldStatsView: UIView {
-    private let millisecondsPerItem = 50
-    private let line = UIView()
+    fileprivate let millisecondsPerItem = 50
+    fileprivate let line = UIView()
     
     lazy var adsStatView: StatView = {
-        let statView = StatView(frame: CGRectZero)
+        let statView = StatView(frame: CGRect.zero)
         statView.title = "Ads \rBlocked"
         statView.color = UIColor(red: 242/255.0, green: 142/255.0, blue: 45/255.0, alpha: 1.0)
         return statView
     }()
 
     lazy var trackersStatView: StatView = {
-        let statView = StatView(frame: CGRectZero)
+        let statView = StatView(frame: CGRect.zero)
         statView.title = "Trackers \rBlocked"
         statView.color = UIColor(red: 234/255.0, green: 58/255.0, blue: 58/255.0, alpha: 1.0)
         return statView
     }()
 
     lazy var httpsStatView: StatView = {
-        let statView = StatView(frame: CGRectZero)
+        let statView = StatView(frame: CGRect.zero)
         statView.title = "HTTPS \rUpgrades"
         statView.color = UIColor(red: 25/255.0, green: 152/255.0, blue: 252/255.0, alpha: 1.0)
         return statView
     }()
 
     lazy var timeStatView: StatView = {
-        let statView = StatView(frame: CGRectZero)
+        let statView = StatView(frame: CGRect.zero)
         statView.title = "Est. Time \rSaved"
         // Color dynamically set in controller: TopSitesPanel, should be abstracted
-        statView.color = PrivateBrowsing.singleton.isOn ? .whiteColor() : .blackColor()
+        statView.color = PrivateBrowsing.singleton.isOn ? .white : .black
         return statView
     }()
     
@@ -60,7 +60,7 @@ class BraveShieldStatsView: UIView {
         
         update()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(update), name: BraveGlobalShieldStats.DidUpdateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(update), name: NSNotification.Name(rawValue: BraveGlobalShieldStats.DidUpdateNotification), object: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -68,7 +68,7 @@ class BraveShieldStatsView: UIView {
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func layoutSubviews() {
@@ -77,7 +77,7 @@ class BraveShieldStatsView: UIView {
         for s: StatView in stats {
             var f: CGRect = s.frame
             f.origin.x = offset
-            f.size = CGSizeMake(width, frame.height)
+            f.size = CGSize(width: width, height: frame.height)
             s.frame = f
             offset += width
         }
@@ -122,7 +122,7 @@ class BraveShieldStatsView: UIView {
 }
 
 class StatView: UIView {
-    var color: UIColor = UIColor.blackColor() {
+    var color: UIColor = UIColor.black {
         didSet {
             statLabel.textColor = color
         }
@@ -140,20 +140,20 @@ class StatView: UIView {
         }
     }
     
-    private var statLabel: UILabel = {
+    fileprivate var statLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.numberOfLines = 0
-        label.font = UIFont.systemFontOfSize(24, weight: UIFontWeightBold)
+        label.font = UIFont.systemFont(ofSize: 24, weight: UIFontWeightBold)
         return label
     }()
     
-    private var titleLabel: UILabel = {
+    fileprivate var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = BraveUX.TopSitesStatTitleColor
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.numberOfLines = 0
-        label.font = UIFont.systemFontOfSize(12, weight: UIFontWeightMedium)
+        label.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightMedium)
         return label
     }()
     
@@ -166,7 +166,7 @@ class StatView: UIView {
         statLabel.snp_makeConstraints(closure: { (make) in
             make.left.equalTo(0)
             make.right.equalTo(0)
-            make.centerY.equalTo(self).offset(-(statLabel.sizeThatFits(CGSizeMake(CGFloat.max, CGFloat.max)).height)-10)
+            make.centerY.equalTo(self).offset(-(statLabel.sizeThatFits(CGSize(width: CGFloat.max, height: CGFloat.max)).height)-10)
         })
         
         titleLabel.snp_makeConstraints(closure: { (make) in

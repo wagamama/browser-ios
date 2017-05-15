@@ -13,7 +13,7 @@ typealias UIAlertActionCallback = (UIAlertAction) -> Void
 // MARK: - Extension methods for building specific UIAlertController instances used across the app
 extension UIAlertController {
 
-    class func clearPrivateDataAlert(okayCallback: (UIAlertAction) -> Void) -> UIAlertController {
+    class func clearPrivateDataAlert(_ okayCallback: (UIAlertAction) -> Void) -> UIAlertController {
         let alert = UIAlertController(
             title: "",
             message: Strings.ThisWillClearAllPrivateDataItCannotBeUndone,
@@ -47,7 +47,7 @@ extension UIAlertController {
      - returns: UIAlertController instance
      */
     class func deleteLoginAlertWithDeleteCallback(
-        deleteCallback: UIAlertActionCallback,
+        _ deleteCallback: UIAlertActionCallback,
         hasSyncedLogins: Bool) -> UIAlertController {
 
         let areYouSureTitle = Strings.AreYouSure

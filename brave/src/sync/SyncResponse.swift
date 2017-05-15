@@ -6,7 +6,7 @@ import Shared
 public final class SyncResponse {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    private struct SerializationKeys {
+    fileprivate struct SerializationKeys {
         static let arg2 = "arg2"
         static let message = "message"
         static let arg1 = "arg1"

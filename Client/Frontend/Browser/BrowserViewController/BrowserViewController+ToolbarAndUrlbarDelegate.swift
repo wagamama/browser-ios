@@ -6,7 +6,7 @@ import Storage
 private let log = Logger.browserLogger
 
 extension BrowserViewController: URLBarDelegate {
-    private func showSearchController() {
+    fileprivate func showSearchController() {
         if searchController != nil {
             return
         }
@@ -27,18 +27,18 @@ extension BrowserViewController: URLBarDelegate {
             return
         }
 
-        homePanelController?.view?.hidden = true
+        homePanelController?.view?.isHidden = true
 
-        searchController!.didMoveToParentViewController(self)
+        searchController!.didMove(toParentViewController: self)
     }
 
-    private func hideSearchController() {
+    fileprivate func hideSearchController() {
         if let searchController = searchController {
-            searchController.willMoveToParentViewController(nil)
+            searchController.willMove(toParentViewController: nil)
             searchController.view.removeFromSuperview()
             searchController.removeFromParentViewController()
             self.searchController = nil
-            homePanelController?.view?.hidden = false
+            homePanelController?.view?.isHidden = false
         }
     }
     
@@ -48,16 +48,16 @@ extension BrowserViewController: URLBarDelegate {
         updateInContentHomePanel(tabManager.selectedTab?.url)
     }
 
-    func urlBarDidPressReload(urlBar: URLBarView) {
+    func urlBarDidPressReload(_ urlBar: URLBarView) {
         tabManager.selectedTab?.reload()
     }
 
-    func urlBarDidPressStop(urlBar: URLBarView) {
+    func urlBarDidPressStop(_ urlBar: URLBarView) {
         tabManager.selectedTab?.stop()
     }
 
-    func urlBarDidPressTabs(urlBar: URLBarView) {
-        self.webViewContainerToolbar.hidden = true
+    func urlBarDidPressTabs(_ urlBar: URLBarView) {
+        self.webViewContainerToolbar.isHidden = true
         updateFindInPageVisibility(visible: false)
 
         let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
@@ -66,15 +66,15 @@ extension BrowserViewController: URLBarDelegate {
             screenshotHelper.takeScreenshot(t)
         }
 
-        tabTrayController.modalPresentationStyle = .OverCurrentContext
-        tabTrayController.modalTransitionStyle = .CrossDissolve
+        tabTrayController.modalPresentationStyle = .overCurrentContext
+        tabTrayController.modalTransitionStyle = .crossDissolve
         // Allowing the tab tray to handle its own animation
-        self.navigationController?.presentViewController(tabTrayController, animated: false, completion: nil)
+        self.navigationController?.present(tabTrayController, animated: false, completion: nil)
         
         self.tabTrayController = tabTrayController
     }
 
-    func urlBarDidPressReaderMode(urlBar: URLBarView) {
+    func urlBarDidPressReaderMode(_ urlBar: URLBarView) {
         if let tab = tabManager.selectedTab {
             if let readerMode = tab.getHelper(ReaderMode.self) {
                 switch readerMode.state {
@@ -89,10 +89,10 @@ extension BrowserViewController: URLBarDelegate {
         }
     }
 
-    func urlBarDidLongPressReaderMode(urlBar: URLBarView) -> Bool {
+    func urlBarDidLongPressReaderMode(_ urlBar: URLBarView) -> Bool {
         guard let tab = tabManager.selectedTab,
-            url = tab.displayURL,
-            result = profile.readingList?.createRecordWithURL(url.absoluteString ?? "", title: tab.title ?? "", addedBy: UIDevice.currentDevice().name)
+            let url = tab.displayURL,
+            let result = profile.readingList?.createRecordWithURL(url.absoluteString ?? "", title: tab.title ?? "", addedBy: UIDevice.currentDevice().name)
             else {
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, Strings.Could_not_add_page_to_Reading_List)
                 return false
@@ -109,25 +109,25 @@ extension BrowserViewController: URLBarDelegate {
         return true
     }
 
-    func locationActionsForURLBar(urlBar: URLBarView) -> [AccessibleAction] {
-        if UIPasteboard.generalPasteboard().string != nil {
+    func locationActionsForURLBar(_ urlBar: URLBarView) -> [AccessibleAction] {
+        if UIPasteboard.general.string != nil {
             return [pasteGoAction, pasteAction, copyAddressAction]
         } else {
             return [copyAddressAction]
         }
     }
 
-    func urlBarDisplayTextForURL(url: NSURL?) -> String? {
+    func urlBarDisplayTextForURL(_ url: URL?) -> String? {
         // use the initial value for the URL so we can do proper pattern matching with search URLs
         var searchURL = self.tabManager.selectedTab?.currentInitialURL
         if searchURL == nil || ErrorPageHelper.isErrorPageURL(searchURL!) {
-            searchURL = url
+            searchURL = url as! NSURL
         }
         return profile.searchEngines.queryForSearchURL(searchURL) ?? url?.absoluteString
     }
 
-    func urlBarDidLongPressLocation(urlBar: URLBarView) {
-        let longPressAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+    func urlBarDidLongPressLocation(_ urlBar: URLBarView) {
+        let longPressAlertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 
         for action in locationActionsForURLBar(urlBar) {
             longPressAlertController.addAction(action.alertAction(style: .Default))
@@ -141,7 +141,7 @@ extension BrowserViewController: URLBarDelegate {
             if let popoverPresentationController = longPressAlertController.popoverPresentationController {
                 popoverPresentationController.sourceView = urlBar
                 popoverPresentationController.sourceRect = urlBar.frame
-                popoverPresentationController.permittedArrowDirections = .Any
+                popoverPresentationController.permittedArrowDirections = .any
                 popoverPresentationController.delegate = self
             }
         }
@@ -153,23 +153,23 @@ extension BrowserViewController: URLBarDelegate {
             updateDisplayedPopoverProperties = setupPopover
         }
 
-        self.presentViewController(longPressAlertController, animated: true, completion: nil)
+        self.present(longPressAlertController, animated: true, completion: nil)
     }
 
-    func urlBarDidPressScrollToTop(urlBar: URLBarView) {
+    func urlBarDidPressScrollToTop(_ urlBar: URLBarView) {
         if let selectedTab = tabManager.selectedTab {
             // Only scroll to top if we are not showing the home view controller
             if homePanelController == nil {
-                selectedTab.webView?.scrollView.setContentOffset(CGPointZero, animated: true)
+                selectedTab.webView?.scrollView.setContentOffset(CGPoint.zero, animated: true)
             }
         }
     }
 
-    func urlBarLocationAccessibilityActions(urlBar: URLBarView) -> [UIAccessibilityCustomAction]? {
+    func urlBarLocationAccessibilityActions(_ urlBar: URLBarView) -> [UIAccessibilityCustomAction]? {
         return locationActionsForURLBar(urlBar).map { $0.accessibilityCustomAction }
     }
 
-    func urlBar(urlBar: URLBarView, didEnterText text: String) {
+    func urlBar(_ urlBar: URLBarView, didEnterText text: String) {
         searchLoader.query = text
 
         if text.isEmpty {
@@ -180,7 +180,7 @@ extension BrowserViewController: URLBarDelegate {
         }
     }
 
-    func urlBar(urlBar: URLBarView, didSubmitText text: String) {
+    func urlBar(_ urlBar: URLBarView, didSubmitText text: String) {
         // If we can't make a valid URL, do a search query.
         // If we still don't have a valid URL, something is broken. Give up.
         guard let url = URIFixup.getURL(text) ??
@@ -192,34 +192,34 @@ extension BrowserViewController: URLBarDelegate {
         finishEditingAndSubmit(url)
     }
 
-    func urlBarDidEnterSearchMode(urlBar: URLBarView) {
+    func urlBarDidEnterSearchMode(_ urlBar: URLBarView) {
         showHomePanelController(inline: false)
     }
 
-    func urlBarDidLeaveSearchMode(urlBar: URLBarView) {
+    func urlBarDidLeaveSearchMode(_ urlBar: URLBarView) {
         hideSearchController()
         updateInContentHomePanel(tabManager.selectedTab?.url)
     }
 }
 
 extension BrowserViewController: BrowserToolbarDelegate {
-    func browserToolbarDidPressBack(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserToolbarDidPressBack(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goBack()
     }
 
-    func browserLocationViewDidPressReload(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserLocationViewDidPressReload(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.reload()
     }
 
-    func browserLocationViewDidPressStop(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserLocationViewDidPressStop(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.stop()
     }
 
-    func browserToolbarDidPressForward(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserToolbarDidPressForward(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.goForward()
     }
 
-    func browserToolbarDidPressBookmark(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserToolbarDidPressBookmark(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         guard let tab = tabManager.selectedTab,
             let url = tab.url else {
                 log.error("Bookmark error: No tab is selected, or no URL in tab.")
@@ -235,15 +235,15 @@ extension BrowserViewController: BrowserToolbarDelegate {
         })
     }
 
-    func browserToolbarDidPressShare(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserToolbarDidPressShare(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         telemetry(action: "Share Button Pressed", props: ["bottomToolbar": "\(browserToolbar as? BraveBrowserBottomToolbar != nil)"])
-        if let tab = tabManager.selectedTab, url = tab.displayURL {
+        if let tab = tabManager.selectedTab, let url = tab.displayURL {
             let sourceView = self.navigationToolbar.shareButton
-            presentActivityViewController(url, tab: tab, sourceView: sourceView.superview, sourceRect: sourceView.frame, arrowDirection: .Up)
+            presentActivityViewController(url, tab: tab, sourceView: sourceView.superview, sourceRect: sourceView.frame, arrowDirection: .up)
         }
     }
     
-    func browserToolbarDidPressPwdMgr(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+    func browserToolbarDidPressPwdMgr(_ browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         if let loginsHelper = tabManager.selectedTab?.getHelper(LoginsHelper) {
             loginsHelper.onExecuteTapped(button)
         }

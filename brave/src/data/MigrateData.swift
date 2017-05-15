@@ -5,25 +5,25 @@ import CoreData
 
 class MigrateData: NSObject {
     
-    private var files: FileAccessor!
-    private var db: COpaquePointer = nil
+    fileprivate var files: FileAccessor!
+    fileprivate var db: OpaquePointer? = nil
     
     enum ProcessOrder: Int {
-        case Bookmarks = 0
-        case History = 1
-        case Domains = 2
-        case Favicons = 3
-        case Tabs = 4
-        case Delete = 5
+        case bookmarks = 0
+        case history = 1
+        case domains = 2
+        case favicons = 3
+        case tabs = 4
+        case delete = 5
     }
-    var completedCalls: [ProcessOrder: Bool] = [.Bookmarks: false, .History: false, .Domains: false, .Favicons: false, .Tabs: false] {
+    var completedCalls: [ProcessOrder: Bool] = [.bookmarks: false, .history: false, .domains: false, .favicons: false, .tabs: false] {
         didSet {
             checkCompleted()
         }
     }
-    var completedCallback: ((success: Bool) -> Void)?
+    var completedCallback: ((_ success: Bool) -> Void)?
     
-    required convenience init(completed: ((success: Bool) -> Void)?) {
+    required convenience init(completed: ((_ success: Bool) -> Void)?) {
         self.init()
         self.files = ProfileFileAccessor(localName: "profile")
         
@@ -35,36 +35,36 @@ class MigrateData: NSObject {
         super.init()
     }
     
-    private func process() {
+    fileprivate func process() {
         if hasOldDb() {
             debugPrint("Found old database...")
             
             migrateDomainData { (success) in
                 debugPrint("Migrate domains... \(success ? "Done" : "Failed")")
-                self.completedCalls[ProcessOrder.Domains] = success
+                self.completedCalls[ProcessOrder.domains] = success
             }
             migrateFavicons { (success) in
                 debugPrint("Migrate favicons... \(success ? "Done" : "Failed")")
-                self.completedCalls[ProcessOrder.Favicons] = success
+                self.completedCalls[ProcessOrder.favicons] = success
             }
             migrateHistory { (success) in
                 debugPrint("Migrate history... \(success ? "Done" : "Failed")")
-                self.completedCalls[ProcessOrder.History] = success
+                self.completedCalls[ProcessOrder.history] = success
             }
             migrateBookmarks { (success) in
                 debugPrint("Migrate bookmarks... \(success ? "Done" : "Failed")")
-                self.completedCalls[ProcessOrder.Bookmarks] = success
+                self.completedCalls[ProcessOrder.bookmarks] = success
             }
             migrateTabs { (success) in
                 debugPrint("Migrate tabs... \(success ? "Done" : "Failed")")
-                self.completedCalls[ProcessOrder.Tabs] = success
+                self.completedCalls[ProcessOrder.tabs] = success
             }
         }
     }
     
-    private func hasOldDb() -> Bool {
+    fileprivate func hasOldDb() -> Bool {
         let file = ((try! files.getAndEnsureDirectory()) as NSString).stringByAppendingPathComponent("browser.db")
-        let status = sqlite3_open_v2(file.cStringUsingEncoding(NSUTF8StringEncoding)!, &db, SQLITE_OPEN_READONLY, nil)
+        let status = sqlite3_open_v2(file.cStringUsingEncoding(String.Encoding.utf8)!, &db, SQLITE_OPEN_READONLY, nil)
         if status != SQLITE_OK {
             debugPrint("Error: Opening Database with Flags")
             return false
@@ -74,9 +74,9 @@ class MigrateData: NSObject {
     
     internal var domainHash: [Int32: Domain] = [:]
     
-    private func migrateDomainData(completed: (success: Bool) -> Void) {
+    fileprivate func migrateDomainData(_ completed: (_ success: Bool) -> Void) {
         let query: String = "SELECT id, domain, showOnTopSites FROM domains"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
@@ -84,7 +84,7 @@ class MigrateData: NSObject {
                 let domain = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
                 let showOnTopSites = sqlite3_column_int(results, 2)
                 
-                if let d = Domain.getOrCreateForUrl(NSURL(string: domain)!, context: DataController.moc) {
+                if let d = Domain.getOrCreateForUrl(URL(string: domain)!, context: DataController.moc) {
                     d.topsite = (showOnTopSites == 1)
                     domainHash[id] = d
                 }
@@ -99,19 +99,19 @@ class MigrateData: NSObject {
             debugPrint("Error finalizing prepared statement: \(error)")
         }
         results = nil
-        completed(success: true)
+        completed(true)
     }
     
-    private func migrateHistory(completed: (success: Bool) -> Void) {
+    fileprivate func migrateHistory(_ completed: (_ success: Bool) -> Void) {
         let query: String = "SELECT url, title FROM history WHERE is_deleted = 0"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
                 let url = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 0))) ?? ""
                 let title = String.fromCString(UnsafePointer<CChar>(sqlite3_column_text(results, 1))) ?? ""
                 
-                History.add(title: title, url: NSURL(string: url)!)
+                History.add(title: title, url: URL(string: url)!)
             }
         } else {
             debugPrint("SELECT statement could not be prepared")
@@ -122,14 +122,14 @@ class MigrateData: NSObject {
             debugPrint("Error finalizing prepared statement: \(error)")
         }
         results = nil
-        completed(success: true)
+        completed(true)
     }
     
     internal var domainFaviconHash: [Int32: Domain] = [:]
     
-    private func buildDomainFaviconHash() {
+    fileprivate func buildDomainFaviconHash() {
         let query: String = "SELECT siteID, faviconID FROM favicon_sites"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
@@ -150,11 +150,11 @@ class MigrateData: NSObject {
         results = nil
     }
     
-    private func migrateFavicons(completed: (success: Bool) -> Void) {
+    fileprivate func migrateFavicons(_ completed: (_ success: Bool) -> Void) {
         buildDomainFaviconHash()
         
         let query: String = "SELECT id, url, width, height, type FROM favicons"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
@@ -170,7 +170,7 @@ class MigrateData: NSObject {
                 
                 if let domain = domainFaviconHash[id] {
                     if let url = domain.url {
-                        FaviconMO.add(favicon: favicon, forSiteUrl: NSURL(string: url)!)
+                        FaviconMO.add(favicon: favicon, forSiteUrl: URL(string: url)!)
                     }
                 }
             }
@@ -183,14 +183,14 @@ class MigrateData: NSObject {
             debugPrint("Error finalizing prepared statement: \(error)")
         }
         results = nil
-        completed(success: true)
+        completed(true)
     }
     
     internal var bookmarkOrderHash: [String: Int16] = [:]
     
-    private func buildBookmarkOrderHash() {
+    fileprivate func buildBookmarkOrderHash() {
         let query: String = "SELECT child, idx FROM bookmarksLocalStructure"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             while sqlite3_step(results) == SQLITE_ROW {
@@ -209,11 +209,11 @@ class MigrateData: NSObject {
         results = nil
     }
     
-    private func migrateBookmarks(completed: (success: Bool) -> Void) {
+    fileprivate func migrateBookmarks(_ completed: (_ success: Bool) -> Void) {
         buildBookmarkOrderHash()
         
         let query: String = "SELECT guid, type, parentid, title, description, bmkUri, faviconID FROM bookmarksLocal WHERE (id > 4 AND is_deleted = 0) ORDER BY type DESC"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             var relationshipHash: [String: Bookmark] = [:]
@@ -229,7 +229,7 @@ class MigrateData: NSObject {
                     let parent = relationshipHash[parentid]
                     bk.parentFolder = parent
                     bk.syncParentUUID = parent?.syncUUID
-                    if let baseUrl = NSURL(string: url)?.baseURL {
+                    if let baseUrl = URL(string: url)?.baseURL {
                         bk.domain = Domain.getOrCreateForUrl(baseUrl, context: DataController.moc)
                     }
                     
@@ -250,12 +250,12 @@ class MigrateData: NSObject {
             debugPrint("Error finalizing prepared statement: \(error)")
         }
         results = nil
-        completed(success: true)
+        completed(true)
     }
     
-    private func migrateTabs(completed: (success: Bool) -> Void) {
+    fileprivate func migrateTabs(_ completed: (_ success: Bool) -> Void) {
         let query: String = "SELECT url, title, history FROM tabs ORDER BY last_used"
-        var results: COpaquePointer = nil
+        var results: OpaquePointer? = nil
         
         if sqlite3_prepare_v2(db, query, -1, &results, nil) == SQLITE_OK {
             var order: Int16 = 0
@@ -282,23 +282,23 @@ class MigrateData: NSObject {
             debugPrint("Error finalizing prepared statement: \(error)")
         }
         results = nil
-        completed(success: true)
+        completed(true)
     }
     
-    private func removeOldDb(completed: (success: Bool) -> Void) {
+    fileprivate func removeOldDb(_ completed: (_ success: Bool) -> Void) {
         do {
-            let documentDirectory = NSURL(fileURLWithPath: self.files.rootPath as String)
+            let documentDirectory = URL(fileURLWithPath: self.files.rootPath as String)
             let originPath = documentDirectory.URLByAppendingPathComponent("browser.db")
             let destinationPath = documentDirectory.URLByAppendingPathComponent("old-browser.db")
-            try NSFileManager.defaultManager().moveItemAtURL(originPath!, toURL: destinationPath!)
-            completed(success: true)
+            try FileManager.defaultManager().moveItemAtURL(originPath!, toURL: destinationPath!)
+            completed(true)
         } catch let error as NSError {
             debugPrint("Cannot clear profile data: \(error)")
-            completed(success: false)
+            completed(false)
         }
     }
     
-    private func checkCompleted() {
+    fileprivate func checkCompleted() {
         var completedAllCalls = true
         for (_, value) in completedCalls {
             if value == false {
@@ -312,7 +312,7 @@ class MigrateData: NSObject {
             removeOldDb { (success) in
                 debugPrint("Delete old database... \(success ? "Done" : "Failed")")
                 if let callback = self.completedCallback {
-                    callback(success: success)
+                    callback(success)
                 }
             }
         }

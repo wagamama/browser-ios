@@ -6,7 +6,7 @@ import Shared
 public final class SyncBookmark {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    private struct SerializationKeys {
+    fileprivate struct SerializationKeys {
         static let isFolder = "isFolder"
         static let parentFolderObjectId = "parentFolderObjectId"
         static let site = "site"
@@ -43,9 +43,9 @@ public final class SyncBookmark {
     /// - returns: A Key value pair containing all valid values in the object.
     public func dictionaryRepresentation() -> [String: AnyObject] {
         var dictionary: [String: AnyObject] = [:]
-        dictionary[SerializationKeys.isFolder] = isFolder
-        if let value = parentFolderObjectId { dictionary[SerializationKeys.parentFolderObjectId] = value }
-        if let value = site { dictionary[SerializationKeys.site] = value.dictionaryRepresentation() }
+        dictionary[SerializationKeys.isFolder] = isFolder as AnyObject
+        if let value = parentFolderObjectId { dictionary[SerializationKeys.parentFolderObjectId] = value as AnyObject }
+        if let value = site { dictionary[SerializationKeys.site] = value.dictionaryRepresentation() as AnyObject }
         return dictionary
     }
     

@@ -5,13 +5,13 @@ import Shared
 
 class SyncSettingsViewController: AppSettingsTableViewController {
     
-    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        let footerView = InsetLabel(frame: CGRectMake(0, 5, tableView.frame.size.width, 60))
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerView = InsetLabel(frame: CGRect(x: 0, y: 5, width: tableView.frame.size.width, height: 60))
         footerView.leftInset = CGFloat(20)
         footerView.rightInset = CGFloat(45)
         footerView.numberOfLines = 0
-        footerView.lineBreakMode = .ByWordWrapping
-        footerView.font = UIFont.systemFontOfSize(13)
+        footerView.lineBreakMode = .byWordWrapping
+        footerView.font = UIFont.systemFont(ofSize: 13)
         footerView.textColor = UIColor(rgb: 0x696969)
         
         if section == 1 {
@@ -21,22 +21,22 @@ class SyncSettingsViewController: AppSettingsTableViewController {
         return footerView
     }
     
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return section == 1 ? 40 : 20
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         title = Strings.Devices
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(SEL_addDevice))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(SEL_addDevice))
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
     }
     

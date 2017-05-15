@@ -3,15 +3,15 @@
 
 import Foundation
 
-extension NSJSONSerialization {
+extension JSONSerialization {
     
     class func swiftObject(withJSON json: AnyObject?) -> [String: AnyObject]? {
 
-        guard let jsonData = json?.dataUsingEncoding(NSUTF8StringEncoding) else  {
+        guard let jsonData = json?.data(using: String.Encoding.utf8.rawValue) else  {
             return nil
         }
         
-        guard let nativeObject = try? NSJSONSerialization.JSONObjectWithData(jsonData, options: []) as? [String: AnyObject] else {
+        guard let nativeObject = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject] else {
             return nil
         }
         
@@ -20,18 +20,18 @@ extension NSJSONSerialization {
     
     class func jsObject(withNative native: AnyObject?, escaped: Bool = false) -> String? {
         
-        guard let native = native, let data = try? NSJSONSerialization.dataWithJSONObject(native, options: NSJSONWritingOptions(rawValue: 0)) else {
+        guard let native = native, let data = try? JSONSerialization.data(withJSONObject: native, options: JSONSerialization.WritingOptions(rawValue: 0)) else {
             return nil
         }
         
         // Convert to string of JSON data, encode " for JSON to JS conversion
-        var encoded = String(data: data, encoding: NSUTF8StringEncoding)
+        var encoded = String(data: data, encoding: String.Encoding.utf8)
         
         if escaped {
-            encoded = encoded?.stringByReplacingOccurrencesOfString("\"", withString: "\\\"")
+            encoded = encoded?.replacingOccurrences(of: "\"", with: "\\\"")
         }
         
-        encoded = encoded?.stringByReplacingOccurrencesOfString("\"null\"", withString: "null")
+        encoded = encoded?.replacingOccurrences(of: "\"null\"", with: "null")
         
         return encoded
     }

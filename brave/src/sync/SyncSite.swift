@@ -6,7 +6,7 @@ import Shared
 public final class SyncSite {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    private struct SerializationKeys {
+    fileprivate struct SerializationKeys {
         static let customTitle = "customTitle"
         static let title = "title"
         static let favicon = "favicon"
@@ -52,12 +52,12 @@ public final class SyncSite {
     /// - returns: A Key value pair containing all valid values in the object.
     public func dictionaryRepresentation() -> [String: AnyObject] {
         var dictionary: [String: AnyObject] = [:]
-        if let value = customTitle { dictionary[SerializationKeys.customTitle] = value }
-        if let value = title { dictionary[SerializationKeys.title] = value }
-        if let value = favicon { dictionary[SerializationKeys.favicon] = value }
-        if let value = location { dictionary[SerializationKeys.location] = value }
-        if let value = creationTime { dictionary[SerializationKeys.creationTime] = value }
-        if let value = lastAccessedTime { dictionary[SerializationKeys.lastAccessedTime] = value }
+        if let value = customTitle { dictionary[SerializationKeys.customTitle] = value as AnyObject }
+        if let value = title { dictionary[SerializationKeys.title] = value as AnyObject }
+        if let value = favicon { dictionary[SerializationKeys.favicon] = value as AnyObject }
+        if let value = location { dictionary[SerializationKeys.location] = value as AnyObject }
+        if let value = creationTime { dictionary[SerializationKeys.creationTime] = value as AnyObject }
+        if let value = lastAccessedTime { dictionary[SerializationKeys.lastAccessedTime] = value as AnyObject }
         return dictionary
     }
     

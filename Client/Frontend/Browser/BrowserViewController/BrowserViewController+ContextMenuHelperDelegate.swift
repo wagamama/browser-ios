@@ -9,11 +9,11 @@ private let log = Logger.browserLogger
 private let ActionSheetTitleMaxLength = 120
 
 extension BrowserViewController: ContextMenuHelperDelegate {
-    func contextMenuHelper(contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UILongPressGestureRecognizer) {
+    func contextMenuHelper(_ contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UILongPressGestureRecognizer) {
         // locationInView can return (0, 0) when the long press is triggered in an invalid page
         // state (e.g., long pressing a link before the document changes, then releasing after a
         // different page loads).
-        let touchPoint = gestureRecognizer.locationInView(view)
+        let touchPoint = gestureRecognizer.location(in: view)
         #if BRAVE
             if urlBar.inSearchMode {
                 return
@@ -26,10 +26,10 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         showContextMenu(elements: elements, touchPoint: touchPoint)
     }
 
-    func showContextMenu(elements elements: ContextMenuHelper.Elements, touchPoint: CGPoint) {
-        let touchSize = CGSizeMake(0, 16)
+    func showContextMenu(elements: ContextMenuHelper.Elements, touchPoint: CGPoint) {
+        let touchSize = CGSize(width: 0, height: 16)
 
-        let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
+        let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         var dialogTitle: String?
         actionSheetController.view.tag = BraveWebViewConstants.kContextMenuBlockNavigation
 
@@ -50,7 +50,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 let openNewPrivateTabTitle = Strings.Open_In_New_Private_Tab
                 let openNewPrivateTabAction =  UIAlertAction(title: openNewPrivateTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                     self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                        self.switchBrowsingMode(toPrivate: true, request: NSURLRequest(URL: url))
+                        self.switchBrowsingMode(toPrivate: true, request: URLRequest(URL: url))
                     })
                 }
                 actionSheetController.addAction(openNewPrivateTabAction)
@@ -59,7 +59,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let copyTitle = Strings.Copy_Link
             let copyAction = UIAlertAction(title: copyTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) -> Void in
                 let pasteBoard = UIPasteboard.generalPasteboard()
-                if let dialogTitle = dialogTitle, url = NSURL(string: dialogTitle) {
+                if let dialogTitle = dialogTitle, let url = NSURL(string: dialogTitle) {
                     pasteBoard.URL = url
                 }
             }
@@ -79,7 +79,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let openImageTitle = Strings.Open_Image_In_Background_Tab
             let openImageAction = UIAlertAction(title: openImageTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
                 self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
-                    self.tabManager.addTab(NSURLRequest(URL: url))
+                    self.tabManager.addTab(URLRequest(URL: url))
                 })
             }
             actionSheetController.addAction(openImageAction)
@@ -121,7 +121,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                         // Only set the image onto the pasteboard if the pasteboard hasn't changed since
                         // fetching the image; otherwise, in low-bandwidth situations,
                         // we might be overwriting something that the user has subsequently added.
-                        if changeCount == pasteboard.changeCount, let imageData = responseData where responseError == nil {
+                        if changeCount == pasteboard.changeCount, let imageData = responseData, responseError == nil {
                             pasteboard.addImageWithData(imageData, forURL: url)
                         }
 
@@ -135,16 +135,16 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         if let popoverPresentationController = actionSheetController.popoverPresentationController {
             popoverPresentationController.sourceView = view
             popoverPresentationController.sourceRect = CGRect(origin: touchPoint, size: touchSize)
-            popoverPresentationController.permittedArrowDirections = .Any
+            popoverPresentationController.permittedArrowDirections = .any
         }
 
         actionSheetController.title = dialogTitle?.ellipsize(maxLength: ActionSheetTitleMaxLength)
         let cancelAction = UIAlertAction(title: Strings.Cancel, style: UIAlertActionStyle.Cancel, handler: nil)
         actionSheetController.addAction(cancelAction)
-        self.presentViewController(actionSheetController, animated: true, completion: nil)
+        self.present(actionSheetController, animated: true, completion: nil)
     }
 
-    private func getImage(url: NSURL, success: UIImage -> ()) {
+    fileprivate func getImage(_ url: URL, success: @escaping (UIImage) -> ()) {
         Alamofire.request(.GET, url)
             .validate(statusCode: 200..<300)
             .response { _, _, data, _ in

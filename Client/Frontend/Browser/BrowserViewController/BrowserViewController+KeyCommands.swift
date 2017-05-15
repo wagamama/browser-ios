@@ -21,7 +21,7 @@ extension BrowserViewController {
     }
 
     func findOnPage(){
-        if let tab = tabManager.selectedTab where homePanelController == nil {
+        if let tab = tabManager.selectedTab, homePanelController == nil {
             browser(tab, didSelectFindInPageForSelection: "")
         }
     }
@@ -54,15 +54,15 @@ extension BrowserViewController {
         }
     }
 
-    private func nextOrPrevTabShortcut(isNext isNext: Bool) {
+    fileprivate func nextOrPrevTabShortcut(isNext: Bool) {
         guard let tab = tabManager.selectedTab else { return }
         let step = isNext ? 1 : -1
         let tabList: [Browser] = tabManager.tabs.displayedTabsForCurrentPrivateMode
-        func wrappingMod(val:Int, mod:Int) -> Int {
+        func wrappingMod(_ val:Int, mod:Int) -> Int {
             return ((val % mod) + mod) % mod
         }
         assert(wrappingMod(-1, mod: 10) == 9)
-        let index = wrappingMod((tabList.indexOf(tab)! + step), mod: tabList.count)
+        let index = wrappingMod((tabList.index(of: tab)! + step), mod: tabList.count)
         tabManager.selectTab(tabList[index])
     }
 

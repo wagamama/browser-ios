@@ -4,7 +4,7 @@ import Shared
 private let log = Logger.browserLogger
 
 extension BrowserViewController: ReaderModeStyleViewControllerDelegate {
-    func readerModeStyleViewController(readerModeStyleViewController: ReaderModeStyleViewController, didConfigureStyle style: ReaderModeStyle) {
+    func readerModeStyleViewController(_ readerModeStyleViewController: ReaderModeStyleViewController, didConfigureStyle style: ReaderModeStyle) {
         // Persist the new style to the profile
         let encodedStyle: [String:AnyObject] = style.encode()
         profile.prefs.setObject(encodedStyle, forKey: ReaderModeProfileKeyStyle)
@@ -32,12 +32,12 @@ extension BrowserViewController {
 //        }
     }
 
-    func showReaderModeBar(animated animated: Bool) {
+    func showReaderModeBar(animated: Bool) {
         (urlBar as! BraveURLBarView).showReaderModeBar()
         updateReaderModeBar()
     }
 
-    func hideReaderModeBar(animated animated: Bool) {
+    func hideReaderModeBar(animated: Bool) {
         (urlBar as! BraveURLBarView).hideReaderModeBar()
     }
 
@@ -47,7 +47,7 @@ extension BrowserViewController {
     /// of the current page is there. And if so, we go there.
 
     func enableReaderMode() {
-        guard let tab = tabManager.selectedTab, webView = tab.webView else { return }
+        guard let tab = tabManager.selectedTab, let webView = tab.webView else { return }
 
         let backList = webView.backForwardList.backList
         let forwardList = webView.backForwardList.forwardList
@@ -70,7 +70,7 @@ extension BrowserViewController {
                         // this is not really correct, the original code is ignoring the navigation
                         webView.loadRequest(NSURLRequest(URL: readerModeURL))
                     #else
-                        if let nav = webView.loadRequest(NSURLRequest(URL: readerModeURL)) {
+                        if let nav = webView.loadRequest(URLRequest(url: readerModeURL)) {
                             self.ignoreNavigationInTab(tab, navigation: nav)
                         }
                     #endif
@@ -101,7 +101,7 @@ extension BrowserViewController {
                             // this is not really correct, the original code is ignoring the navigation
                             webView.loadRequest(NSURLRequest(URL: originalURL))
                         #else
-                            if let nav = webView.loadRequest(NSURLRequest(URL: originalURL)) {
+                            if let nav = webView.loadRequest(URLRequest(url: originalURL)) {
                                 self.ignoreNavigationInTab(tab, navigation: nav)
                             }
                         #endif
@@ -111,7 +111,7 @@ extension BrowserViewController {
         }
     }
 
-    func SELDynamicFontChanged(notification: NSNotification) {
+    func SELDynamicFontChanged(_ notification: Notification) {
         guard notification.name == NotificationDynamicFontChanged else { return }
 
         var readerModeStyle = DefaultReaderModeStyle
@@ -126,10 +126,10 @@ extension BrowserViewController {
 }
 
 extension BrowserViewController: ReaderModeBarViewDelegate {
-    func readerModeBar(readerModeBar: ReaderModeBarView, didSelectButton buttonType: ReaderModeBarButtonType) {
+    func readerModeBar(_ readerModeBar: ReaderModeBarView, didSelectButton buttonType: ReaderModeBarButtonType) {
 //        switch buttonType {
 //        case .Settings:
-        guard let readerMode = tabManager.selectedTab?.getHelper(ReaderMode.self) where readerMode.state == ReaderModeState.Active else {
+        guard let readerMode = tabManager.selectedTab?.getHelper(ReaderMode.self), readerMode.state == ReaderModeState.Active else {
             return
         }
         var readerModeStyle = DefaultReaderModeStyle
@@ -142,15 +142,15 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
         let readerModeStyleViewController = ReaderModeStyleViewController()
         readerModeStyleViewController.delegate = self
         readerModeStyleViewController.readerModeStyle = readerModeStyle
-        readerModeStyleViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
+        readerModeStyleViewController.modalPresentationStyle = UIModalPresentationStyle.popover
 
         let setupPopover = { [unowned self] in
             if let popoverPresentationController = readerModeStyleViewController.popoverPresentationController {
-                popoverPresentationController.backgroundColor = UIColor.whiteColor()
+                popoverPresentationController.backgroundColor = UIColor.white
                 popoverPresentationController.delegate = self
                 popoverPresentationController.sourceView = readerModeBar
                 popoverPresentationController.sourceRect = CGRect(x: readerModeBar.frame.width/2, y: readerModeBar.frame.height, width: 1, height: 1)
-                popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
+                popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.up
             }
         }
 
@@ -161,6 +161,6 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
             updateDisplayedPopoverProperties = setupPopover
         }
 
-        self.presentViewController(readerModeStyleViewController, animated: true, completion: nil)
+        self.present(readerModeStyleViewController, animated: true, completion: nil)
     }
 }

@@ -13,8 +13,8 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     @NSManaged var customTitle: String?
     @NSManaged var url: String?
     @NSManaged var visits: Int32
-    @NSManaged var lastVisited: NSDate?
-    @NSManaged var created: NSDate?
+    @NSManaged var lastVisited: Date?
+    @NSManaged var created: Date?
     @NSManaged var order: Int16
     @NSManaged var tags: [String]?
     
@@ -52,11 +52,11 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     }
     
     var displayTitle: String? {
-        if let custom = customTitle where !custom.isEmpty {
+        if let custom = customTitle, !custom.isEmpty {
             return customTitle
         }
         
-        if let t = title where !t.isEmpty {
+        if let t = title, !t.isEmpty {
             return title
         }
         
@@ -66,20 +66,20 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     
     override func awakeFromInsert() {
         super.awakeFromInsert()
-        created = NSDate()
+        created = Date()
         lastVisited = created
     }
     
-    func asDictionary(deviceId deviceId: [Int]?, action: Int?) -> [String: AnyObject] {
+    func asDictionary(deviceId: [Int]?, action: Int?) -> [String: AnyObject] {
         return SyncRoot(bookmark: self, deviceId: deviceId, action: action).dictionaryRepresentation()
     }
 
-    static func entity(context:NSManagedObjectContext) -> NSEntityDescription {
-        return NSEntityDescription.entityForName("Bookmark", inManagedObjectContext: context)!
+    static func entity(_ context:NSManagedObjectContext) -> NSEntityDescription {
+        return NSEntityDescription.entity(forEntityName: "Bookmark", in: context)!
     }
 
-    class func frc(parentFolder parentFolder: Bookmark?) -> NSFetchedResultsController {
-        let fetchRequest = NSFetchRequest()
+    class func frc(parentFolder: Bookmark?) -> NSFetchedResultsController<NSFetchRequestResult> {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 200
@@ -98,7 +98,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         title = site.title
         customTitle = site.customTitle
         url = site.location
-        lastVisited = NSDate(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
+        lastVisited = Date(timeIntervalSince1970:(Double(site.lastAccessedTime ?? 0) / 1000.0))
         syncParentUUID = bm.parentFolderObjectId
         
         if save {
@@ -106,18 +106,18 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         }
     }
     
-    func update(customTitle customTitle: String?, url: String?, save: Bool = false) {
+    func update(customTitle: String?, url: String?, save: Bool = false) {
         
         // See if there has been any change
         if self.customTitle == customTitle && self.url == url {
             return
         }
         
-        if let ct = customTitle where !ct.isEmpty {
+        if let ct = customTitle, !ct.isEmpty {
             self.customTitle = customTitle
         }
         
-        if let u = url where !u.isEmpty {
+        if let u = url, !u.isEmpty {
             self.url = url
         }
         
@@ -139,7 +139,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
             // Turn into 'update' record instead
             bk = foundBK
         } else {
-            bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertIntoManagedObjectContext: DataController.moc)
+            bk = Bookmark(entity: Bookmark.entity(DataController.moc), insertInto: DataController.moc)
         }
         
         // Should probably have visual indication before reaching this point
@@ -155,18 +155,18 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         bk.syncUUID = root.objectId ?? bk.syncUUID ?? (0..<16).map { _ in Int(arc4random_uniform(256)) }
         
         if let created = site?.creationTime {
-            bk.created = NSDate(timeIntervalSince1970:(Double(created) / 1000.0))
+            bk.created = Date(timeIntervalSince1970:(Double(created) / 1000.0))
         } else if bk.created == nil {
-            bk.created = NSDate()
+            bk.created = Date()
         }
         
         if let visited = site?.lastAccessedTime {
-            bk.lastVisited = NSDate(timeIntervalSince1970:(Double(visited) / 1000.0))
+            bk.lastVisited = Date(timeIntervalSince1970:(Double(visited) / 1000.0))
         } else if bk.lastVisited == nil {
-            bk.lastVisited = NSDate()
+            bk.lastVisited = Date()
         }
         
-        if let location = site?.location, let url = NSURL(string: location) {
+        if let location = site?.location, let url = URL(string: location) {
             bk.domain = Domain.getOrCreateForUrl(url, context: DataController.moc)
         }
         
@@ -198,7 +198,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     }
     
     // TODO: DELETE
-    class func add(url url: NSURL?,
+    class func add(url: URL?,
                        title: String?,
                        customTitle: String? = nil, // Folders only use customTitle
                        parentFolder:Bookmark? = nil,
@@ -222,7 +222,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     
     // TODO: Migration syncUUIDS still needs to be solved
     // Should only ever be used for migration from old db
-    class func addForMigration(url url: String?, title: String, customTitle: String, parentFolder: Bookmark?, isFolder: Bool?) -> Bookmark? {
+    class func addForMigration(url: String?, title: String, customTitle: String, parentFolder: Bookmark?, isFolder: Bool?) -> Bookmark? {
         // isFolder = true
         
         let site = SyncSite()
@@ -241,10 +241,10 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         return self.add(rootObject: root, save: true)
     }
 
-    class func contains(url url: NSURL, completionOnMain completion: ((Bool)->Void)) {
+    class func contains(url: URL, completionOnMain completion: @escaping ((Bool)->Void)) {
         var found = false
         let context = DataController.shared.workerContext()
-        context.performBlock {
+        context.perform {
             if let count = get(forUrl: url, countOnly: true, context: context) as? Int {
                 found = count > 0
             }
@@ -254,10 +254,10 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         }
     }
 
-    class func frecencyQuery(context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
-        assert(!NSThread.isMainThread())
+    class func frecencyQuery(_ context: NSManagedObjectContext, containing: String?) -> [Bookmark] {
+        assert(!Thread.isMainThread)
 
-        let fetchRequest = NSFetchRequest()
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.fetchLimit = 5
         fetchRequest.entity = Bookmark.entity(context)
         
@@ -268,7 +268,7 @@ class Bookmark: NSManagedObject, WebsitePresentable {
         fetchRequest.predicate = predicate
 
         do {
-            if let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark] {
+            if let results = try context.fetch(fetchRequest) as? [Bookmark] {
                 return results
             }
         } catch {
@@ -280,30 +280,30 @@ class Bookmark: NSManagedObject, WebsitePresentable {
     
     
     /// UUID -> DisplayUUID
-    private static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
-        return uuid?.map{ $0.description }.joinWithSeparator(",")
+    fileprivate static func syncDisplay(fromUUID uuid: [Int]?) -> String? {
+        return uuid?.map{ $0.description }.joined(separator: ",")
     }
     
     /// DisplayUUID -> UUID
-    private func syncUUID(fromString string: String?) -> [Int]? {
-        return string?.componentsSeparatedByString(",").map { Int($0) }.flatMap { $0 }
+    fileprivate func syncUUID(fromString string: String?) -> [Int]? {
+        return string?.components(separatedBy: ",").map { Int($0) }.flatMap { $0 }
     }
 }
 
 // TODO: Document well
 // Getters
 extension Bookmark {
-    private static func get(forUrl url: NSURL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
+    fileprivate static func get(forUrl url: URL, countOnly: Bool = false, context: NSManagedObjectContext) -> AnyObject? {
         guard let str = url.absoluteString else { return nil }
-        let fetchRequest = NSFetchRequest()
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Bookmark.entity(context)
         fetchRequest.predicate = NSPredicate(format: "url == %@", str)
         do {
             if countOnly {
-                let count = try context.countForFetchRequest(fetchRequest)
-                return count
+                let count = try context.count(for: fetchRequest)
+                return count as AnyObject
             }
-            let results = try context.executeFetchRequest(fetchRequest) as? [Bookmark]
+            let results = try context.fetch(fetchRequest) as? [Bookmark]
             return results?.first
         } catch {
             let fetchError = error as NSError
@@ -312,13 +312,13 @@ extension Bookmark {
         return nil
     }
     
-    private static func get(predicate predicate: NSPredicate?) -> [Bookmark]? {
-        let fetchRequest = NSFetchRequest()
+    fileprivate static func get(predicate: NSPredicate?) -> [Bookmark]? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>()
         fetchRequest.entity = Bookmark.entity(DataController.moc)
         fetchRequest.predicate = predicate
         
         do {
-            return try DataController.moc.executeFetchRequest(fetchRequest) as? [Bookmark]
+            return try DataController.moc.fetch(fetchRequest) as? [Bookmark]
         } catch {
             let fetchError = error as NSError
             print(fetchError)
@@ -327,7 +327,7 @@ extension Bookmark {
         return nil
     }
     
-    static func get(syncUUIDs syncUUIDs: [[Int]]?) -> [Bookmark]? {
+    static func get(syncUUIDs: [[Int]]?) -> [Bookmark]? {
         
         guard let syncUUIDs = syncUUIDs else {
             return nil
@@ -355,7 +355,7 @@ extension Bookmark {
         return get(predicate: NSPredicate(format: "syncDisplayUUID == %@", searchableUUID))?.first
     }
     
-    static func getFolders(bookmark: Bookmark?) -> [Bookmark] {
+    static func getFolders(_ bookmark: Bookmark?) -> [Bookmark] {
     
         var predicate: NSPredicate?
         if let parent = bookmark?.parentFolder {
@@ -374,7 +374,7 @@ extension Bookmark {
 
 // Removals
 extension Bookmark {
-    class func remove(forUrl url: NSURL, save: Bool = true) -> Bool {
+    class func remove(forUrl url: URL, save: Bool = true) -> Bool {
         if let bm = get(forUrl: url, context: DataController.moc) as? Bookmark {
             self.remove(bookmark: bm, save: save)
             return true
@@ -382,11 +382,11 @@ extension Bookmark {
         return false
     }
     
-    class func remove(bookmark bookmark: Bookmark, save: Bool = true) {
+    class func remove(bookmark: Bookmark, save: Bool = true) {
         // Must happen before, otherwise bookmark is gone
         Sync.shared.sendSyncRecords(.bookmark, action: .delete, bookmarks: [bookmark])
 
-        DataController.moc.deleteObject(bookmark)
+        DataController.moc.delete(bookmark)
         if save {
             DataController.saveContext()
         }

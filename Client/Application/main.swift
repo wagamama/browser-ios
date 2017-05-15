@@ -7,4 +7,4 @@ import Shared
 private var appDelegate: AppDelegate.Type
 appDelegate = AppDelegate.self
 
-UIApplicationMain(Process.argc, Process.unsafeArgv, NSStringFromClass(UIApplication.self), NSStringFromClass(appDelegate))
+UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, NSStringFromClass(UIApplication.self), NSStringFromClass(appDelegate))

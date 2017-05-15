@@ -8,11 +8,11 @@ import Shared
 
 private let log = Logger.syncLogger
 
-public class SQLiteBookmarks: BookmarksModelFactorySource {
+open class SQLiteBookmarks: BookmarksModelFactorySource {
     let db: BrowserDB
     let favicons: FaviconsTable<Favicon>
 
-    public lazy var modelFactory: Deferred<Maybe<BookmarksModelFactory>> =
+    open lazy var modelFactory: Deferred<Maybe<BookmarksModelFactory>> =
         deferMaybe(SQLiteBookmarksModelFactory(bookmarks: self, direction: .Local))
 
     public init(db: BrowserDB) {

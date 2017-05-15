@@ -6,7 +6,7 @@ import Shared
 public final class SyncRoot {
     
     // MARK: Declaration for string constants to be used to decode and also serialize.
-    private struct SerializationKeys {
+    fileprivate struct SerializationKeys {
         static let objectId = "objectId"
         static let deviceId = "deviceId"
         static let action = "action"
@@ -78,21 +78,21 @@ public final class SyncRoot {
     public func dictionaryRepresentation() -> [String: AnyObject] {
         var dictionary: [String: AnyObject] = [:]
         // Override to use string value instead of array, to be uniform to CD
-        if let value = objectId { dictionary[SerializationKeys.objectId] = value }
-        if let value = deviceId { dictionary[SerializationKeys.deviceId] = value }
-        if let value = action { dictionary[SerializationKeys.action] = value }
-        if let value = bookmark { dictionary[SerializationKeys.bookmark] = value.dictionaryRepresentation() }
-        if let value = objectData { dictionary[SerializationKeys.objectData] = value }
+        if let value = objectId { dictionary[SerializationKeys.objectId] = value as AnyObject }
+        if let value = deviceId { dictionary[SerializationKeys.deviceId] = value as AnyObject }
+        if let value = action { dictionary[SerializationKeys.action] = value as AnyObject }
+        if let value = bookmark { dictionary[SerializationKeys.bookmark] = value.dictionaryRepresentation() as AnyObject }
+        if let value = objectData { dictionary[SerializationKeys.objectData] = value as AnyObject }
         return dictionary
     }
 }
 
 extension SyncRoot {
-    static func syncObject(rootJSON: [JSON]) -> [SyncRoot]? {
+    static func syncObject(_ rootJSON: [JSON]) -> [SyncRoot]? {
         return rootJSON.map { SyncRoot(json: $0) }
     }
     
-    static func syncObject(data: [[String: AnyObject]]) -> [SyncRoot]? {
+    static func syncObject(_ data: [[String: AnyObject]]) -> [SyncRoot]? {
         return data.map { SyncRoot(object: $0) }
     }
 }

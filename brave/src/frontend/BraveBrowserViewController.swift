@@ -5,9 +5,18 @@ import SnapKit
 import SafariServices
 
 class BraveBrowserViewController : BrowserViewController {
+    private static var __once: () = {
+            if BraveApp.shouldRestoreTabs() && !PrivateBrowsing.singleton.isOn {
+                // Only do tab restoration if in normal mode.
+                //  If in PM, restoration happens on leaving.
+                tabManager.restoreTabs()
+            } else {
+                tabManager.addTabAndSelect()
+            }
+        }()
     var historySwiper = HistorySwiper()
 
-    override func applyTheme(themeName: String) {
+    override func applyTheme(_ themeName: String) {
         super.applyTheme(themeName)
 
         toolbar?.accessibilityLabel = "bottomToolbar"
@@ -19,7 +28,7 @@ class BraveBrowserViewController : BrowserViewController {
         toolbar?.applyTheme(themeName)
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         struct RunOnceAtStartup { static var ran = false }
@@ -33,7 +42,7 @@ class BraveBrowserViewController : BrowserViewController {
         //  If Sync is not in the view "hierarchy" it will behavior extremely unpredictably, often just dying in the middle of a promize chain
         //  Added to keyWindow, since it can then be utilized from any VC (e.g. settings modal)
         Sync.shared.webView.alpha = 0.01
-        UIApplication.sharedApplication().keyWindow?.insertSubview(Sync.shared.webView, atIndex: 0)
+        UIApplication.shared.keyWindow?.insertSubview(Sync.shared.webView, at: 0)
         
         // TODO: Remove
         // Makes webview visible for debug logging
@@ -41,7 +50,7 @@ class BraveBrowserViewController : BrowserViewController {
 //        UIApplication.sharedApplication().keyWindow?.addSubview(Sync.shared.webView)
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         let showingIntroScreen = profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil
@@ -54,16 +63,8 @@ class BraveBrowserViewController : BrowserViewController {
         // TODO: Should never call setupConstraints multiple times, this can cause huge headaches. Constraints should mostly be static with adjustments made to those constraints.
         setupConstraints()
 
-        struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
-        dispatch_once(&RunOnceAtStartup.token) {
-            if BraveApp.shouldRestoreTabs() && !PrivateBrowsing.singleton.isOn {
-                // Only do tab restoration if in normal mode.
-                //  If in PM, restoration happens on leaving.
-                tabManager.restoreTabs()
-            } else {
-                tabManager.addTabAndSelect()
-            }
-        }
+        struct RunOnceAtStartup { static var token: Int = 0 }
+        _ = BraveBrowserViewController.__once
 
         updateTabCountUsingTabManager(tabManager, animated: false)
 
@@ -71,28 +72,28 @@ class BraveBrowserViewController : BrowserViewController {
         footerBackdrop.accessibilityLabel = "footerBackdrop"
     }
 
-    func updateBraveShieldButtonState(animated animated: Bool) {
+    func updateBraveShieldButtonState(animated: Bool) {
         guard let s = tabManager.selectedTab?.braveShieldStateSafeAsync.get() else { return }
         let up = s.isNotSet() || !s.isAllOff()
         (urlBar as! BraveURLBarView).setBraveButtonState(shieldsUp: up, animated: animated)
     }
 
-    override func selectedTabChanged(selected: Browser) {
+    override func selectedTabChanged(_ selected: Browser) {
         historySwiper.setup(topLevelView: self.view, webViewContainer: self.webViewContainer)
         for swipe in [historySwiper.goBackSwipe, historySwiper.goForwardSwipe] {
-            selected.webView?.scrollView.panGestureRecognizer.requireGestureRecognizerToFail(swipe)
-            scrollController.panGesture.requireGestureRecognizerToFail(swipe)
+            selected.webView?.scrollView.panGestureRecognizer.require(toFail: swipe)
+            scrollController.panGesture.require(toFail: swipe)
         }
 
         if let webView = selected.webView {
-            webViewContainer.insertSubview(webView, atIndex: 0)
+            webViewContainer.insertSubview(webView, at: 0)
             webView.snp_makeConstraints { make in
                 make.top.equalTo(webViewContainerToolbar.snp_bottom)
                 make.left.right.bottom.equalTo(self.webViewContainer)
             }
 
             urlBar.updateProgressBar(Float(webView.estimatedProgress), dueToTabChange: true)
-            urlBar.updateReloadStatus(webView.loading)
+            urlBar.updateReloadStatus(webView.isLoading)
             updateBraveShieldButtonState(animated: false)
 
             let bravePanel = getApp().braveTopViewController.rightSidePanel
@@ -137,7 +138,7 @@ class BraveBrowserViewController : BrowserViewController {
         heightConstraint?.updateOffset(-BraveApp.statusBarHeight())
     }
     
-    override func updateToolbarStateForTraitCollection(newCollection: UITraitCollection) {
+    override func updateToolbarStateForTraitCollection(_ newCollection: UITraitCollection) {
         super.updateToolbarStateForTraitCollection(newCollection)
 
         heightConstraint?.updateOffset(-BraveApp.statusBarHeight())
@@ -147,7 +148,7 @@ class BraveBrowserViewController : BrowserViewController {
         }
     }
 
-    override func showHomePanelController(inline inline:Bool) {
+    override func showHomePanelController(inline:Bool) {
         super.showHomePanelController(inline: inline)
         postAsyncToMain(0.1) {
             if UIResponder.currentFirstResponder() == nil {
@@ -160,7 +161,7 @@ class BraveBrowserViewController : BrowserViewController {
         super.hideHomePanelController()
 
         // For bizzaro reasons, this can take a few delayed attempts. The first responder is getting set to nil -I *did* search the codebase for any resigns that could cause this.
-        func setSelfAsFirstResponder(attempt: Int) {
+        func setSelfAsFirstResponder(_ attempt: Int) {
             if UIResponder.currentFirstResponder() === self {
                 return
             }
@@ -179,13 +180,13 @@ class BraveBrowserViewController : BrowserViewController {
         }
     }
 
-    func newTabForDesktopSite(url url: NSURL) {
+    func newTabForDesktopSite(url: URL) {
         let tab = tabManager.addTabForDesktopSite()
-        tab.loadRequest(NSURLRequest(URL: url))
+        tab.loadRequest(URLRequest(url: url))
     }
 
     @objc func learnMoreTapped() {
-        UIApplication.sharedApplication().openURL(BraveUX.BravePrivacyURL)
+        UIApplication.shared.openURL(BraveUX.BravePrivacyURL as URL)
     }
 
     func presentOptInDialog() {
@@ -213,27 +214,27 @@ extension BraveBrowserViewController: BraveTermsViewControllerDelegate {
             return
         }
 
-        func showHiddenSafariViewController(controller:SFSafariViewController) {
-            controller.view.userInteractionEnabled = false
+        func showHiddenSafariViewController(_ controller:SFSafariViewController) {
+            controller.view.isUserInteractionEnabled = false
             controller.view.alpha = 0.0
-            controller.view.frame = CGRectZero
+            controller.view.frame = CGRect.zero
             self.addChildViewController(controller)
             self.view.addSubview(controller.view)
-            controller.didMoveToParentViewController(self)
+            controller.didMove(toParentViewController: self)
         }
 
-        func removeHiddenSafariViewController(controller:SFSafariViewController) {
-            controller.willMoveToParentViewController(nil)
+        func removeHiddenSafariViewController(_ controller:SFSafariViewController) {
+            controller.willMove(toParentViewController: nil)
             controller.view.removeFromSuperview()
             controller.removeFromParentViewController()
         }
 
-        let mixpanelToken = NSBundle.mainBundle().infoDictionary?["MIXPANEL_TOKEN"] ?? "no-token"
-        let callbackData = "{'event':'install','properties':{'product':'brave-ios','token':'\(mixpanelToken)','version':'/\(getApp().appVersion)'}}".stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet()) ?? "no-data"
-        let base64Encoded = callbackData.dataUsingEncoding(NSUTF8StringEncoding)?.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue: 0)) ?? "no-base64"
+        let mixpanelToken = Bundle.main.infoDictionary?["MIXPANEL_TOKEN"] ?? "no-token"
+        let callbackData = "{'event':'install','properties':{'product':'brave-ios','token':'\(mixpanelToken)','version':'/\(getApp().appVersion)'}}".addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "no-data"
+        let base64Encoded = callbackData.data(using: String.Encoding.utf8)?.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0)) ?? "no-base64"
         let callbackUrl = "https://metric-proxy.brave.com/track?data=" + base64Encoded
 
-        let sf = SFSafariViewController(URL: NSURL(string: callbackUrl)!)
+        let sf = SFSafariViewController(url: URL(string: callbackUrl)!)
         showHiddenSafariViewController(sf)
 
         postAsyncToMain(15) {
@@ -249,7 +250,7 @@ extension UIResponder {
     }
 
     static func currentFirstResponder() -> UIResponder? {
-        if (UIApplication.sharedApplication().sendAction(#selector(findFirstResponder), to: nil, from: nil, forEvent: nil)) {
+        if (UIApplication.shared.sendAction(#selector(findFirstResponder), to: nil, from: nil, for: nil)) {
             return _firstResponder
         } else {
             return nil
