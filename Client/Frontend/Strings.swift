@@ -282,6 +282,8 @@ extension Strings {
     public static let Block_Popups = NSLocalizedString("Block Popups", comment: "Setting to enable popup blocking")
     public static let Show_Tabs_Bar = NSLocalizedString("Show Tabs Bar", comment: "Setting to show/hide the tabs bar")
     public static let Private_Browsing_Only = NSLocalizedString("Private Browsing Only", comment: "Setting to keep app in private mode")
+    public static let Browser_Lock = NSLocalizedString("Browser Lock", comment: "Setting to enable browser pin locking")
+    public static let Change_Pin = NSLocalizedString("Pin", comment: "Setting to change browser lock pin")
     public static let Brave_Shield_Defaults = NSLocalizedString("Brave Shield Defaults", comment: "Section title for adbblock, tracking protection, HTTPS-E, and cookies")
     public static let Block_Ads_and_Tracking = NSLocalizedString("Block Ads & Tracking", comment: "")
     public static let HTTPS_Everywhere = NSLocalizedString("HTTPS Everywhere", comment: "")
