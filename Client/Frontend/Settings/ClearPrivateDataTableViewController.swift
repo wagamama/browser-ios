@@ -20,6 +20,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
     private var clearButton: UITableViewCell?
 
     var profile: Profile!
+    var savedTabs: [SavedTab]?
 
     private var gotNotificationDeathOfAllWebViews = false
 
@@ -164,7 +165,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
             } else {
                 ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(dispatch_get_main_queue()) {
                     // TODO: add API to avoid add/remove
-                    getApp().tabManager.removeTab(getApp().tabManager.addTab()!, createTabIfNoneLeft: true)
+                    getApp().tabManager.restoreTabs()
                 }
             }
 
@@ -185,7 +186,12 @@ class ClearPrivateDataTableViewController: UITableViewController {
         if (BraveWebView.allocCounter == 0) {
             allWebViewsKilled()
         } else {
-            getApp().tabManager.removeAll()
+            var flushToDisk = false
+            if self.toggles[0] {
+                // Remove from TabMO only when Browsing History is toggled
+                flushToDisk = true
+            }
+            getApp().tabManager.removeAll(flushToDisk)
             postAsyncToMain(0.5, closure: {
                 if !self.gotNotificationDeathOfAllWebViews {
                     getApp().tabManager.tabs.internalTabList.forEach { $0.deleteWebView(isTabDeleted: true) }

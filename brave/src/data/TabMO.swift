@@ -50,8 +50,7 @@ extension TabManager {
     }
 
     func restoreTabs() {
-        struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
-        dispatch_once(&RunOnceAtStartup.token, restoreTabsInternal)
+        restoreTabsInternal()
     }
 
     private func restoreTabsInternal() {
@@ -88,7 +87,7 @@ extension TabManager {
         if tabCount > 0 {
             delegates.forEach { $0.value?.tabManagerDidRestoreTabs(self) }
         } else {
-            tabToSelect = addTab()
+            tabToSelect = addTab(id: TabMO.freshTab())
         }
 
         if let tab = tabToSelect {
