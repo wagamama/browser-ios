@@ -350,10 +350,8 @@ class TabManager : NSObject {
         }
         tabs.removeTab(tab)
 
-        if flushToDisk {
-            if let tabID = tab.tabID {
-                TabMO.removeTab(tabID)
-            }
+        if let tabID = tab.tabID {
+            TabMO.removeTab(tabID)
         }
         
         // There's still some time between this and the webView being destroyed.
@@ -375,9 +373,7 @@ class TabManager : NSObject {
             selectTab(tabs.displayedTabsForCurrentPrivateMode.first)
         }
         
-        if flushToDisk {
-            preserveTabs()
-        }
+        preserveTabs()
     }
 
     /// Removes all private tabs from the manager.
@@ -394,12 +390,12 @@ class TabManager : NSObject {
         }
     }
 
-    func removeAll(flushToDisk: Bool) {
+    func removeAll() {
         objc_sync_enter(self); defer { objc_sync_exit(self) }
         let tabs = self.tabs
 
         for tab in tabs.internalTabList {
-            self.removeTab(tab, flushToDisk: flushToDisk, notify: true, createTabIfNoneLeft: false)
+            self.removeTab(tab, flushToDisk: false, notify: true, createTabIfNoneLeft: false)
         }
     }
 

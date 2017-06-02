@@ -50,7 +50,8 @@ extension TabManager {
     }
 
     func restoreTabs() {
-        restoreTabsInternal()
+        struct RunOnceAtStartup { static var token: dispatch_once_t = 0 }
+        dispatch_once(&RunOnceAtStartup.token, restoreTabsInternal)
     }
 
     private func restoreTabsInternal() {

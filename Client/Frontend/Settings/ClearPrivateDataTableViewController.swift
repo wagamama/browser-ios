@@ -20,27 +20,28 @@ class ClearPrivateDataTableViewController: UITableViewController {
     private var clearButton: UITableViewCell?
 
     var profile: Profile!
-    var savedTabs: [SavedTab]?
 
     private var gotNotificationDeathOfAllWebViews = false
 
-    private typealias DefaultCheckedState = Bool
-
-    private lazy var clearables: [(clearable: Clearable, checked: DefaultCheckedState)] = {
+    private lazy var clearables: [Clearable] = {
         return [
-            (HistoryClearable(), true),
-            (CacheClearable(), true),
-            (CookiesClearable(), true),
-            (PasswordsClearable(profile: self.profile), true),
+            HistoryClearable(),
+            CacheClearable(),
+            CookiesClearable(),
+            PasswordsClearable(profile: self.profile),
             ]
     }()
 
-    private lazy var toggles: [Bool] = {
-        if let savedToggles = self.profile.prefs.arrayForKey(TogglesPrefKey) as? [Bool] {
+    private lazy var toggles: [String: Bool] = {
+        if let savedToggles = self.profile.prefs.dictionaryForKey(TogglesPrefKey) as? [String: Bool] {
             return savedToggles
         }
 
-        return self.clearables.map { $0.checked }
+        var clearableToggles = [String: Bool]()
+        for i in 0..<self.clearables.count {
+            clearableToggles[self.clearables[i].label] = true
+        }
+        return clearableToggles
     }()
 
     private var clearButtonEnabled = true {
@@ -67,11 +68,11 @@ class ClearPrivateDataTableViewController: UITableViewController {
         let cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: nil)
 
         if indexPath.section == SectionToggles {
-            cell.textLabel?.text = clearables[indexPath.item].clearable.label
+            cell.textLabel?.text = clearables[indexPath.item].label
             let control = UISwitch()
             control.onTintColor = UIConstants.ControlTintColor
             control.addTarget(self, action: #selector(ClearPrivateDataTableViewController.switchValueChanged(_:)), forControlEvents: UIControlEvents.ValueChanged)
-            control.on = toggles[indexPath.item]
+            control.on = toggles[clearables[indexPath.item].label]!
             cell.accessoryView = control
             cell.selectionStyle = .None
             control.tag = indexPath.item
@@ -148,8 +149,8 @@ class ClearPrivateDataTableViewController: UITableViewController {
         postAsyncToMain(0.5) { // for some reason, even after all webviews killed, an big delay is needed before the filehandles are unlocked
             var clear = [Clearable]()
             for i in 0..<self.clearables.count {
-                if self.toggles[i] {
-                    clear.append(self.clearables[i].clearable)
+                if self.toggles[self.clearables[i].label]! {
+                    clear.append(self.clearables[i])
                 }
             }
 
@@ -165,7 +166,7 @@ class ClearPrivateDataTableViewController: UITableViewController {
             } else {
                 ClearPrivateDataTableViewController.clearPrivateData(clear).uponQueue(dispatch_get_main_queue()) {
                     // TODO: add API to avoid add/remove
-                    getApp().tabManager.restoreTabs()
+                    getApp().tabManager.removeTab(getApp().tabManager.addTab()!, createTabIfNoneLeft: true)
                 }
             }
 
@@ -180,18 +181,13 @@ class ClearPrivateDataTableViewController: UITableViewController {
         self.clearButtonEnabled = false
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
 
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(allWebViewsKilled), name: kNotificationAllWebViewsDeallocated, object: nil)
-
-        if (BraveWebView.allocCounter == 0) {
+        if BraveWebView.allocCounter == 0 || !self.toggles[Strings.Browsing_History]! {
             allWebViewsKilled()
         } else {
-            var flushToDisk = false
-            if self.toggles[0] {
-                // Remove from TabMO only when Browsing History is toggled
-                flushToDisk = true
-            }
-            getApp().tabManager.removeAll(flushToDisk)
+            NSNotificationCenter.defaultCenter().removeObserver(self)
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(allWebViewsKilled), name: kNotificationAllWebViewsDeallocated, object: nil)
+
+            getApp().tabManager.removeAll()
             postAsyncToMain(0.5, closure: {
                 if !self.gotNotificationDeathOfAllWebViews {
                     getApp().tabManager.tabs.internalTabList.forEach { $0.deleteWebView(isTabDeleted: true) }
@@ -210,9 +206,16 @@ class ClearPrivateDataTableViewController: UITableViewController {
     }
 
     @objc func switchValueChanged(toggle: UISwitch) {
-        toggles[toggle.tag] = toggle.on
+        toggles[clearables[toggle.tag].label] = toggle.on
 
         // Dim the clear button if no clearables are selected.
-        clearButtonEnabled = toggles.contains(true)
+        clearButtonEnabled = toggle.on
+        var i = 0
+        while i < self.clearables.count && !clearButtonEnabled {
+            if self.toggles[clearables[i].label]! {
+                clearButtonEnabled = true
+            }
+            i += 1
+        }
     }
 }
